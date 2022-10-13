@@ -1,7 +1,7 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import type { NextPage } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
   return (
@@ -13,10 +13,88 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        Bunt
+        <section className={styles.header}>
+          <h1> BUNT STUDIO 사전 신청 </h1>
+          <h2> 신청 안내</h2>
+          <div className={styles.description}>
+            <div>카드결제시 현장에서 가능합니다.</div>
+            <div>
+              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 금요일
+              수업 사전 신청서입니다.
+            </div>
+          </div>
+
+          <Image
+            src="/buntLogo.png"
+            alt="Bunt logo image"
+            width={350}
+            height={197}
+            objectFit="cover"
+          ></Image>
+        </section>
+        <section className={styles.formField}>
+          <form className={styles.chooseClass}>
+            <h2>클래스 선택</h2>
+            <div className={styles.classSelectForm}>
+              <div className={styles.classSelectCheckBox}>
+                <label className={styles.checkBoxContainer}>
+                  <input type="checkbox" />
+                  <span className={styles.checkmark}></span>
+                </label>
+                <span>10.12 (목) 17:00</span>
+              </div>
+              <div className={styles.formDetail}>Luke</div>
+            </div>
+            <div className={styles.classSelectForm}>
+              <div className={styles.classSelectCheckBox}>
+                <label className={styles.checkBoxContainer}>
+                  <input type="checkbox" />
+                  <span className={styles.checkmark}></span>
+                </label>
+                <span>10.12 (목) 17:00</span>
+              </div>
+              <div className={styles.formDetail}>Bethev</div>
+            </div>
+          </form>
+        </section>
+        <section className={styles.classSelectStudentInfo}>
+          <h2>이름 (입금자명) </h2>
+          <input type="text" name="" id="" placeholder="ex. 김민수(김민수)" />
+        </section>
+        <section className={styles.classSelectStudentInfo}>
+          <h2>연락처</h2>
+          <input type="text" name="" id="" placeholder="01050946369" />
+        </section>
+        <section className={styles.formField}>
+          <form className={styles.chooseClass}>
+            <h2>쿠폰</h2>
+            <div className={styles.classSelectForm}>
+              <div className={styles.classSelectCheckBox}>
+                <label className={styles.checkBoxContainer}>
+                  <input type="checkbox" />
+                  <span className={styles.checkmark}></span>
+                </label>
+                <span>1회</span>
+              </div>
+              <div className={styles.formDetail}>30,000 KRW</div>
+            </div>
+
+            <div className={styles.classSelectForm}>
+              <div className={styles.classSelectCheckBox}>
+                <label className={styles.checkBoxContainer}>
+                  <input type="checkbox" />
+                  <span className={styles.checkmark}></span>
+                </label>
+                <span>4회</span>
+              </div>
+              <div className={styles.formDetail}>30,000 KRW</div>
+            </div>
+          </form>
+        </section>
+        <button>신청하기</button>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
