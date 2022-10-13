@@ -1,6 +1,12 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+
+import firebase from "firebase/app";
+import "firebase/analytics";
+import "firebase/auth";
+import "firebase/firestore";
+
 import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
