@@ -143,7 +143,7 @@ const Home: NextPage = () => {
             try {
               const docRef = await addDoc(collection(db, "enrollment"), {
                 ID: uuidv4(),
-                enrolledDate: firebase.firestore.Timestamp.fromDate(new Date()),
+                enrolledDate: new Date(),
                 classID: process.env.NEXT_PUBLIC_STUDIO_ID,
                 userName: data.name,
                 phoneNumber: data.phone,
