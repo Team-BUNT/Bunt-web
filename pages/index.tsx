@@ -134,13 +134,14 @@ const Home: NextPage = () => {
         <form
           className={styles.chooseClass}
           onSubmit={handleSubmit(async (data) => {
-            const classesId = Object.keys(data)
+            const classeId = Object.keys(data)
               .splice(4)
               .filter((el) => data[el] === true)[0];
 
             try {
               const docRef = await addDoc(collection(db, "enrollment"), {
                 enrolledDate: moment().format(),
+                classID: process.env.NEXT_PUBLIC_STUDIO_ID,
                 userName: data.name,
                 phoneNumber: data.phone,
               });
