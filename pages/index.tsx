@@ -13,6 +13,7 @@ import {
   collection,
   getDocs,
   DocumentReference,
+  doc,
 } from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
@@ -24,6 +25,7 @@ import "moment/locale/ko";
 import styles from "../styles/Home.module.css";
 import BuntImage from "public/buntLogo.png";
 import DanceClass from "./components/DanceClass";
+import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 
 interface IClass {
@@ -140,10 +142,13 @@ const Home: NextPage = () => {
 
             try {
               const docRef = await addDoc(collection(db, "enrollment"), {
-                enrolledDate: moment().format(),
+                ID: uuidv4(),
+                enrolledDate: firebase.firestore.Timestamp.fromDate(new Date()),
                 classID: process.env.NEXT_PUBLIC_STUDIO_ID,
                 userName: data.name,
                 phoneNumber: data.phone,
+                number: 1,
+                paid: false,
               });
               console.log("Document written with ID: ", docRef.id);
             } catch (error) {
