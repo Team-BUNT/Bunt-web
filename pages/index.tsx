@@ -1,15 +1,95 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import type { UseFormRegisterReturn } from "react-hook-form";
 
-import firebase from "firebase/app";
+import firebase from "firebase/compat/app";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from "firebase/firestore/lite";
+import { Firestore } from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 
+import moment from "moment";
+import "moment/locale/ko";
+
 import styles from "../styles/Home.module.css";
+import DanceClass from "./components/DanceClass";
+import { useState } from "react";
+
+interface IClass {
+  instructorName: string;
+  classTime: string;
+  classID: number;
+}
 
 const Home: NextPage = () => {
+  // Firebase
+  // const firebaseConfig = {
+  //   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  //   authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  //   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  //   storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  //   messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  //   appId: process.env.NEXT_PUBLIC_APP_ID,
+  //   measurementId: process.env.NEXT_PUBLIC_MERASUREMENT_ID,
+  // };
+
+  // const app = initializeApp(firebaseConfig);
+  // const db = getFirestore(app);
+
+  // const datas: IClass[] = [];
+
+  // if (!firebase.apps.length) {
+  //   firebase.initializeApp(firebaseConfig);
+  //   firebase.analytics();
+  // }
+
+  // const higgsClasses = async (db: Firestore) => {
+  //   const danceClasses = collection(db, "classes");
+  //   const classSnapshot = await getDocs(danceClasses);
+  //   const classList = classSnapshot.docs.map((doc) => doc.data());
+  //   const higgsStudioClass = classList.filter(
+  //     (aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID
+  //   );
+
+  //   return higgsStudioClass;
+  // };
+
+  // higgsClasses(db).then((value) => {
+  //   value.map((e) => {
+  //     const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
+  //     const { instructorName } = e;
+  //     if (numberParseDay >= 17 && numberParseDay <= 23) {
+  //       const classTime = moment(e.date.toDate()).format(
+  //         "MM월 DD일 (ddd) HH:mm"
+  //       );
+  //       console.log(classTime);
+  //       datas.push({ classTime, instructorName });
+  //     }
+  //   });
+  // });
+
+  const sampleDatas: IClass[] = [
+    { classID: 123, classTime: "10/12 (목) 17:00", instructorName: "Raven" },
+    { classID: 125, classTime: "10/13 (금) 18:00", instructorName: "Luke" },
+    { classID: 130, classTime: "10/14 (토) 19:30", instructorName: "Bethev" },
+  ];
+
+  const classList = sampleDatas.map((v) => (
+    // eslint-disable-next-line react/jsx-key
+    <DanceClass
+      key={v.classID}
+      classTime={v.classTime}
+      instructorName={v.instructorName}
+    />
+  ));
+
+  //TODO: Register DanceClass에 상속
+  const { register, handleSubmit } = useForm();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -25,8 +105,8 @@ const Home: NextPage = () => {
           <div className={styles.description}>
             <div>카드결제시 현장에서 가능합니다.</div>
             <div>
-              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 금요일
-              수업 사전 신청서입니다.
+              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17
+              ~ 10/23 까지의 수업 사전 신청서입니다.
             </div>
           </div>
 
@@ -38,66 +118,68 @@ const Home: NextPage = () => {
             objectFit="cover"
           ></Image>
         </section>
-        <section className={styles.formField}>
-          <form className={styles.chooseClass}>
+        <form
+          className={styles.chooseClass}
+          onSubmit={handleSubmit((data) => alert(JSON.stringify(data)))}
+          method="post"
+        >
+          <section className={styles.formField}>
             <h2>클래스 선택</h2>
-            <div className={styles.classSelectForm}>
-              <div className={styles.classSelectCheckBox}>
-                <label className={styles.checkBoxContainer}>
-                  <input type="checkbox" />
-                  <span className={styles.checkmark}></span>
-                </label>
-                <span>10.12 (목) 17:00</span>
+            {sampleDatas.map((v) => (
+              // eslint-disable-next-line react/jsx-key
+              <DanceClass
+                key={v.classID}
+                classTime={v.classTime}
+                instructorName={v.instructorName}
+              />
+            ))}
+          </section>
+          <section className={styles.classSelectStudentInfo}>
+            <h2>이름 (입금자명) </h2>
+            <input
+              type="text"
+              id=""
+              placeholder="ex. 김민수(김민수)"
+              {...register("name")}
+            />
+          </section>
+          <section className={styles.classSelectStudentInfo}>
+            <h2>연락처</h2>
+            <input
+              type="text"
+              id=""
+              placeholder="01050946369"
+              {...register("phone")}
+            />
+          </section>
+          <section className={styles.formField}>
+            <div className={styles.chooseClass}>
+              <h2>쿠폰</h2>
+              <div className={styles.classSelectForm}>
+                <div className={styles.classSelectCheckBox}>
+                  <label className={styles.checkBoxContainer}>
+                    <input type="checkbox" {...register("ticket1")} />
+                    <span className={styles.checkmark}></span>
+                  </label>
+                  <span>1회</span>
+                </div>
+                <div className={styles.formDetail}>30,000 KRW</div>
               </div>
-              <div className={styles.formDetail}>Luke</div>
-            </div>
-            <div className={styles.classSelectForm}>
-              <div className={styles.classSelectCheckBox}>
-                <label className={styles.checkBoxContainer}>
-                  <input type="checkbox" />
-                  <span className={styles.checkmark}></span>
-                </label>
-                <span>10.12 (목) 17:00</span>
-              </div>
-              <div className={styles.formDetail}>Bethev</div>
-            </div>
-          </form>
-        </section>
-        <section className={styles.classSelectStudentInfo}>
-          <h2>이름 (입금자명) </h2>
-          <input type="text" name="" id="" placeholder="ex. 김민수(김민수)" />
-        </section>
-        <section className={styles.classSelectStudentInfo}>
-          <h2>연락처</h2>
-          <input type="text" name="" id="" placeholder="01050946369" />
-        </section>
-        <section className={styles.formField}>
-          <form className={styles.chooseClass}>
-            <h2>쿠폰</h2>
-            <div className={styles.classSelectForm}>
-              <div className={styles.classSelectCheckBox}>
-                <label className={styles.checkBoxContainer}>
-                  <input type="checkbox" />
-                  <span className={styles.checkmark}></span>
-                </label>
-                <span>1회</span>
-              </div>
-              <div className={styles.formDetail}>30,000 KRW</div>
-            </div>
 
-            <div className={styles.classSelectForm}>
-              <div className={styles.classSelectCheckBox}>
-                <label className={styles.checkBoxContainer}>
-                  <input type="checkbox" />
-                  <span className={styles.checkmark}></span>
-                </label>
-                <span>4회</span>
+              <div className={styles.classSelectForm}>
+                <div className={styles.classSelectCheckBox}>
+                  <label className={styles.checkBoxContainer}>
+                    <input type="checkbox" {...register("ticket2")} />
+                    <span className={styles.checkmark}></span>
+                  </label>
+                  <span>4회</span>
+                </div>
+                <div className={styles.formDetail}>30,000 KRW</div>
               </div>
-              <div className={styles.formDetail}>30,000 KRW</div>
             </div>
-          </form>
-        </section>
-        <button>신청하기</button>
+          </section>
+          <button type="submit">신청하기</button>
+        </form>
       </main>
     </div>
   );
