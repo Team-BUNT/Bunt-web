@@ -120,7 +120,9 @@ const Home: NextPage = () => {
         </section>
         <form
           className={styles.chooseClass}
-          onSubmit={handleSubmit((data) => alert(JSON.stringify(data)))}
+          onSubmit={handleSubmit((data) =>
+            alert(`${data.name}님 수강신청 완료했습니다 !!`)
+          )}
           method="post"
         >
           <section className={styles.formField}>
