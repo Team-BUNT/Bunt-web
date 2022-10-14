@@ -6,8 +6,14 @@ import type { UseFormRegisterReturn } from "react-hook-form";
 
 import firebase from "firebase/compat/app";
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore/lite";
-import { Firestore } from "firebase/firestore";
+import {
+  Firestore,
+  addDoc,
+  getFirestore,
+  collection,
+  getDocs,
+  DocumentReference,
+} from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
@@ -18,75 +24,81 @@ import "moment/locale/ko";
 import styles from "../styles/Home.module.css";
 import BuntImage from "public/buntLogo.png";
 import DanceClass from "./components/DanceClass";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IClass {
   instructorName: string;
   classTime: string;
-  classID: number;
+  classID: string;
+}
+
+interface IEnrollment {
+  name: string;
+  phone: string;
 }
 
 const Home: NextPage = () => {
   // Firebase
-  // const firebaseConfig = {
-  //   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  //   authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-  //   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-  //   storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-  //   messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-  //   appId: process.env.NEXT_PUBLIC_APP_ID,
-  //   measurementId: process.env.NEXT_PUBLIC_MERASUREMENT_ID,
-  // };
 
-  // const app = initializeApp(firebaseConfig);
-  // const db = getFirestore(app);
+  const [enrollment, setEnrollment] = useState<IClass[]>([]);
+  const datas: IClass[] = [];
 
-  // const datas: IClass[] = [];
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_MERASUREMENT_ID,
+  };
 
-  // if (!firebase.apps.length) {
-  //   firebase.initializeApp(firebaseConfig);
-  //   firebase.analytics();
-  // }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  // const higgsClasses = async (db: Firestore) => {
-  //   const danceClasses = collection(db, "classes");
-  //   const classSnapshot = await getDocs(danceClasses);
-  //   const classList = classSnapshot.docs.map((doc) => doc.data());
-  //   const higgsStudioClass = classList.filter(
-  //     (aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID
-  //   );
+  useEffect(() => {
+    // const classList = enrollment.map((v) => (
+    //   // eslint-disable-next-line react/jsx-key
+    //   <DanceClass
+    //     key={v.classID}
+    //     classTime={v.classTime}
+    //     instructorName={v.instructorName}
+    //   />
+    // ));
 
-  //   return higgsStudioClass;
-  // };
+    const higgsClasses = async (db: Firestore) => {
+      const danceClasses = collection(db, "classes");
+      const classSnapshot = await getDocs(danceClasses);
+      const classList = classSnapshot.docs.map((doc) => doc.data());
+      const higgsStudioClass = classList.filter(
+        (aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID
+      );
 
-  // higgsClasses(db).then((value) => {
-  //   value.map((e) => {
-  //     const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
-  //     const { instructorName } = e;
-  //     if (numberParseDay >= 17 && numberParseDay <= 23) {
-  //       const classTime = moment(e.date.toDate()).format(
-  //         "MM월 DD일 (ddd) HH:mm"
-  //       );
-  //       console.log(classTime);
-  //       datas.push({ classTime, instructorName });
-  //     }
-  //   });
-  // });
+      return higgsStudioClass;
+    };
 
-  const sampleDatas: IClass[] = [
-    { classID: 123, classTime: "10/12 (목) 17:00", instructorName: "Raven" },
-    { classID: 125, classTime: "10/13 (금) 18:00", instructorName: "Luke" },
-    { classID: 130, classTime: "10/14 (토) 19:30", instructorName: "Bethev" },
-  ];
+    higgsClasses(db).then((value) => {
+      value.map((e) => {
+        const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
+        const { instructorName } = e;
+        if (numberParseDay >= 17 && numberParseDay <= 23) {
+          const classTime = moment(e.date.toDate()).format(
+            "MM월 DD일 (ddd) HH:mm"
+          );
 
-  const classList = sampleDatas.map((v) => (
-    // eslint-disable-next-line react/jsx-key
-    <DanceClass
-      key={v.classID}
-      classTime={v.classTime}
-      instructorName={v.instructorName}
-    />
-  ));
+          datas.push({ classID: e.ID, classTime, instructorName });
+        }
+      });
+
+      let sortClass = datas.sort(
+        (a, b) =>
+          a.instructorName[0].charCodeAt(0) - b.instructorName[0].charCodeAt(0)
+      );
+
+      setEnrollment(sortClass);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //TODO: Register DanceClass에 상속
   const { register, handleSubmit } = useForm();
@@ -121,21 +133,46 @@ const Home: NextPage = () => {
         </section>
         <form
           className={styles.chooseClass}
-          onSubmit={handleSubmit((data) =>
-            alert(`${data.name}님 수강신청 완료했습니다 !!`)
-          )}
+          onSubmit={handleSubmit(async (data) => {
+            const classesId = Object.keys(data)
+              .splice(4)
+              .filter((el) => data[el] === true)[0];
+
+            try {
+              const docRef = await addDoc(collection(db, "enrollment"), {
+                enrolledDate: moment().format(),
+                userName: data.name,
+                phoneNumber: data.phone,
+              });
+              console.log("Document written with ID: ", docRef.id);
+            } catch (error) {
+              console.log(error);
+            }
+
+            alert(`${data.name}님  수강신청 완료했습니다 !!`);
+          })}
           method="post"
         >
           <section className={styles.formField}>
             <h2>클래스 선택</h2>
-            {sampleDatas.map((v) => (
-              // eslint-disable-next-line react/jsx-key
-              <DanceClass
-                key={v.classID}
-                classTime={v.classTime}
-                instructorName={v.instructorName}
-              />
-            ))}
+            <>
+              {enrollment.map((aClass) => (
+                <>
+                  <div className={styles.classSelectForm}>
+                    <div className={styles.classSelectCheckBox}>
+                      <label className={styles.checkBoxContainer}>
+                        <input type="checkbox" {...register(aClass.classID)} />
+                        <span className={styles.checkmark}></span>
+                      </label>
+                      <span>{aClass.classTime}</span>
+                    </div>
+                    <div className={styles.formDetail}>
+                      {aClass.instructorName}
+                    </div>
+                  </div>
+                </>
+              ))}
+            </>
           </section>
           <section className={styles.classSelectStudentInfo}>
             <h2>이름 (입금자명) </h2>
@@ -177,7 +214,7 @@ const Home: NextPage = () => {
                   </label>
                   <span>4회</span>
                 </div>
-                <div className={styles.formDetail}>30,000 KRW</div>
+                <div className={styles.formDetail}>120,000 KRW</div>
               </div>
             </div>
           </section>

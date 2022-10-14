@@ -1295,6 +1295,7 @@ __metadata:
     moment: ^2.29.4
     next: 12.3.1
     react: 18.2.0
+    react-async: ^10.0.1
     react-dom: 18.2.0
     react-hook-form: ^7.37.0
     typescript: ^4.8.4
@@ -3179,6 +3180,15 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: b676f8c040cdc5b12723ad2f91414d267605b26419d5c821ff03befa817ddd10e238d22b25d604920340fd73efd8ba795465a0377c4adf45a4a41e4234e42dc4
+  languageName: node
+  linkType: hard
+
+"react-async@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "react-async@npm:10.0.1"
+  peerDependencies:
+    react: ">=16.3.1"
+  checksum: 30d3959f22b66bfbcc11041cacd6635c5e5818e3996a81ea9544bf411fa0aeccefe0f41b24b337f5b6d16db8be90cbdeae367f2f359a9ab615dd73122c3d69d2
   languageName: node
   linkType: hard
 
