@@ -16,6 +16,7 @@ import moment from "moment";
 import "moment/locale/ko";
 
 import styles from "../styles/Home.module.css";
+import BuntImage from "public/buntLogo.png";
 import DanceClass from "./components/DanceClass";
 import { useState } from "react";
 
@@ -111,7 +112,7 @@ const Home: NextPage = () => {
           </div>
 
           <Image
-            src="/buntLogo.png"
+            src={BuntImage}
             alt="Bunt logo image"
             width={350}
             height={197}
