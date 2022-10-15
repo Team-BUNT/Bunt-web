@@ -144,7 +144,7 @@ const Home: NextPage = () => {
               const docRef = await addDoc(collection(db, "enrollment"), {
                 ID: uuidv4(),
                 enrolledDate: new Date(),
-                classID: process.env.NEXT_PUBLIC_STUDIO_ID,
+                classID: classeId,
                 userName: data.name,
                 phoneNumber: data.phone,
                 number: 1,
@@ -154,7 +154,7 @@ const Home: NextPage = () => {
             } catch (error) {
               console.log(error);
             }
-
+            console.log(JSON.stringify(data));
             alert(`${data.name}님  수강신청 완료했습니다 !!`);
           })}
           method="post"
