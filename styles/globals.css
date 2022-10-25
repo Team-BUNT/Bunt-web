@@ -100,9 +100,14 @@ nav,
 section {
   display: block;
 }
+html {
+  font-size: 62.5%;
+}
+
 body {
+  width: 100%;
+  height: 100%;
   line-height: 1;
-  font-size: 12px;
   font-family: "SF Pro Text", sans-serif;
 }
 ol,
@@ -123,6 +128,18 @@ q:after {
 table {
   border-collapse: collapse;
   border-spacing: 0;
+}
+
+a {
+  cursor: pointer;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
 }
 
 @media (prefers-color-scheme: dark) {

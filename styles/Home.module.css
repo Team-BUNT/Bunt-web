@@ -1,9 +1,20 @@
-.main {
+.container {
   width: 100%;
-  height: 110vh;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  max-width: 65.5rem;
+  min-width: 39rem;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  align-items: center;
+  padding: 2rem;
+  margin-top: 7rem;
 }
 
 .main h2 {
@@ -37,18 +48,11 @@
   transition: background-color 0.5 ease-in-out;
 }
 
-.container {
-  width: 390px;
-  height: 100vh;
-  margin: 0 auto;
-}
-
 .header h1 {
   font-family: "Montserrat", "Arial Narrow", Arial, sans-serif;
-  font-size: 2rem;
-  font-weight: 400;
-  margin-top: 40px;
-  margin-bottom: 50px;
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 2.2rem;
 }
 
 .header h2 {
@@ -58,14 +62,33 @@
   margin-bottom: 9px;
 }
 
-.header .description {
-  font-size: 1.1rem;
+.header .imageContainer {
+  width: 100%;
+  margin-top: 2.3rem;
+}
+
+.main .description {
+  width: 100%;
+  font-size: 1.7rem;
   color: #b8b8b8;
-  line-height: 1.6;
+  line-height: 2.8rem;
+}
+
+.main .description h2 {
+  font-size: 1.9rem;
+  color: white;
+}
+
+.main .subDescription {
+  margin-top: 2.2rem;
+}
+
+.chooseClass {
+  width: 100%;
 }
 
 .formField .classSelectForm {
-  width: 350px;
+  width: 100%;
   font-size: 1.1rem;
   display: flex;
   justify-content: space-between;
@@ -79,7 +102,7 @@
 }
 
 .formField .classSelectForm .classSelectCheckBox {
-  width: 210px;
+  width: 21rem;
   gap: 10px;
   color: #a4a4a4;
   display: flex;
@@ -87,18 +110,23 @@
 }
 
 .classSelectStudentInfo {
-  width: 350px;
+  width: 100%;
 }
+
+.classSelectStudentInfo h2 {
+  font-size: 1.9rem;
+}
+
 .classSelectStudentInfo input {
   margin: 0 auto;
-  width: 350px;
+  width: calc(100% - 3rem);
   height: 30px;
   font-size: 1.2rem;
   letter-spacing: 1.5px;
   border: 0;
   border-radius: 10px;
-  padding: 15px;
-  margin-top: 0.2rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
   background-color: #1c1c1e;
 }
 

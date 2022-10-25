@@ -38,9 +38,45 @@ interface IEnrollment {
   phone: string;
 }
 
-const Home: NextPage = () => {
-  // Firebase
+interface ICoupon {
+  title: string;
+  value: number;
+}
 
+const Home: NextPage = () => {
+  const coupons = [
+    {
+      title: "1class",
+      value: 30_000,
+    },
+    {
+      title: "2class",
+      value: 55_000,
+    },
+    {
+      title: "3class",
+      value: 80_000,
+    },
+    {
+      title: "4class",
+      value: 100_000,
+    },
+    {
+      title: "5class",
+      value: 120_000,
+    },
+    {
+      title: "8class",
+      value: 180_000,
+    },
+    {
+      title: "free pass",
+      value: 400_000,
+    },
+  ];
+
+  // Firebase
+  const [newFlareCoupones, setCoupon] = useState<ICoupon[]>(coupons);
   const [enrollment, setEnrollment] = useState<IClass[]>([]);
   const datas: IClass[] = [];
 
@@ -117,23 +153,33 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <section className={styles.header}>
-          <h1> NewFlare 사전 신청 </h1>
-          <h2> 신청 안내</h2>
-          <div className={styles.description}>
-            <div>카드결제시 현장에서 가능합니다.</div>
-            <div>
-              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17
-              ~ 10/23 까지의 수업 사전 신청서입니다.
-            </div>
+          <h1> 10월 CLASS </h1>
+          <div className={styles.imageContainer}>
+            <Image
+              src={NFStudioBannerImage}
+              alt="NewFlare Studio Banner image"
+              objectFit="cover"
+              objectPosition="center"
+            ></Image>
           </div>
-
-          <Image
-            src={NFStudioBannerImage}
-            alt="NewFlare Studio Banner image"
-            objectFit="cover"
-            objectPosition="center"
-          ></Image>
         </section>
+        <div className={styles.description}>
+          <h2>Class Price</h2>
+          <div>쿠폰 (사용 기간 1개월)</div>
+          <>
+            {newFlareCoupones.map((aCoupon) => (
+              // eslint-disable-next-line react/jsx-key
+              <div
+                key={aCoupon.title}
+              >{`${aCoupon.title} -> ${aCoupon.value}`}</div>
+            ))}
+          </>
+          <div className={styles.subDescription}>
+            <div>정규 수업신청시</div>
+            <div>한 과목만 수강 한 달 4회 기준(1회 연장 사용 가능)</div>
+            <div>100,000</div>
+          </div>
+        </div>
         <form
           className={styles.chooseClass}
           onSubmit={handleSubmit(async (data) => {
@@ -155,11 +201,38 @@ const Home: NextPage = () => {
             } catch (error) {
               console.log(error);
             }
-            console.log(JSON.stringify(data));
+
             alert(`${data.name}님  수강신청 완료했습니다 !!`);
           })}
           method="post"
         >
+          <section className={styles.classSelectStudentInfo}>
+            <h2>이름 (입금자명) </h2>
+            <input
+              type="text"
+              id=""
+              placeholder="ex. 김민수(김민수)"
+              {...register("name")}
+            />
+          </section>
+          <section className={styles.classSelectStudentInfo}>
+            <h2>전화번호</h2>
+            <input
+              type="text"
+              id=""
+              placeholder="010-5094-6369"
+              {...register("phone")}
+            />
+          </section>
+          <section className={styles.classSelectStudentInfo}>
+            <h2>수업신청 (날짜&강사명) 복수기제 가능</h2>
+            <input
+              type="text"
+              id=""
+              placeholder="콤마를 이용해 구분해주세요"
+              {...register("classRequest")}
+            />
+          </section>
           <section className={styles.formField}>
             <h2>클래스 선택</h2>
             <>
@@ -181,24 +254,7 @@ const Home: NextPage = () => {
               ))}
             </>
           </section>
-          <section className={styles.classSelectStudentInfo}>
-            <h2>이름 (입금자명) </h2>
-            <input
-              type="text"
-              id=""
-              placeholder="ex. 김민수(김민수)"
-              {...register("name")}
-            />
-          </section>
-          <section className={styles.classSelectStudentInfo}>
-            <h2>연락처</h2>
-            <input
-              type="text"
-              id=""
-              placeholder="01050946369"
-              {...register("phone")}
-            />
-          </section>
+
           <section className={styles.formField}>
             <div className={styles.chooseClass}>
               <h2>쿠폰</h2>
