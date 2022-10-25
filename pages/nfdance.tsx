@@ -81,8 +81,10 @@ const Home: NextPage = () => {
     NewFlareDanceClass(db).then((value) => {
       value.map((e) => {
         const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
+        const today = Number(moment().format("DD"));
+
         const { instructorName } = e;
-        if (numberParseDay >= 17 && numberParseDay <= 23) {
+        if (numberParseDay >= today && numberParseDay <= today + 7) {
           const classTime = moment(e.date.toDate()).format(
             "MM월 DD일 (ddd) HH:mm"
           );
@@ -93,7 +95,8 @@ const Home: NextPage = () => {
 
       let sortClass = datas.sort(
         (a, b) =>
-          a.instructorName[0].charCodeAt(0) - b.instructorName[0].charCodeAt(0)
+          Number(a.classTime.split(" ")[1].replace("일", "")) -
+          Number(b.classTime.split(" ")[1].replace("일", ""))
       );
 
       setEnrollment(sortClass);
