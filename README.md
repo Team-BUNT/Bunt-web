@@ -34,8 +34,7 @@
 
 - [ ] 프로젝트 구조 개편 및 Component 재구성
 - [ ] Validation을 위한 모델 로직 분리
-- [ ] Api 호출 로직 개선
-- [ ] Firebase 모델 로직 분리
+- [ ] Firebase Api 호출 로직 개선 및 모델 분리
 
 #### Update form
 
