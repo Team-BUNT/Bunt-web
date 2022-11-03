@@ -16,6 +16,7 @@ import { Firestore, addDoc, getFirestore, collection, getDocs } from "firebase/f
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
+import HeadMeta from "./components/HeadMeta";
 
 interface IClass {
   instructorName: string;
@@ -72,11 +73,7 @@ const Home: NextPage = () => {
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>Bunt</title>
-        <meta name="description" content="스튜디오 클래스별 신청폼 작성을 도와주는 서비스입니다." />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <HeadMeta title="Bunt"></HeadMeta>
 
       <main className={styles.main}>
         <ClassDescription
