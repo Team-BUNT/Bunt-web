@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useState } from "react";
-
 import styles from "../../styles/Home.module.css";
+
+import { ChangeEvent, useState } from "react";
 
 import { FieldValues, UseFormRegister, useFormState } from "react-hook-form";
 
@@ -11,7 +11,7 @@ interface IClass {
   register: UseFormRegister<FieldValues>;
 }
 
-const DanceClass = ({ classTime, instructorName, classID, register }: IClass) => {
+const StudioDanceClass = ({ classTime, instructorName, classID, register }: IClass) => {
   const [checked, setChecked] = useState(false);
 
   const checkHandler = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked);
@@ -30,4 +30,4 @@ const DanceClass = ({ classTime, instructorName, classID, register }: IClass) =>
   );
 };
 
-export default DanceClass;
+export default StudioDanceClass;

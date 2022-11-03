@@ -1,8 +1,9 @@
-import React from "react";
-import { FieldValues, UseFormRegister } from "react-hook-form";
-import styles from "../../styles/Home.module.css";
 import StudentCoupons from "./StudentCoupons";
 import StudentInformation from "./StudentInformation";
+
+import React from "react";
+
+import { FieldValues, UseFormRegister } from "react-hook-form";
 
 interface IReactHookFormRegister {
   register: UseFormRegister<FieldValues>;

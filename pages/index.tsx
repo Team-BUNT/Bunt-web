@@ -1,24 +1,21 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useForm } from "react-hook-form";
+import styles from "../styles/Home.module.css";
+import ClassDescription from "./components/StudioDescription";
+import StudioClassCheckList from "./components/StudioClassCheckList";
+import StudentInputForm from "./components/StudentInputForm";
 
+import type { NextPage } from "next";
+import { useEffect, useState } from "react";
+import Head from "next/head";
+
+import { useForm } from "react-hook-form";
+import moment from "moment";
+import "moment/locale/ko";
+import { v4 as uuidv4 } from "uuid";
 import { initializeApp } from "firebase/app";
-import { Firestore, addDoc, getFirestore, collection, getDocs, DocumentReference, doc } from "firebase/firestore";
+import { Firestore, addDoc, getFirestore, collection, getDocs } from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
-
-import moment from "moment";
-import "moment/locale/ko";
-
-import styles from "../styles/Home.module.css";
-
-import { v4 as uuidv4 } from "uuid";
-import { useEffect, useState } from "react";
-import ClassDescription from "./components/StudioDescription";
-import StudioClassCheckList from "./components/StudioClassCheckList";
-import StudentInformationInput from "./components/StudentInputForm";
-import StudentInputForm from "./components/StudentInputForm";
 
 interface IClass {
   instructorName: string;

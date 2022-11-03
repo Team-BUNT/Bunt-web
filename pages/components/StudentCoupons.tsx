@@ -1,6 +1,8 @@
-import React from "react";
-import { FieldValues, UseFormRegister } from "react-hook-form";
 import styles from "../../styles/Home.module.css";
+
+import React from "react";
+
+import { FieldValues, UseFormRegister } from "react-hook-form";
 
 interface ICoupon {
   count: number;

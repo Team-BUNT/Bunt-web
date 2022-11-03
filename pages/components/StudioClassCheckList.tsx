@@ -1,8 +1,7 @@
-import { FieldValues, UseFormRegister } from "react-hook-form";
-
 import styles from "../../styles/Home.module.css";
-
 import StudioDanceClass from "./StudioDanceClass";
+
+import { FieldValues, UseFormRegister } from "react-hook-form";
 
 interface IClass {
   instructorName: string;

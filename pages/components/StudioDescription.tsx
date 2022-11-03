@@ -1,6 +1,7 @@
-import Image from "next/image";
-import React from "react";
 import styles from "../../styles/Home.module.css";
+
+import React from "react";
+import Image from "next/image";
 
 interface IStudioDescription {
   studioName: string;
