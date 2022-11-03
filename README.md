@@ -1,5 +1,7 @@
 # Bunt
 
+<center><img src="https://user-images.githubusercontent.com/61782746/199677768-cb7b52b1-1b99-417e-9fc1-16affe716bc0.png" width="300" height="300"></center>
+
 > **_Life is on stage_** > **_댄스를 더 가볍게 모두가 스트릿 댄스를 즐길 수 있도록_**
 
 ## Description
