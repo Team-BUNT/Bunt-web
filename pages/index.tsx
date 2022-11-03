@@ -2,9 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import type { UseFormRegisterReturn } from "react-hook-form";
 
-import firebase from "firebase/compat/app";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Firestore, addDoc, getFirestore, collection, getDocs, DocumentReference, doc } from "firebase/firestore";
 import "firebase/analytics";
@@ -51,15 +49,6 @@ const Home: NextPage = () => {
   const db = getFirestore(app);
 
   useEffect(() => {
-    // const classList = enrollment.map((v) => (
-    //   // eslint-disable-next-line react/jsx-key
-    //   <DanceClass
-    //     key={v.classID}
-    //     classTime={v.classTime}
-    //     instructorName={v.instructorName}
-    //   />
-    // ));
-
     const higgsClasses = async (db: Firestore) => {
       const danceClasses = collection(db, "classes");
       const classSnapshot = await getDocs(danceClasses);
@@ -114,20 +103,21 @@ const Home: NextPage = () => {
         <form
           className={styles.chooseClass}
           onSubmit={handleSubmit(async (data) => {
-            const classeId = Object.keys(data)
-              .splice(4)
-              .filter((el) => data[el] === true)[0];
+            const checkedClasses = [...Object.keys(data).splice(4)].filter((checkingClassId) => data[checkingClassId]);
 
             try {
-              const docRef = await addDoc(collection(db, "enrollment"), {
-                ID: uuidv4(),
-                enrolledDate: new Date(),
-                classID: classeId,
-                userName: data.name,
-                phoneNumber: data.phone,
-                number: 1,
-                paid: false,
-              });
+              checkedClasses.length !== 0 &&
+                checkedClasses.forEach(async (checkedClass) => {
+                  const docRef = await addDoc(collection(db, "enrollment"), {
+                    ID: uuidv4(),
+                    enrolledDate: new Date(),
+                    classID: checkedClass,
+                    userName: data.name,
+                    phoneNumber: data.phone,
+                    number: 1,
+                    paid: false,
+                  });
+                });
             } catch (error) {
               console.error(error);
             }
@@ -141,7 +131,13 @@ const Home: NextPage = () => {
             <>
               {enrollment.map((aClass) => (
                 <>
-                  <div className={styles.classSelectForm}>
+                  <DanceClass
+                    classTime={aClass.classTime}
+                    instructorName={aClass.instructorName}
+                    classID={aClass.classID}
+                    register={register}
+                  ></DanceClass>
+                  {/* <div className={styles.classSelectForm}>
                     <div className={styles.classSelectCheckBox}>
                       <label className={styles.checkBoxContainer}>
                         <input type="checkbox" {...register(aClass.classID)} />
@@ -150,7 +146,7 @@ const Home: NextPage = () => {
                       <span>{aClass.classTime}</span>
                     </div>
                     <div className={styles.formDetail}>{aClass.instructorName}</div>
-                  </div>
+                  </div> */}
                 </>
               ))}
             </>

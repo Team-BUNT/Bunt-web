@@ -1,18 +1,26 @@
+import { ChangeEvent, useEffect, useState } from "react";
+
 import styles from "../../styles/Home.module.css";
 
-import * as React from "react";
+import { FieldValues, UseFormRegister, useFormState } from "react-hook-form";
 
 interface IClass {
   classTime: string;
   instructorName: string;
+  classID: string;
+  register: UseFormRegister<FieldValues>;
 }
 
-const DanceClass = ({ classTime, instructorName }: IClass) => {
+const DanceClass = ({ classTime, instructorName, classID, register }: IClass) => {
+  const [checked, setChecked] = useState(false);
+
+  const checkHandler = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked);
+
   return (
     <div className={styles.classSelectForm}>
       <div className={styles.classSelectCheckBox}>
         <label className={styles.checkBoxContainer}>
-          <input type="checkbox" />
+          <input type="checkbox" {...register(classID)} onChange={checkHandler} />
           <span className={styles.checkmark}></span>
         </label>
         <span>{classTime}</span>
