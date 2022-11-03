@@ -24,8 +24,6 @@ interface IClass {
 }
 
 const Home: NextPage = () => {
-  // Firebase
-
   const [enrollment, setEnrollment] = useState<IClass[]>([]);
   const datas: IClass[] = [];
 
@@ -70,7 +68,6 @@ const Home: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //TODO: Register DanceClass에 상속
   const { register, handleSubmit } = useForm();
 
   return (
