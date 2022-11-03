@@ -13,10 +13,10 @@ import moment from "moment";
 import "moment/locale/ko";
 
 import styles from "../styles/Home.module.css";
-import BuntImage from "public/buntLogo.png";
-import DanceClass from "./components/DanceClass";
+import DanceClass from "./components/StudioDanceClass";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
+import ClassDescription from "./components/StudioDescription";
 
 interface IClass {
   instructorName: string;
@@ -88,18 +88,11 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <section className={styles.header}>
-          <h1> BUNT STUDIO 사전 신청 </h1>
-          <h2> 신청 안내</h2>
-          <div className={styles.description}>
-            <div>카드결제시 현장에서 가능합니다.</div>
-            <div>
-              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17 ~ 10/23 까지의 수업 사전 신청서입니다.
-            </div>
-          </div>
-
-          <Image src={BuntImage} alt="Bunt logo image" width={350} height={197} objectFit="cover"></Image>
-        </section>
+        <ClassDescription
+          studioName="Bunt"
+          notice={`카드결제시 현장에서 가능합니다.
+사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17 ~ 10/23 까지의 수업 사전 신청서입니다.`}
+        ></ClassDescription>
         <form
           className={styles.chooseClass}
           onSubmit={handleSubmit(async (data) => {
