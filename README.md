@@ -1,10 +1,10 @@
-# Bunt
+# Introduce Team
 
 <center><img src="https://user-images.githubusercontent.com/61782746/199677768-cb7b52b1-1b99-417e-9fc1-16affe716bc0.png" width="300" height="300"></center>
 
 > **_Life is on stage_** > **_댄스를 더 가볍게 모두가 스트릿 댄스를 즐길 수 있도록_**
 
-## Description
+## Product Description
 
 제휴를 맺은 스튜디오들의 수강생들이 신청폼을 입력하여 수업을 수강하는 서비스입니다.
 
