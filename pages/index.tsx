@@ -18,15 +18,15 @@ import "firebase/auth";
 import "firebase/firestore";
 import HeadMeta from "./components/HeadMeta";
 
-interface IClass {
+interface IClasses {
   instructorName: string;
   classTime: string;
   classID: string;
 }
 
 const Home: NextPage = () => {
-  const [enrollment, setEnrollment] = useState<IClass[]>([]);
-  const datas: IClass[] = [];
+  const [enrollment, setEnrollment] = useState<IClasses[]>([]);
+  const datas: IClasses[] = [];
 
   const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

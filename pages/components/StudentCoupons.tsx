@@ -9,12 +9,12 @@ interface ICoupon {
   price: number;
 }
 
-interface IStudentCoupon {
+interface IStudentCoupons {
   coupons: ICoupon[];
   register: UseFormRegister<FieldValues>;
 }
 
-const StudentCoupons = ({ coupons, register }: IStudentCoupon) => {
+const StudentCoupons = ({ coupons, register }: IStudentCoupons) => {
   return (
     <section className={styles.formField}>
       <div className={styles.chooseClass}>
