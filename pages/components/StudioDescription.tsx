@@ -11,7 +11,7 @@ interface IStudioDescription {
 const ClassDescription = ({ studioName, notice }: IStudioDescription) => {
   return (
     <section className={styles.header}>
-      <h1> BUNT STUDIO 사전 신청 </h1>
+      <h1>{`${studioName} Studio`}</h1>
       <h2>공지사항</h2>
       <div className={styles.description}>
         <div>{notice}</div>
