@@ -1,9 +1,8 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 
-import { FirebaseApp, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { Firestore, addDoc, getFirestore, collection, getDocs, DocumentReference, doc } from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
@@ -13,20 +12,16 @@ import moment from "moment";
 import "moment/locale/ko";
 
 import styles from "../styles/Home.module.css";
-import DanceClass from "./components/StudioDanceClass";
+
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import ClassDescription from "./components/StudioDescription";
+import StudioClassCheckList from "./components/StudioClassCheckList";
 
 interface IClass {
   instructorName: string;
   classTime: string;
   classID: string;
-}
-
-interface IEnrollment {
-  name: string;
-  phone: string;
 }
 
 const Home: NextPage = () => {
@@ -119,21 +114,8 @@ const Home: NextPage = () => {
           })}
           method="post"
         >
-          <section className={styles.formField}>
-            <h2>클래스 선택</h2>
-            <>
-              {enrollment.map((aClass, index) => (
-                <div key={aClass.classID + index}>
-                  <DanceClass
-                    classTime={aClass.classTime}
-                    instructorName={aClass.instructorName}
-                    classID={aClass.classID}
-                    register={register}
-                  ></DanceClass>
-                </div>
-              ))}
-            </>
-          </section>
+          <StudioClassCheckList enrollment={enrollment} register={register}></StudioClassCheckList>
+
           <section className={styles.classSelectStudentInfo}>
             <h2>이름 (입금자명) </h2>
             <input type="text" id="" placeholder="ex. 김민수(김민수)" {...register("name")} />
