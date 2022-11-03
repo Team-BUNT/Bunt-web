@@ -32,14 +32,14 @@
 
 [MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/2)
 
-- [ ] 프로젝트 구조 개편 및 Component 재구성
-- [ ] Validation을 위한 모델 로직 분리
-- [ ] Firebase Api 호출 로직 개선 및 모델 분리
+- [ ] 프로젝트 구조 개편 및 Component 재구성 (https://github.com/Team-BUNT/Bunt-web/issues/8)
+- [ ] Firebase Api 호출 로직 개선 및 모델 분리 (https://github.com/Team-BUNT/Bunt-web/issues/9)
+- [ ] Validation을 위한 모델 로직 분리 (https://github.com/Team-BUNT/Bunt-web/issues/10)
 
 #### Update form
 
 [MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/3)
 
-- [ ] Landing page 제작을 위한 index 수정
-- [ ] Form 제작을 위한 Router 설정
-- [ ] 각 Router에 해당하는 View 제작
+- [ ] Landing page 제작을 위한 index 수정 (https://github.com/Team-BUNT/Bunt-web/issues/11)
+- [ ] 각 Router에 해당하는 View 제작 (https://github.com/Team-BUNT/Bunt-web/issues/11)
+- [ ] Form 제작을 위한 Router 설정 (https://github.com/Team-BUNT/Bunt-web/issues/12)
