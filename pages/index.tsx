@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import ClassDescription from "./components/StudioDescription";
 import StudioClassCheckList from "./components/StudioClassCheckList";
+import StudentInformationInput from "./components/StudentInputForm";
+import StudentInputForm from "./components/StudentInputForm";
 
 interface IClass {
   instructorName: string;
@@ -116,40 +118,7 @@ const Home: NextPage = () => {
         >
           <StudioClassCheckList enrollment={enrollment} register={register}></StudioClassCheckList>
 
-          <section className={styles.classSelectStudentInfo}>
-            <h2>이름 (입금자명) </h2>
-            <input type="text" id="" placeholder="ex. 김민수(김민수)" {...register("name")} />
-          </section>
-          <section className={styles.classSelectStudentInfo}>
-            <h2>연락처</h2>
-            <input type="text" id="" placeholder="01050946369" {...register("phone")} />
-          </section>
-          <section className={styles.formField}>
-            <div className={styles.chooseClass}>
-              <h2>쿠폰</h2>
-              <div className={styles.classSelectForm}>
-                <div className={styles.classSelectCheckBox}>
-                  <label className={styles.checkBoxContainer}>
-                    <input type="checkbox" {...register("ticket1")} />
-                    <span className={styles.checkmark}></span>
-                  </label>
-                  <span>1회</span>
-                </div>
-                <div className={styles.formDetail}>30,000 KRW</div>
-              </div>
-
-              <div className={styles.classSelectForm}>
-                <div className={styles.classSelectCheckBox}>
-                  <label className={styles.checkBoxContainer}>
-                    <input type="checkbox" {...register("ticket2")} />
-                    <span className={styles.checkmark}></span>
-                  </label>
-                  <span>4회</span>
-                </div>
-                <div className={styles.formDetail}>120,000 KRW</div>
-              </div>
-            </div>
-          </section>
+          <StudentInputForm register={register}></StudentInputForm>
           <button type="submit">신청하기</button>
         </form>
       </main>
