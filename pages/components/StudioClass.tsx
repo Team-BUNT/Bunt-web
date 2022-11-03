@@ -11,7 +11,7 @@ interface IClass {
   register: UseFormRegister<FieldValues>;
 }
 
-const StudioDanceClass = ({ classTime, instructorName, classID, register }: IClass) => {
+const StudioClass = ({ classTime, instructorName, classID, register }: IClass) => {
   const [checked, setChecked] = useState(false);
 
   const checkHandler = (e: ChangeEvent<HTMLInputElement>) => setChecked(e.target.checked);
@@ -30,4 +30,4 @@ const StudioDanceClass = ({ classTime, instructorName, classID, register }: ICla
   );
 };
 
-export default StudioDanceClass;
+export default StudioClass;

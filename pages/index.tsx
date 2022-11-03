@@ -5,7 +5,6 @@ import StudentInputForm from "./components/StudentInputForm";
 
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import Head from "next/head";
 
 import { useForm } from "react-hook-form";
 import moment from "moment";

@@ -1,5 +1,5 @@
 import styles from "../../styles/Home.module.css";
-import StudioDanceClass from "./StudioDanceClass";
+import StudioClass from "./StudioClass";
 
 import { FieldValues, UseFormRegister } from "react-hook-form";
 
@@ -21,12 +21,12 @@ const StudioClassCheckList = ({ enrollment, register }: IClassList) => {
       <>
         {enrollment.map((aClass, index) => (
           <div key={aClass.classID + index}>
-            <StudioDanceClass
+            <StudioClass
               classTime={aClass.classTime}
               instructorName={aClass.instructorName}
               classID={aClass.classID}
               register={register}
-            ></StudioDanceClass>
+            ></StudioClass>
           </div>
         ))}
       </>
