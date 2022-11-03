@@ -1,8 +1,44 @@
-# Bunt Form
+# Bunt
 
-## Feature
+> **_Life is on stage_** > **_댄스를 더 가볍게 모두가 스트릿 댄스를 즐길 수 있도록_**
 
-### Firebase
+## Description
 
-- [ ] Firebase에서 스튜디오 class를 가져옵니다.
-- [ ]
+제휴를 맺은 스튜디오들의 수강생들이 신청폼을 입력하여 수업을 수강하는 서비스입니다.
+
+**서비스 이용 시 Bunt팀에서 기대하는 효과는**
+
+1. 수강생들이 매번 변화하는 스튜디오 클래스 상황을 손쉽게 확인할 수 있습니다.
+2. Class를 관리하는 관리자 앱을 통해 관리자는 등록한 수강생들의 결제, 출석 현황을 손쉽게 관리합니다.
+
+## Develop
+
+**Stack**
+
+- Next
+
+### Router
+
+- / : 랜딩페이지를 보여줍니다.
+- /studio : 제휴맺은 스튜디오 리스트를 보여준다.
+- /studio/[id]/login : 이름과 전화번호가 있는 form이 나옵니다.
+- /studio/[id]/form : 이름과 전화번호를 이용하여 firebase에 있는 값과 비교 후 form을 보여줍니다.
+
+### Todo
+
+#### Refactor Bunt-web
+
+[MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/2)
+
+- [ ] Landing page 제작을 위한 index 수정
+- [ ] 프로젝트 구조 개편 및 Component 재구성
+- [ ] Validation을 위한 모델 로직 분리
+- [ ] Api 호출 로직 개선
+- [ ] Firebase 모델 로직 분리
+
+#### Update form
+
+[MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/3)
+
+- [ ] Form 제작을 위한 Router 설정
+- [ ] 각 Router에 해당하는 View 제작
