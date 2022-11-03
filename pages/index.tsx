@@ -129,25 +129,15 @@ const Home: NextPage = () => {
           <section className={styles.formField}>
             <h2>클래스 선택</h2>
             <>
-              {enrollment.map((aClass) => (
-                <>
+              {enrollment.map((aClass, index) => (
+                <div key={aClass.classID + index}>
                   <DanceClass
                     classTime={aClass.classTime}
                     instructorName={aClass.instructorName}
                     classID={aClass.classID}
                     register={register}
                   ></DanceClass>
-                  {/* <div className={styles.classSelectForm}>
-                    <div className={styles.classSelectCheckBox}>
-                      <label className={styles.checkBoxContainer}>
-                        <input type="checkbox" {...register(aClass.classID)} />
-                        <span className={styles.checkmark}></span>
-                      </label>
-                      <span>{aClass.classTime}</span>
-                    </div>
-                    <div className={styles.formDetail}>{aClass.instructorName}</div>
-                  </div> */}
-                </>
+                </div>
               ))}
             </>
           </section>
