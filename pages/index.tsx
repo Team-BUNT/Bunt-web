@@ -6,15 +6,7 @@ import type { UseFormRegisterReturn } from "react-hook-form";
 
 import firebase from "firebase/compat/app";
 import { FirebaseApp, initializeApp } from "firebase/app";
-import {
-  Firestore,
-  addDoc,
-  getFirestore,
-  collection,
-  getDocs,
-  DocumentReference,
-  doc,
-} from "firebase/firestore";
+import { Firestore, addDoc, getFirestore, collection, getDocs, DocumentReference, doc } from "firebase/firestore";
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
@@ -72,9 +64,7 @@ const Home: NextPage = () => {
       const danceClasses = collection(db, "classes");
       const classSnapshot = await getDocs(danceClasses);
       const classList = classSnapshot.docs.map((doc) => doc.data());
-      const higgsStudioClass = classList.filter(
-        (aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID
-      );
+      const higgsStudioClass = classList.filter((aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID);
 
       return higgsStudioClass;
     };
@@ -84,18 +74,13 @@ const Home: NextPage = () => {
         const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
         const { instructorName } = e;
         if (numberParseDay >= 17 && numberParseDay <= 23) {
-          const classTime = moment(e.date.toDate()).format(
-            "MM월 DD일 (ddd) HH:mm"
-          );
+          const classTime = moment(e.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 
           datas.push({ classID: e.ID, classTime, instructorName });
         }
       });
 
-      let sortClass = datas.sort(
-        (a, b) =>
-          a.instructorName[0].charCodeAt(0) - b.instructorName[0].charCodeAt(0)
-      );
+      let sortClass = datas.sort((a, b) => a.instructorName[0].charCodeAt(0) - b.instructorName[0].charCodeAt(0));
 
       setEnrollment(sortClass);
     });
@@ -120,18 +105,11 @@ const Home: NextPage = () => {
           <div className={styles.description}>
             <div>카드결제시 현장에서 가능합니다.</div>
             <div>
-              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17
-              ~ 10/23 까지의 수업 사전 신청서입니다.
+              사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17 ~ 10/23 까지의 수업 사전 신청서입니다.
             </div>
           </div>
 
-          <Image
-            src={BuntImage}
-            alt="Bunt logo image"
-            width={350}
-            height={197}
-            objectFit="cover"
-          ></Image>
+          <Image src={BuntImage} alt="Bunt logo image" width={350} height={197} objectFit="cover"></Image>
         </section>
         <form
           className={styles.chooseClass}
@@ -150,11 +128,10 @@ const Home: NextPage = () => {
                 number: 1,
                 paid: false,
               });
-              console.log("Document written with ID: ", docRef.id);
             } catch (error) {
-              console.log(error);
+              console.error(error);
             }
-            console.log(JSON.stringify(data));
+
             alert(`${data.name}님  수강신청 완료했습니다 !!`);
           })}
           method="post"
@@ -172,9 +149,7 @@ const Home: NextPage = () => {
                       </label>
                       <span>{aClass.classTime}</span>
                     </div>
-                    <div className={styles.formDetail}>
-                      {aClass.instructorName}
-                    </div>
+                    <div className={styles.formDetail}>{aClass.instructorName}</div>
                   </div>
                 </>
               ))}
@@ -182,21 +157,11 @@ const Home: NextPage = () => {
           </section>
           <section className={styles.classSelectStudentInfo}>
             <h2>이름 (입금자명) </h2>
-            <input
-              type="text"
-              id=""
-              placeholder="ex. 김민수(김민수)"
-              {...register("name")}
-            />
+            <input type="text" id="" placeholder="ex. 김민수(김민수)" {...register("name")} />
           </section>
           <section className={styles.classSelectStudentInfo}>
             <h2>연락처</h2>
-            <input
-              type="text"
-              id=""
-              placeholder="01050946369"
-              {...register("phone")}
-            />
+            <input type="text" id="" placeholder="01050946369" {...register("phone")} />
           </section>
           <section className={styles.formField}>
             <div className={styles.chooseClass}>
