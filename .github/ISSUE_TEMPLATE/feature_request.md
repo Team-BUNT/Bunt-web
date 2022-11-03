@@ -1,20 +1,47 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
+about: 기능 구현 사항에 대한 세부 설명을 기입합니다.
+title: '기능 구현'
 labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## 🌁  기능을 추가 해야 하는 맥락에 관해 설명합니다.
+ex) 파이어베이스를 이용한 로그인 기능 추가
+1. AppStorage를 이용하여 MVP 제작 후 소비자 테스트 진행, 반응이 긍정적
+2. 확장성과 범용성을 고려하여 로그인 피쳐 고려
+3. 백엔드 사용 불가, 대체제로 파이어베이스 이용
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+<br/>
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## 🖊  작업했던 내용을 기술합니다.
+ex)
+- [x] APIkey 연동
+- [x] 더비데이터 생성
+- [x] CRUD 기능 구현을 위한 람다함수 제작
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+<br/>
+
+## 👿  기능 구현 시 이슈 상황에 대해 기록합니다.
+ex)
+1. 파이어베이스 API key에 대해 이슈가 있습니다. 해당 [링크](https://haranglog.tistory.com/25)를 첨부합니다. 
+2. 비동기 이슈가 있어 Task를 이용해 작업했지만 성능 이슈가 있습니다. PR To do와 노션 백로그에 등록했고 지속적으로 업무에 대해 트래킹하고 있습니다.
+
+<br/>
+
+## 📸 구현 부분에 대한 스크린샷을 첨부합니다.
+<img width="353" alt="Screenshot 2022-10-29 at 9 11 00 PM" src="https://user-images.githubusercontent.com/61782746/198830648-428e3080-1c7d-4694-bd0f-4a19fcd9d7fc.png">
+
+
+
+<br/>
+
+## 📝  기타 사항이 있을 때 작성합니다.
+설문지 작성에 대한 애니메이션이 추가로 있었으면 좋겠습니다.
+
+<br/>
+
+## ‼️ 해당 이슈에 작업했던 커밋에 대해 기록합니다.
+ex)
+- 70ef39e5143e500c3296ccae21a9fb7457cf9759 : 딕셔너리 이름 변경
