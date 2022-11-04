@@ -2,6 +2,8 @@ import styles from "../styles/Home.module.css";
 import StudioInformation from "./components/StudioInformation";
 import StudioClassCheckList from "./components/StudioClassCheckList";
 import StudentInputForm from "./components/StudentInputForm";
+import HeadMeta from "../Components/HeadMeta";
+import firebaseDB from "../Domains/firebase";
 
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -9,13 +11,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import moment from "moment";
 import "moment/locale/ko";
+
 import { v4 as uuidv4 } from "uuid";
-import { initializeApp } from "firebase/app";
-import { Firestore, addDoc, getFirestore, collection, getDocs } from "firebase/firestore";
-import "firebase/analytics";
-import "firebase/auth";
-import "firebase/firestore";
-import HeadMeta from "../Components/HeadMeta";
+import { Firestore, addDoc, collection, getDocs } from "firebase/firestore";
 
 interface IClasses {
   instructorName: string;
@@ -27,19 +25,6 @@ const Home: NextPage = () => {
   const [enrollment, setEnrollment] = useState<IClasses[]>([]);
   const datas: IClasses[] = [];
 
-  const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_MERASUREMENT_ID,
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
   useEffect(() => {
     const higgsClasses = async (db: Firestore) => {
       const danceClasses = collection(db, "classes");
@@ -50,7 +35,7 @@ const Home: NextPage = () => {
       return higgsStudioClass;
     };
 
-    higgsClasses(db).then((value) => {
+    higgsClasses(firebaseDB).then((value) => {
       value.map((e) => {
         const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
         const { instructorName } = e;
@@ -88,7 +73,7 @@ const Home: NextPage = () => {
             try {
               checkedClasses.length !== 0 &&
                 checkedClasses.forEach(async (checkedClass) => {
-                  const docRef = await addDoc(collection(db, "enrollment"), {
+                  const docRef = await addDoc(collection(firebaseDB, "enrollment"), {
                     ID: uuidv4(),
                     enrolledDate: new Date(),
                     classID: checkedClass,
