@@ -1,14 +1,10 @@
-import db from "../../../firebase";
-
 import { collection, doc, Firestore, getDoc, getDocs } from "firebase/firestore";
-import CustomFirestore from "../AbstractFirestore";
 
-class ImportedData extends CustomFirestore {
+class FirestoreFetcher {
   db: Firestore;
   args: string[];
 
   constructor(db: Firestore, ...args: string[]) {
-    super();
     this.db = db;
     this.args = args;
   }
@@ -26,7 +22,7 @@ class ImportedData extends CustomFirestore {
 
   async getDocs() {
     const [documentId] = this.args;
-    const docRef = collection(db, documentId);
+    const docRef = collection(this.db, documentId);
     const querySnapshot = await getDocs(docRef);
 
     return querySnapshot.docs.map((doc) => ({
@@ -37,7 +33,7 @@ class ImportedData extends CustomFirestore {
   async getDoc() {
     const [collectionId, documentId] = this.args;
 
-    const docRef = doc(db, collectionId, documentId);
+    const docRef = doc(this.db, collectionId, documentId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -48,4 +44,4 @@ class ImportedData extends CustomFirestore {
   }
 }
 
-export default ImportedData;
+export default FirestoreFetcher;
