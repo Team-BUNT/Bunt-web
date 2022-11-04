@@ -15,7 +15,7 @@ import { Firestore, addDoc, getFirestore, collection, getDocs } from "firebase/f
 import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
-import HeadMeta from "./components/HeadMeta";
+import HeadMeta from "../Components/HeadMeta";
 
 interface IClasses {
   instructorName: string;
