@@ -3,12 +3,12 @@ import styles from "../../styles/Home.module.css";
 import React from "react";
 import Image from "next/image";
 
-interface IStudioDescription {
+interface IStudioInformation {
   studioName: string;
   notice: string;
 }
 
-const ClassDescription = ({ studioName, notice }: IStudioDescription) => {
+const StudioInformation = ({ studioName, notice }: IStudioInformation) => {
   return (
     <section className={styles.header}>
       <h1>{`${studioName} Studio`}</h1>
@@ -28,4 +28,4 @@ const ClassDescription = ({ studioName, notice }: IStudioDescription) => {
   );
 };
 
-export default ClassDescription;
+export default StudioInformation;

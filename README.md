@@ -32,7 +32,7 @@
 
 [MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/2)
 
-- [ ] 프로젝트 구조 개편 및 Component 재구성 (https://github.com/Team-BUNT/Bunt-web/issues/8)
+- [x] 프로젝트 구조 개편 및 Component 재구성 (https://github.com/Team-BUNT/Bunt-web/issues/8)
 - [ ] Firebase Api 호출 로직 개선 및 모델 분리 (https://github.com/Team-BUNT/Bunt-web/issues/9)
 - [ ] Validation을 위한 모델 로직 분리 (https://github.com/Team-BUNT/Bunt-web/issues/10)
 
