@@ -22,9 +22,13 @@
 ### Router
 
 - / : 랜딩페이지를 보여줍니다.
-- /studio : 제휴맺은 스튜디오 리스트를 보여준다.
-- /studio/[id]/login : 이름과 전화번호가 있는 form이 나옵니다.
-- /studio/[id]/form : 이름과 전화번호를 이용하여 firebase에 있는 값과 비교 후 form을 보여줍니다.
+- /form/studios : 제휴맺은 스튜디오 리스트를 보여준다.
+- /form/studios/[id]/login : 수강생의 이름과 전화번호를 입력 받는 Form이 나옵니다.
+- /form/studios/[id]/class : 수강생의 이름과 전화번호를 이용하여 firebase에 있는 값과 비교 후
+  각 스튜디오의 클래스 신청 view가 나옵니다.
+- /form/studios/[id]/coupon : 선택한 클래스에서 쿠폰을 사용할 지 구입할 지 결정하는 view 입니다.
+- /form/studios/[id]/coupon/payment : 만약 쿠폰을 구매한다면 쿠폰에 대한 정보와 종류, 결제 방법에 대한 정보를 제공하는 view 입니다.
+  이때 신청완료를 누르면 모든 정보들을 파이어베이스로 저장하는 역할을 합니다.
 
 ### Todo
 
