@@ -1,4 +1,4 @@
-import CustomFirestore from "../CustomFirestore";
+import CustomFirestore from "../AbstractFirestore";
 
 class UpdatedData extends CustomFirestore {}
 

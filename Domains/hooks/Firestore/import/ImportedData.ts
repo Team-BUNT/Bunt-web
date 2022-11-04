@@ -1,7 +1,7 @@
 import db from "../../../firebase";
 
 import { collection, doc, Firestore, getDoc, getDocs } from "firebase/firestore";
-import CustomFirestore from "../CustomFirestore";
+import CustomFirestore from "../AbstractFirestore";
 
 class ImportedData extends CustomFirestore {
   db: Firestore;
@@ -14,7 +14,7 @@ class ImportedData extends CustomFirestore {
   }
 
   async fetchData() {
-    if (!db) return new Error("Firestore 객체가 없습니다.");
+    if (!this.db) return new Error("Firestore 객체가 없습니다.");
 
     if (this.args.length !== 1 && this.args.length !== 2)
       return new Error("collectionId 혹은 collectionId와 documentId를 인자로 줘야합니다..");
