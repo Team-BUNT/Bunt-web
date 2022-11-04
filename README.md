@@ -37,8 +37,24 @@
 [MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/2)
 
 - [x] 프로젝트 구조 개편 및 Component 재구성 (https://github.com/Team-BUNT/Bunt-web/issues/8)
+
+##### Domain
+
 - [ ] Firebase Api 호출 로직 개선 및 모델 분리 (https://github.com/Team-BUNT/Bunt-web/issues/9)
 - [ ] Validation을 위한 모델 로직 분리 (https://github.com/Team-BUNT/Bunt-web/issues/10)
+
+###### Firestore
+
+- [ ] Collection의 studios에서 모든 정보 가져오기
+- [ ] 수강생이 이름 연락처 입력 시 Collection의 students에서 해당 수강생 정보 가져오기
+- [ ] 특정 studioID를 통해 현재 일로부터 일주일 후의 모든 Class 정보 가져오기
+- [ ] 해당 모든 정보들을 Enrollment, Student, Coupon에 저장하기
+
+###### Model
+
+- [ ] 시간을 UI에 맞게 Formatting
+- [ ] 시간 순에 따라 데이터 정제하기
+- [ ] 체크박스에 선택된 클래스만 선별한다.
 
 #### Update form
 
