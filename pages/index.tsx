@@ -26,6 +26,8 @@ const Home: NextPage = () => {
   const datas: IClasses[] = [];
 
   useEffect(() => {
+    if (process.env.MODE !== "production") return;
+
     const higgsClasses = async (db: Firestore) => {
       const danceClasses = collection(db, "classes");
       const classSnapshot = await getDocs(danceClasses);
@@ -72,6 +74,7 @@ const Home: NextPage = () => {
 
             try {
               checkedClasses.length !== 0 &&
+                process.env.MODE === "production" &&
                 checkedClasses.forEach(async (checkedClass) => {
                   const docRef = await addDoc(collection(firebaseDB, "enrollment"), {
                     ID: uuidv4(),
