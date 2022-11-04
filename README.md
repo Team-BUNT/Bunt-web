@@ -44,6 +44,7 @@
 
 [MileStone](https://github.com/Team-BUNT/Bunt-web/milestone/3)
 
+- [ ] 페이지 별 데이터 저장을 위한 indexedDB 사용 (https://github.com/Team-BUNT/Bunt-web/issues/15)
 - [ ] Landing page 제작을 위한 index 수정 (https://github.com/Team-BUNT/Bunt-web/issues/11)
 - [ ] 각 Router에 해당하는 View 제작 (https://github.com/Team-BUNT/Bunt-web/issues/11)
 - [ ] Form 제작을 위한 Router 설정 (https://github.com/Team-BUNT/Bunt-web/issues/12)
