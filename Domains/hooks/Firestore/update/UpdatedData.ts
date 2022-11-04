@@ -1,5 +1,11 @@
-import CustomFirestore from "../FirestoreFetcher";
+import FirestoreFetcher from "../FirestoreFetcher";
 
-class UpdatedData extends CustomFirestore {}
+import { Firestore } from "firebase/firestore";
+
+class UpdatedData extends FirestoreFetcher {
+  constructor(db: Firestore, ...args: string[]) {
+    super(db, ...args);
+  }
+}
 
 export default UpdatedData;
