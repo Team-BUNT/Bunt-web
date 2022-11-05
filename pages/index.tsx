@@ -30,7 +30,7 @@ const Home: NextPage = () => {
     const classList = new Class(firebaseDB, "classes");
 
     classList.fetchData().then((value) => {
-      setEnrollment(timeFormatter(value));
+      value ?? setEnrollment(timeFormatter(value));
     });
   }, []);
 
