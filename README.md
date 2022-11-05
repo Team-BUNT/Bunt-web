@@ -48,9 +48,11 @@
 - [ ] Firestore 로직 분리
 
   - [x] FirestoreFetcher
-  - [ ] AddedData
-  - [ ] FilteredData
-  - [ ] UpdatedData
+  - [ ] Collection
+    - [ ] Class
+    - [ ] Enrollment
+    - [ ] Student
+    - [ ] Studio
 
 - [ ] Collection의 studios에서 모든 정보 가져오기
 - [ ] 수강생이 이름 연락처 입력 시 Collection의 students에서 해당 수강생 정보 가져오기

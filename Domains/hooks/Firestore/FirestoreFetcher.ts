@@ -1,4 +1,4 @@
-import { collection, doc, Firestore, getDoc, getDocs } from "firebase/firestore";
+import { Firestore } from "firebase/firestore";
 
 class FirestoreFetcher {
   db: Firestore;
