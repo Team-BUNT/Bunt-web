@@ -1,7 +1,22 @@
-import { DocumentData } from "firebase/firestore";
-
+import { Timestamp } from "firebase/firestore";
 import moment from "moment";
 import "moment/locale/ko";
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+interface IClass {
+  ID: string;
+  studioID?: string;
+  title?: string;
+  instructorName?: string;
+  date: Timestamp | string;
+  durationMinute?: number;
+  applicantsCount?: number;
+  hall?: IHall;
+  isPopUp?: boolean;
+}
 
 //TODO: Time 객체로 리팩토링
 const timeChecker = (classDate: moment.Moment) => {
@@ -38,26 +53,23 @@ const timeChecker = (classDate: moment.Moment) => {
     return false;
   }
 
-  // console.log(classDate.year(), classDate.month() + 1, classDate.date(), classDate.day());
   //MEMO: 해 넘어갈 때의 로직 추가
 };
 
-const timeFormatter = (classes: DocumentData[]) => {
+const timeFormatter = (classes: IClass[]) => {
   return [...classes].map((aClass) => {
     const { instructorName } = aClass;
-    const classTime = moment(aClass.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 
-    const classDate = moment(aClass.date.toDate());
+    if (typeof aClass.date !== "string") {
+      const classTime = moment(aClass.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 
-    if (!timeChecker(classDate)) return undefined;
+      const classDate = moment(aClass.date.toDate());
+      if (!timeChecker(classDate)) return undefined;
 
-    aClass.date = classTime;
+      aClass.date = classTime;
 
-    return {
-      classID: aClass.ID,
-      classTime: classTime,
-      instructorName: instructorName,
-    };
+      return aClass;
+    }
   });
 };
 

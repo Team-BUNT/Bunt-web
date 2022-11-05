@@ -14,26 +14,20 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 
-interface IClasses {
-  instructorName: string;
-  classTime: string;
-  classID: string;
-}
-
 interface IHall {
   name: string;
   capacity: number;
 }
 interface IClass {
   ID: string;
-  studioID?: string;
-  title?: string;
-  instructorName?: string;
-  date?: Date;
-  durationMinute?: number;
-  applicantsCount?: number;
-  hall?: IHall;
-  isPopUp?: boolean;
+  studioID: string;
+  title: string;
+  instructorName: string;
+  date: Date;
+  durationMinute: number;
+  applicantsCount: number;
+  hall: IHall;
+  isPopUp: boolean;
 }
 
 const Home: NextPage = () => {
