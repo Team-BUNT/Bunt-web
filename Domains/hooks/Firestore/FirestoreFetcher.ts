@@ -2,11 +2,11 @@ import { Firestore } from "firebase/firestore";
 
 class FirestoreFetcher {
   db: Firestore;
-  args: string[];
+  documentId: string;
 
-  constructor(db: Firestore, ...args: string[]) {
+  constructor(db: Firestore, documentId: string) {
     this.db = db;
-    this.args = args;
+    this.documentId = documentId;
   }
 }
 
