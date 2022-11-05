@@ -3,6 +3,9 @@ import { DocumentData, orderBy, where } from "firebase/firestore";
 import moment from "moment";
 import "moment/locale/ko";
 
+//TODO: Time 객체로 리팩토링
+const timeChecker = () => {};
+
 const timeFormatter = (datas: DocumentData[]) => {
   return [...datas].map((data: any) => {
     const { instructorName } = data;

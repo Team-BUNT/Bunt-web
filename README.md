@@ -62,9 +62,8 @@
 
 ###### Model
 
-- [ ] 시간을 UI에 맞게 Formatting
+- [x] 시간을 UI에 맞게 Formatting
 - [ ] 시간 순에 따라 데이터 정제하기
-- [ ] 체크박스에 선택된 클래스만 선별한다.
 
 #### Update form
 

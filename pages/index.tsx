@@ -25,12 +25,14 @@ const Home: NextPage = () => {
   const [enrollment, setEnrollment] = useState<IClasses[]>([]);
 
   useEffect(() => {
-    // if (process.env.MODE !== "production") return;
-
     const classList = new Class(firebaseDB, "classes");
 
     classList.fetchData().then((value) => {
-      value ?? setEnrollment(timeFormatter(value));
+      try {
+        setEnrollment(timeFormatter(value));
+      } catch (error) {
+        console.error(error);
+      }
     });
   }, []);
 
