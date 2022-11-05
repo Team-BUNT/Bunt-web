@@ -49,9 +49,9 @@
 - [ ] 팩토리 패턴으로 리팩토링 하기
 
   - [x] FirestoreFetcher
-  - [ ] Collection
-    - [ ] Class
-    - [ ] Enrollment
+  - [x] Collection
+    - [x] Class
+    - [x] Enrollment
     - [x] Student
     - [x] Studio
 
