@@ -9,11 +9,11 @@ import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
-import moment from "moment";
-import "moment/locale/ko";
 
 import { v4 as uuidv4 } from "uuid";
-import { Firestore, addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
+import timeFormatter from "../Domains/timeFormatter";
+import Class from "../Domains/hooks/Firestore/Collections/Class";
 
 interface IClasses {
   instructorName: string;
@@ -23,36 +23,15 @@ interface IClasses {
 
 const Home: NextPage = () => {
   const [enrollment, setEnrollment] = useState<IClasses[]>([]);
-  const datas: IClasses[] = [];
 
   useEffect(() => {
-    if (process.env.MODE !== "production") return;
+    // if (process.env.MODE !== "production") return;
 
-    const higgsClasses = async (db: Firestore) => {
-      const danceClasses = collection(db, "classes");
-      const classSnapshot = await getDocs(danceClasses);
-      const classList = classSnapshot.docs.map((doc) => doc.data());
-      const higgsStudioClass = classList.filter((aClass) => aClass.studioID === process.env.NEXT_PUBLIC_STUDIO_ID);
+    const classList = new Class(firebaseDB, "classes");
 
-      return higgsStudioClass;
-    };
-
-    higgsClasses(firebaseDB).then((value) => {
-      value.map((e) => {
-        const numberParseDay = Number(moment(e.date.toDate()).format("DD"));
-        const { instructorName } = e;
-        if (numberParseDay >= 17 && numberParseDay <= 23) {
-          const classTime = moment(e.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
-
-          datas.push({ classID: e.ID, classTime, instructorName });
-        }
-      });
-
-      let sortClass = datas.sort((a, b) => a.instructorName[0].charCodeAt(0) - b.instructorName[0].charCodeAt(0));
-
-      setEnrollment(sortClass);
+    classList.fetchData().then((value) => {
+      setEnrollment(timeFormatter(value));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { register, handleSubmit } = useForm();
@@ -74,7 +53,6 @@ const Home: NextPage = () => {
 
             try {
               checkedClasses.length !== 0 &&
-                process.env.MODE === "production" &&
                 checkedClasses.forEach(async (checkedClass) => {
                   const docRef = await addDoc(collection(firebaseDB, "enrollment"), {
                     ID: uuidv4(),

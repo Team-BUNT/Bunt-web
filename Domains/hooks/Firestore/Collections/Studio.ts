@@ -54,7 +54,7 @@ export default class Studio extends FirestoreFetcher {
       : await this.getStudioAll();
   }
 
-  async getStudioAll() {
+  private async getStudioAll() {
     const querySnapshot = await getDocs(this.studioRef);
 
     return querySnapshot.docs.map((doc) => ({
@@ -62,7 +62,7 @@ export default class Studio extends FirestoreFetcher {
     }));
   }
 
-  async getStudios() {
+  private async getStudios() {
     if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
 
     const studiosRef = query(this.studioGroupRef, ...this.condition);
