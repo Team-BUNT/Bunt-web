@@ -5,7 +5,7 @@ import StudentInputForm from "./components/StudentInputForm";
 import HeadMeta from "../Components/HeadMeta";
 import firebaseDB from "../Domains/firebase";
 import { timeFormatter } from "../Domains/timeFormatter";
-import { Class } from "../Domains/hooks/Firestore";
+import { Class, Enrollment } from "../Domains/hooks/Firestore";
 
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -59,13 +59,12 @@ const Home: NextPage = () => {
             try {
               checkedClasses.length !== 0 &&
                 checkedClasses.forEach(async (checkedClass) => {
-                  const docRef = await addDoc(collection(firebaseDB, "enrollment"), {
+                  await new Enrollment(firebaseDB, "enrollment").addData({
                     ID: uuidv4(),
                     enrolledDate: new Date(),
                     classID: checkedClass,
                     userName: data.name,
                     phoneNumber: data.phone,
-                    number: 1,
                     paid: false,
                   });
                 });

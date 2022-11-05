@@ -15,11 +15,11 @@ import {
 } from "firebase/firestore";
 
 interface IEnrollment {
-  id: string;
-  classId: string;
+  ID: string;
+  classID: string;
   userName?: string;
   phoneNumber?: string;
-  enrolledDate?: Timestamp;
+  enrolledDate?: Date;
   paid?: Boolean;
   paymentType?: string;
   attendance?: Boolean;
