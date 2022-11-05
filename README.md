@@ -46,7 +46,8 @@
 ###### Firestore
 
 - [x] Firestore 로직 분리
-- [ ] 팩토리 패턴으로 리팩토링 하기
+- [ ] 팩토리 패턴으로 도메인 정보 리팩토링 하기
+- [ ] Time 객체로 시간 관련 함수 리팩토링 ( 라이브러리 date-fns 사용 )
 
   - [x] FirestoreFetcher
   - [x] Collection
