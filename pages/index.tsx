@@ -4,6 +4,8 @@ import StudioClassCheckList from "./components/StudioClassCheckList";
 import StudentInputForm from "./components/StudentInputForm";
 import HeadMeta from "../Components/HeadMeta";
 import firebaseDB from "../Domains/firebase";
+import { timeFormatter } from "../Domains/timeFormatter";
+import { Class } from "../Domains/hooks/Firestore";
 
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
@@ -11,9 +13,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { v4 as uuidv4 } from "uuid";
+
 import { addDoc, collection } from "firebase/firestore";
-import timeFormatter from "../Domains/timeFormatter";
-import Class from "../Domains/hooks/Firestore/Collections/Class";
 
 interface IClasses {
   instructorName: string;

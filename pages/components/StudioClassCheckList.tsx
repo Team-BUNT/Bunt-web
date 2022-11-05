@@ -19,16 +19,20 @@ const StudioClassCheckList = ({ enrollment, register }: IClassList) => {
     <section className={styles.formField}>
       <h2>클래스 선택</h2>
       <>
-        {enrollment.map((aClass, index) => (
-          <div key={aClass.classID + index}>
-            <StudioClass
-              classTime={aClass.classTime}
-              instructorName={aClass.instructorName}
-              classID={aClass.classID}
-              register={register}
-            ></StudioClass>
-          </div>
-        ))}
+        {enrollment.map((aClass, index) => {
+          if (aClass === undefined) return;
+
+          return (
+            <div key={aClass.classID + index}>
+              <StudioClass
+                classTime={aClass.classTime}
+                instructorName={aClass.instructorName}
+                classID={aClass.classID}
+                register={register}
+              ></StudioClass>
+            </div>
+          );
+        })}
       </>
     </section>
   );

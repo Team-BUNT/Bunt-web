@@ -4,32 +4,52 @@ import moment from "moment";
 import "moment/locale/ko";
 
 //TODO: Time 객체로 리팩토링
-const timeChecker = (danceClass: DocumentData) => {
+const timeChecker = (classDate: moment.Moment) => {
+  const now = new Date();
+  const addSevenDays = new Date(new Date().setDate(now.getDate() + 7));
+
+  /** new Date()
+   * getMonth: 1월: 0, 2월: 1
+   * getDay: 일요일: 0, 월요일: 1
+   */
   const today = {
-    month: moment().month() + 1,
-    day: moment().date(),
-    endOfDay: moment().daysInMonth(),
+    year: now.getFullYear(),
+    month: now.getMonth() + 1,
+    date: now.getDate(),
+    day: now.getDay(),
   };
 
-  const afterSevenDays = {
-    month: moment().add(7, "days").month() + 1,
-    day: moment().add(7, "days").date(),
-    endOfDay: moment().add(7, "days").daysInMonth(),
+  const sevenDaysAfter = {
+    year: addSevenDays.getFullYear(),
+    month: addSevenDays.getMonth() + 1,
+    date: addSevenDays.getDate(),
+    day: addSevenDays.getDay(),
   };
 
-  const classDate = {
-    month: moment(danceClass.date.toDate()).month() + 1,
-    day: moment(danceClass.date.toDate()).date(),
-    endOfDay: moment(danceClass.date.toDate()).daysInMonth(),
-  };
+  if (today.month === sevenDaysAfter.month) {
+    if (classDate.date() >= today.date && classDate.date() <= sevenDaysAfter.date) {
+      return true;
+    }
+  } else if (today.month + 1 === sevenDaysAfter.month) {
+    if (1 <= classDate.date() && classDate.date() <= sevenDaysAfter.date) {
+      return true;
+    }
+  } else {
+    return false;
+  }
 
-  return true;
+  // console.log(classDate.year(), classDate.month() + 1, classDate.date(), classDate.day());
+  //MEMO: 해 넘어갈 때의 로직 추가
 };
 
 const timeFormatter = (datas: DocumentData[]) => {
   return [...datas].map((data) => {
     const { instructorName } = data;
     const classTime = moment(data.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
+
+    const classDate = moment(data.date.toDate());
+
+    if (!timeChecker(classDate)) return;
 
     return {
       classID: data.ID,
@@ -39,4 +59,4 @@ const timeFormatter = (datas: DocumentData[]) => {
   });
 };
 
-export default timeFormatter;
+export { timeFormatter, timeChecker };
