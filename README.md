@@ -46,8 +46,6 @@
 ###### Firestore
 
 - [x] Firestore 로직 분리
-- [ ] 팩토리 패턴으로 도메인 정보 리팩토링 하기
-- [ ] Time 객체로 시간 관련 함수 리팩토링 ( 라이브러리 date-fns 사용 )
 
   - [x] FirestoreFetcher
   - [x] Collection
@@ -74,3 +72,9 @@
 - [ ] Landing page 제작을 위한 index 수정 (https://github.com/Team-BUNT/Bunt-web/issues/11)
 - [ ] 각 Router에 해당하는 View 제작 (https://github.com/Team-BUNT/Bunt-web/issues/11)
 - [ ] Form 제작을 위한 Router 설정 (https://github.com/Team-BUNT/Bunt-web/issues/12)
+
+### 추가 To do
+
+- [ ] 팩토리 패턴으로 도메인 정보 리팩토링 하기
+- [ ] Time 객체로 시간 관련 함수 리팩토링 ( 라이브러리 date-fns 사용 )
+- [ ] Form Submit 객체로 분리

@@ -6,15 +6,13 @@ import HeadMeta from "../Components/HeadMeta";
 import firebaseDB from "../Domains/firebase";
 import { timeFormatter } from "../Domains/timeFormatter";
 import { Class, Enrollment } from "../Domains/hooks/Firestore";
+import { orderByTime } from "../Domains/orderByTime";
 
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
-
 import { v4 as uuidv4 } from "uuid";
-
-import { addDoc, collection } from "firebase/firestore";
 
 interface IClasses {
   instructorName: string;
@@ -32,7 +30,9 @@ const Home: NextPage = () => {
       classList.fetchData().then((value) => {
         //MEMO: value 타입 체크
         // Type 'Error' is missing the following properties from type
-        setEnrollment(timeFormatter(value));
+        const formattedClass = [...timeFormatter(value)].filter((aClass) => aClass !== undefined);
+
+        setEnrollment(orderByTime(formattedClass));
       });
     } catch (error) {
       console.error(error);

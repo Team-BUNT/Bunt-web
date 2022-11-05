@@ -49,7 +49,7 @@ const timeFormatter = (datas: DocumentData[]) => {
 
     const classDate = moment(data.date.toDate());
 
-    if (!timeChecker(classDate)) return;
+    if (!timeChecker(classDate)) return undefined;
 
     return {
       classID: data.ID,
