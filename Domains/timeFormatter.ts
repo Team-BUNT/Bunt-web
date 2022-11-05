@@ -42,17 +42,19 @@ const timeChecker = (classDate: moment.Moment) => {
   //MEMO: 해 넘어갈 때의 로직 추가
 };
 
-const timeFormatter = (datas: DocumentData[]) => {
-  return [...datas].map((data) => {
-    const { instructorName } = data;
-    const classTime = moment(data.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
+const timeFormatter = (classes: DocumentData[]) => {
+  return [...classes].map((aClass) => {
+    const { instructorName } = aClass;
+    const classTime = moment(aClass.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 
-    const classDate = moment(data.date.toDate());
+    const classDate = moment(aClass.date.toDate());
 
     if (!timeChecker(classDate)) return undefined;
 
+    aClass.date = classTime;
+
     return {
-      classID: data.ID,
+      classID: aClass.ID,
       classTime: classTime,
       instructorName: instructorName,
     };

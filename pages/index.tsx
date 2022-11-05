@@ -20,8 +20,24 @@ interface IClasses {
   classID: string;
 }
 
+interface IHall {
+  name: string;
+  capacity: number;
+}
+interface IClass {
+  ID: string;
+  studioID?: string;
+  title?: string;
+  instructorName?: string;
+  date?: Date;
+  durationMinute?: number;
+  applicantsCount?: number;
+  hall?: IHall;
+  isPopUp?: boolean;
+}
+
 const Home: NextPage = () => {
-  const [enrollment, setEnrollment] = useState<IClasses[]>([]);
+  const [enrollment, setEnrollment] = useState<IClass[]>([]);
 
   useEffect(() => {
     const classList = new Class(firebaseDB, "classes");

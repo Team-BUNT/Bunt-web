@@ -56,11 +56,11 @@ export default class Class extends FirestoreFetcher {
   private async getclassAll() {
     const querySnapshot = await getDocs(this.classRef);
 
-    if (querySnapshot.empty) return new Error("값이 없습니다.");
-
-    return querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    }));
+    return !querySnapshot.empty
+      ? querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }))
+      : new Error("값이 없습니다.");
   }
 
   private async getclasses() {
