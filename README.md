@@ -45,7 +45,7 @@
 
 ###### Firestore
 
-- [ ] Firestore 로직 분리
+- [x] Firestore 로직 분리
 - [ ] 팩토리 패턴으로 리팩토링 하기
 
   - [x] FirestoreFetcher
@@ -58,7 +58,7 @@
 - [x] Collection의 studios에서 모든 정보 가져오기
 - [x] 수강생이 이름 연락처 입력 시 Collection의 students에서 해당 수강생 정보 가져오기
 - [x] 특정 studioID를 통해 현재 일로부터 일주일 후의 모든 Class 정보 가져오기
-- [ ] 해당 모든 정보들을 Enrollment, Student, Coupon에 저장하기
+- [x] 해당 모든 정보들을 Enrollment, Student, Coupon에 저장하기
 
 ###### Model
 

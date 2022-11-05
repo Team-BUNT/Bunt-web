@@ -1,6 +1,7 @@
 import FirestoreFetcher from "../FirestoreFetcher";
 
 import {
+  addDoc,
   collection,
   collectionGroup,
   CollectionReference,
@@ -12,6 +13,24 @@ import {
   QueryConstraint,
 } from "firebase/firestore";
 
+interface INotice {
+  imageURL: string;
+  description: string;
+  bankAccount: string;
+}
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+
+interface IStudio {
+  id: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
 export default class Studio extends FirestoreFetcher {
   condition?: QueryConstraint[];
   studioRef: CollectionReference<DocumentData>;
@@ -52,5 +71,13 @@ export default class Studio extends FirestoreFetcher {
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
     }));
+  }
+
+  async addData(data: IStudio) {
+    try {
+      await addDoc(this.studioRef, data);
+    } catch (error) {
+      console.error("Error가 발생했습니다. ", error);
+    }
   }
 }

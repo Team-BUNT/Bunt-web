@@ -1,6 +1,7 @@
 import FirestoreFetcher from "../FirestoreFetcher";
 
 import {
+  addDoc,
   collection,
   collectionGroup,
   CollectionReference,
@@ -10,7 +11,20 @@ import {
   Query,
   query,
   QueryConstraint,
+  Timestamp,
 } from "firebase/firestore";
+
+interface IEnrollment {
+  id: string;
+  classId: string;
+  userName?: string;
+  phoneNumber?: string;
+  enrolledDate?: Timestamp;
+  paid?: Boolean;
+  paymentType?: string;
+  attendance?: Boolean;
+  info?: string;
+}
 
 export default class Enrollment extends FirestoreFetcher {
   condition?: QueryConstraint[];
@@ -52,5 +66,13 @@ export default class Enrollment extends FirestoreFetcher {
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
     }));
+  }
+
+  async addData(data: IEnrollment) {
+    try {
+      await addDoc(this.enrollmentRef, data);
+    } catch (error) {
+      console.error("Error가 발생했습니다. ", error);
+    }
   }
 }
