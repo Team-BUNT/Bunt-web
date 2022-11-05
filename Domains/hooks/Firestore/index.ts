@@ -1,5 +1,6 @@
-import AddedData from "./add/AddedData";
-import FilteredData from "./filter/FilteredData";
-import UpdatedData from "./update/UpdatedData";
+import Class from "./Collection/Class";
+import Enrollment from "./Collection/Enrollment";
+import Student from "./Collection/Student";
+import Studio from "./Collection/Studio";
 
-export { AddedData, FilteredData, UpdatedData };
+export default { Class, Enrollment, Student, Studio };

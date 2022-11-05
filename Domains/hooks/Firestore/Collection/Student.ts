@@ -1,11 +1,8 @@
-import CustomFirestore from "../FirestoreFetcher";
-
 import { Firestore } from "firebase/firestore";
+import FirestoreFetcher from "../FirestoreFetcher";
 
-class FilteredData extends CustomFirestore {
+export default class Student extends FirestoreFetcher {
   constructor(db: Firestore, ...args: string[]) {
     super(db, ...args);
   }
 }
-
-export default FilteredData;
