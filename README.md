@@ -41,7 +41,7 @@
 ##### Domain
 
 - [x] Firebase Api 호출 로직 개선 및 모델 분리 (https://github.com/Team-BUNT/Bunt-web/issues/9)
-- [ ] Validation을 위한 모델 로직 분리 (https://github.com/Team-BUNT/Bunt-web/issues/10)
+- [x] Validation을 위한 모델 로직 분리 (https://github.com/Team-BUNT/Bunt-web/issues/10)
 
 ###### Firestore
 

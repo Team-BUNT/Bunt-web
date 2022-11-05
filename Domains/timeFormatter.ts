@@ -27,7 +27,7 @@ const timeChecker = (danceClass: DocumentData) => {
 };
 
 const timeFormatter = (datas: DocumentData[]) => {
-  return [...datas].map((data: any) => {
+  return [...datas].map((data) => {
     const { instructorName } = data;
     const classTime = moment(data.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 

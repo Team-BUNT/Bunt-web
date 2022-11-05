@@ -27,14 +27,15 @@ const Home: NextPage = () => {
   useEffect(() => {
     const classList = new Class(firebaseDB, "classes");
 
-    classList.fetchData().then((value) => {
-      try {
-        if (value instanceof Error) return;
+    try {
+      classList.fetchData().then((value) => {
+        //MEMO: value 타입 체크
+        // Type 'Error' is missing the following properties from type
         setEnrollment(timeFormatter(value));
-      } catch (error) {
-        console.error(error);
-      }
-    });
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }, []);
 
   const { register, handleSubmit } = useForm();
