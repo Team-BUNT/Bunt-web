@@ -29,6 +29,7 @@ const Home: NextPage = () => {
 
     classList.fetchData().then((value) => {
       try {
+        if (value instanceof Error) return;
         setEnrollment(timeFormatter(value));
       } catch (error) {
         console.error(error);

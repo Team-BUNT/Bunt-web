@@ -31,8 +31,6 @@ const timeFormatter = (datas: DocumentData[]) => {
     const { instructorName } = data;
     const classTime = moment(data.date.toDate()).format("MM월 DD일 (ddd) HH:mm");
 
-    if (!timeChecker(data)) return;
-
     return {
       classID: data.ID,
       classTime: classTime,
