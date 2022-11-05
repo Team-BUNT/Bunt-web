@@ -57,6 +57,8 @@ export default class Studio extends FirestoreFetcher {
   private async getStudioAll() {
     const querySnapshot = await getDocs(this.studioRef);
 
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
+
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
     }));
@@ -67,6 +69,8 @@ export default class Studio extends FirestoreFetcher {
 
     const studiosRef = query(this.studioGroupRef, ...this.condition);
     const querySnapshot = await getDocs(studiosRef);
+
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
 
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),

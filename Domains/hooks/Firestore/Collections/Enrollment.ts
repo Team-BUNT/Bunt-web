@@ -49,19 +49,23 @@ export default class Enrollment extends FirestoreFetcher {
       : await this.getEnrollmentAll();
   }
 
-  async getEnrollmentAll() {
+  private async getEnrollmentAll() {
     const querySnapshot = await getDocs(this.enrollmentRef);
+
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
 
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
     }));
   }
 
-  async getEnrollments() {
+  private async getEnrollments() {
     if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
 
     const enrollmentsRef = query(this.enrollmentGroupRef, ...this.condition);
     const querySnapshot = await getDocs(enrollmentsRef);
+
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
 
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),

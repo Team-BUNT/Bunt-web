@@ -53,19 +53,23 @@ export default class Class extends FirestoreFetcher {
       : await this.getclassAll();
   }
 
-  async getclassAll() {
+  private async getclassAll() {
     const querySnapshot = await getDocs(this.classRef);
+
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
 
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
     }));
   }
 
-  async getclasses() {
+  private async getclasses() {
     if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
 
     const classesRef = query(this.classGroupRef, ...this.condition);
     const querySnapshot = await getDocs(classesRef);
+
+    if (querySnapshot.empty) return new Error("값이 없습니다.");
 
     return querySnapshot.docs.map((doc) => ({
       ...doc.data(),
