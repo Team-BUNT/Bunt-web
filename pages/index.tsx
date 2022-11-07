@@ -63,7 +63,6 @@ const Home: NextPage = () => {
 
   return (
     <Root>
-      <HeadMeta title="Bunt"></HeadMeta>
       <LandingPage></LandingPage>
 
       {/* <StudioInformation

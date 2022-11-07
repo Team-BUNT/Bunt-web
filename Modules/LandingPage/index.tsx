@@ -1,9 +1,11 @@
 /* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import React from "react";
 
 import styled from "styled-components";
+import HeadMeta from "../../Components/HeadMeta";
 
 const Container = styled.div`
   width: 100%;
@@ -85,9 +87,11 @@ const BottomImageContainer = styled.div`
 
 const index = () => {
   const buntIcon = `/bunt.png`;
-
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = useRouter();
   return (
     <Container>
+      <HeadMeta title="Bunt"></HeadMeta>
       <Header>
         <Image src={buntIcon} width={125} height={125} alt="Bunt logo"></Image>
       </Header>
@@ -102,7 +106,7 @@ const index = () => {
             <span>BUNT에서 쉽고 간편하게</span>
             <span>LIFE IS ON STAGE</span>
           </BuntSlogan>
-          <Button>
+          <Button onClick={() => router.push("/form/studios", "/form/studios")}>
             <span>클래스 신청하러 가기</span> <Image src="/landingPage/ButtonArrow.png" width={18} height={17}></Image>
           </Button>
         </div>
