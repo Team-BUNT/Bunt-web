@@ -4,7 +4,7 @@ import StudioInformation from "./components/StudioInformation";
 import StudioClassCheckList from "./components/StudioClassCheckList";
 import StudentInputForm from "./components/StudentInputForm";
 import HeadMeta from "../Components/HeadMeta";
-import firebaseDB from "../Domains/firebase";
+
 import { timeFormatter } from "../Domains/timeFormatter";
 import { Class, Enrollment } from "../Domains/hooks/Firestore";
 import { orderByTime } from "../Domains/orderByTime";
@@ -43,21 +43,21 @@ const Home: NextPage = () => {
     height: 100vh;
   `;
 
-  useEffect(() => {
-    const classList = new Class(firebaseDB, "classes");
+  // useEffect(() => {
+  //   const classList = new Class(firebaseDB, "classes");
 
-    try {
-      classList.fetchData().then((value) => {
-        //MEMO: value 타입 체크
-        // Type 'Error' is missing the following properties from type
-        const formattedClass = [...timeFormatter(value)].filter((aClass) => aClass !== undefined);
+  //   try {
+  //     classList.fetchData().then((value) => {
+  //       //MEMO: value 타입 체크
+  //       // Type 'Error' is missing the following properties from type
+  //       const formattedClass = [...timeFormatter(value)].filter((aClass) => aClass !== undefined);
 
-        setEnrollment(orderByTime(formattedClass));
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  //       setEnrollment(orderByTime(formattedClass));
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }, []);
 
   const { register, handleSubmit } = useForm();
 
