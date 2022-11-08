@@ -3,10 +3,16 @@
 import React, { useEffect, useState } from "react";
 import { firestorage } from "../../../Domains/firebase";
 
+import { useRouter } from "next/router";
+import Image from "next/image";
+
 import { getDownloadURL, ref } from "firebase/storage";
 import styled from "styled-components";
-import Image from "next/image";
-import { GetStaticProps } from "next";
+
+interface IClass {
+  name: string;
+  url: string;
+}
 
 const Container = styled.section`
   width: 100%;
@@ -45,15 +51,16 @@ const ImageContainer = styled.div`
 `;
 
 const index = () => {
-  const [urls, setUrl] = useState<string[]>([]);
+  const [classes, setUrl] = useState<IClass[]>([]);
+  const router = useRouter();
 
   const studios = ["bunt", "nfstudio", "movidic", "bonafide"];
-  const getStudiosUrls = (studios: string[]) => {
+  const getStudiosClasses = (studios: IClass[]) => {
     studios.forEach((studio) => {
       const starsRef = ref(firestorage, `/studios/${studio}.png`);
       getDownloadURL(starsRef)
         .then((url) => {
-          setUrl((urls) => [url, ...urls]);
+          setUrl((classes) => [{ url, name: studio }, ...classes]);
         })
         .catch((error) => {
           switch (error.code) {
@@ -69,9 +76,10 @@ const index = () => {
         });
     });
   };
+
   //TODO: Server side prop으로 리팩토링하기
   useEffect(() => {
-    getStudiosUrls(studios);
+    getStudiosClasses(studios);
   }, []);
 
   return (
@@ -81,10 +89,13 @@ const index = () => {
           <div>클래스 신청하러 가기</div>
         </ClassTitle>
         <ClassLogo>
-          {urls
-            .filter((url, i) => urls.indexOf(url) === i)
-            .map((url, index) => (
-              <ImageContainer key={`${url}${index}`}>
+          {classes
+            .filter((url, i) => classes.indexOf(url) === i)
+            .map(({ name, url }, index) => (
+              <ImageContainer
+                key={`${name}${index}`}
+                onClick={() => router.push(`/form/studios/${name}/login`, `/form/studios/${name}/login`)}
+              >
                 <Image layout="responsive" objectFit="cover" width={362} height={283} src={url}></Image>
               </ImageContainer>
             ))}
@@ -93,36 +104,5 @@ const index = () => {
     </Container>
   );
 };
-
-export async function getStaticProps() {
-  const studios = ["bunt", "nfstudio", "movidic", "bonafide"];
-  console.log(studios);
-  const getStudiosUrls = (studios: string[]) => {
-    console.log(studios);
-    return studios.map((studio) => {
-      const starsRef = ref(firestorage, `/studios/${studio}.png`);
-      getDownloadURL(starsRef)
-        .then((url) => url)
-        .catch((error) => {
-          switch (error.code) {
-            case "storage/object-not-found":
-              break;
-            case "storage/unauthorized":
-              break;
-            case "storage/canceled":
-              break;
-            case "storage/unknown":
-              break;
-          }
-        });
-    });
-  };
-
-  return {
-    props: {
-      studios: getStudiosUrls(studios),
-    },
-  };
-}
 
 export default index;
