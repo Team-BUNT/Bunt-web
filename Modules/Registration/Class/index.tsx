@@ -19,7 +19,7 @@ const Container = styled.section`
   height: 100%;
 `;
 
-const StudioContainer = styled.div`
+const ClassContainer = styled.div`
   width: 100%;
   max-width: 660px;
   min-width: 390px;
@@ -27,7 +27,7 @@ const StudioContainer = styled.div`
   margin-bottom: 2.5rem;
 `;
 
-const StudioInformation = styled.div`
+const ClassInformation = styled.div`
   width: 100%;
   height: auto;
   line-height: 3.2rem;
@@ -41,7 +41,6 @@ const StudioInformation = styled.div`
   h2 {
     font-size: 1.7rem;
     color: #787878;
-    font-weight: 500;
   }
 `;
 
@@ -49,7 +48,7 @@ const CalenderContainer = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 1.7rem;
-
+  margin-top: 1.8rem;
   span {
     font-size: 1.5rem;
     color: #787878;
@@ -60,26 +59,48 @@ const DateContainers = styled.div`
   display: flex;
   justify-content: space-between;
   font-size: 1.3rem;
+  margin-top: 1.8rem;
 `;
 
 const DateContainer = styled.div<DateContainerProps>`
   color: ${(props) => props.order === 0 && "red"};
+
+  height: 8.2rem;
   text-align: center;
-`;
-
-const StudioDescription = styled.div`
-  color: #787878;
-  font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 2rem;
   font-weight: 400;
-  line-height: 2.2rem;
-  word-break: keep-all;
-  margin-top: 2rem;
+
+  div:nth-child(1) {
+    padding: 1.2rem;
+  }
+
+  div:nth-child(2) {
+    margin-top: 1.2rem;
+  }
 `;
 
-const StudentEnrollmentForm = styled.form`
+{
+  /*
+    <label className={styles.checkBoxContainer}>
+      <input type="checkbox" {...register(classID)} onChange={checkHandler} />
+      <span className={styles.checkmark}></span>
+    </label> 
+*/
+}
+
+const ClassRegistrationForm = styled.form`
   width: 100%;
   max-width: 660px;
   min-width: 390px;
+  padding-top: 3rem;
+  margin-top: 3rem;
+  border-top: 0.1rem solid #363636;
+
+  h3 {
+    font-size: 1.7rem;
+  }
 
   label {
     font-size: 1.7rem;
@@ -98,12 +119,69 @@ const StudentEnrollmentForm = styled.form`
   }
 `;
 
-const LabelContainer = styled.div`
-  margin-top: 3rem;
+const LabelContainer = styled.label`
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
-  input {
-    font-size: 1.5rem;
-    font-weight: 400;
+  & input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  & span {
+    position: absolute;
+    top: -5px;
+    left: 5px;
+    height: 18px;
+    width: 18px;
+    background-color: transparent;
+    border: 1.5px solid gray;
+    border-radius: 5px;
+  }
+
+  &:hover input[type="checkbox"] ~ span {
+    background-color: transparent;
+    border: 1.5px solid #da0000;
+  }
+
+  & input[type="checkbox"]:checked ~ span {
+    border: 1.5px solid #da0000;
+    background-color: #da0000;
+  }
+
+  & input[type="checkbox"]:checked ~ span:after {
+    display: block;
+  }
+
+  span:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  & span:after {
+    left: 5px;
+
+    width: 5px;
+    height: 11px;
+    border: solid black;
+
+    border-width: 0px 2px 2.3px 0px;
+    -webkit-transform: rotate(30deg);
+    -ms-transform: rotate(30deg);
+    transform: skewY(15deg) scaleY(1.2) rotate(30deg);
   }
 `;
 
@@ -134,49 +212,39 @@ const index = () => {
 
   return (
     <Container>
-      <StudioContainer>
-        <StudioInformation>
+      <ClassContainer>
+        <ClassInformation>
           {typeof studio === "string" &&
             (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
           <h2>클래스 신청 - 클래스 선택</h2>
-          <CalenderContainer>
-            <h3>
-              날짜<span>(주간 공개)</span>
-            </h3>
-            <DateContainers>
-              {week.map((day, index) => (
-                <DateContainer key={`${day}_${index}`} order={index}>
-                  <div>{day.getDate()}</div>
-                  <div>{dayFormatter(day, index)}</div>
-                </DateContainer>
-              ))}
-            </DateContainers>
-          </CalenderContainer>
-          <StudioDescription>
-            각 스튜디오에 해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기 각 스튜디오에
-            해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기
-          </StudioDescription>
-        </StudioInformation>
-        <StudentEnrollmentForm>
+        </ClassInformation>
+        <CalenderContainer>
+          <h3>
+            날짜<span>(주간 공개)</span>
+          </h3>
+          <DateContainers>
+            {week.map((day, index) => (
+              <DateContainer key={`${day}_${index}`} order={index}>
+                <div>{day.getDate()}</div>
+                <div>{dayFormatter(day, index)}</div>
+              </DateContainer>
+            ))}
+          </DateContainers>
+        </CalenderContainer>
+
+        <ClassRegistrationForm>
+          <h3>정규 클래스</h3>
           <LabelContainer>
-            <label htmlFor="studentName">
-              이름 (입금자명)
-              <input type="text" id="studentName" placeholder="Ex. 김민수(김민수)" {...register("name")} />
-            </label>
+            <input type="checkbox" />
+            <span></span>
           </LabelContainer>
-          <LabelContainer>
-            <label htmlFor="studentPhone">
-              연락처
-              <input type="text" id="studentPhone" placeholder="01050946369" {...register("phone")} />
-            </label>
-          </LabelContainer>
-        </StudentEnrollmentForm>
+        </ClassRegistrationForm>
         <ButtonContainer onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}>
           <Button>
             <span>다음</span>&gt;
           </Button>
         </ButtonContainer>
-      </StudioContainer>
+      </ClassContainer>
     </Container>
   );
 };

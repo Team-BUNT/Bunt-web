@@ -56,7 +56,7 @@ const StudioDescription = styled.div`
   margin-top: 2rem;
 `;
 
-const StudentEnrollmentForm = styled.form`
+const ClassRegistrationForm = styled.form`
   width: 100%;
   max-width: 660px;
   min-width: 390px;
@@ -126,7 +126,7 @@ const index = () => {
             해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기
           </StudioDescription>
         </StudioInformation>
-        <StudentEnrollmentForm>
+        <ClassRegistrationForm>
           <LabelContainer>
             <label htmlFor="studentName">
               이름 (입금자명)
@@ -139,7 +139,7 @@ const index = () => {
               <input type="text" id="studentPhone" placeholder="01050946369" {...register("phone")} />
             </label>
           </LabelContainer>
-        </StudentEnrollmentForm>
+        </ClassRegistrationForm>
         <ButtonContainer onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}>
           <Button>
             <span>다음</span>&gt;
