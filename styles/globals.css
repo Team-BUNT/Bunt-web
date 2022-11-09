@@ -102,8 +102,8 @@ section {
 }
 body {
   line-height: 1;
-  font-size: 12px;
-  font-family: "SF Pro Text", sans-serif;
+  font-size: 10px;
+  font-family: "SF Pro Text", "SF Pro Display", "Montserrat", sans-serif;
 }
 ol,
 ul {

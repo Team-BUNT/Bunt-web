@@ -32,16 +32,15 @@ interface IClass {
   hall: IHall;
   isPopUp: boolean;
 }
+const Root = styled.main`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+`;
 
 const Home: NextPage = () => {
   const [enrollment, setEnrollment] = useState<IClass[]>([]);
-
-  const Root = styled.main`
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 100vh;
-  `;
 
   // useEffect(() => {
   //   const classList = new Class(firebaseDB, "classes");

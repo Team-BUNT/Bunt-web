@@ -48,6 +48,7 @@ const ClassLogo = styled.div`
 const ImageContainer = styled.div`
   width: 100%;
   height: 100%;
+  cursor: pointer;
 `;
 
 const index = () => {
@@ -55,7 +56,7 @@ const index = () => {
   const router = useRouter();
 
   const studios = ["bunt", "nfstudio", "movidic", "bonafide"];
-  const getStudiosClasses = (studios: IClass[]) => {
+  const getStudiosClasses = (studios: string[]) => {
     studios.forEach((studio) => {
       const starsRef = ref(firestorage, `/studios/${studio}.png`);
       getDownloadURL(starsRef)

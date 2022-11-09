@@ -71,6 +71,7 @@ const Button = styled.button`
   padding: 0 4rem;
   border: 0;
   margin-top: 5.2rem;
+  cursor: pointer;
   span {
     margin-right: 1.7rem;
   }
