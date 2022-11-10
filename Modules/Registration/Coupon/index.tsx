@@ -1,15 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
-interface DateContainerProps {
-  order: number;
-}
-
-interface CheckboxContainerProps {
-  isFull: boolean;
+interface ButtonProps {
+  pageActionType: string;
 }
 
 const Container = styled.section`
@@ -21,7 +17,7 @@ const Container = styled.section`
   height: 100%;
 `;
 
-const ClassContainer = styled.div`
+const CouponContainer = styled.div`
   width: 100%;
   max-width: 660px;
   min-width: 390px;
@@ -29,7 +25,7 @@ const ClassContainer = styled.div`
   margin-bottom: 2.5rem;
 `;
 
-const ClassInformation = styled.div`
+const CouponInformation = styled.div`
   width: 100%;
   height: auto;
   line-height: 3.2rem;
@@ -46,40 +42,22 @@ const ClassInformation = styled.div`
   }
 `;
 
-const CalenderContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 1.7rem;
+const CouponDescription = styled.div`
+  line-height: 2.2rem;
   margin-top: 1.8rem;
-  span {
+
+  h3 {
+    font-size: 1.7rem;
+    font-weight: 600;
+  }
+
+  div {
+    color: #a4a4a4;
+    word-break: break-all;
+    font-weight: 400;
+    line-height: 2.7rem;
     font-size: 1.5rem;
-    color: #787878;
-  }
-`;
-
-const DateContainers = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.3rem;
-  margin-top: 1.8rem;
-`;
-
-const DateContainer = styled.div<DateContainerProps>`
-  color: ${(props) => props.order === 0 && "red"};
-
-  height: 8.2rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  font-size: 2rem;
-  font-weight: 400;
-
-  div:nth-child(1) {
-    padding: 1.2rem;
-  }
-
-  div:nth-child(2) {
-    margin-top: 1.2rem;
+    margin-top: 1.5rem;
   }
 `;
 
@@ -129,7 +107,7 @@ const LabelContainer = styled.label`
   -ms-user-select: none;
   user-select: none;
 
-  & input[type="checkbox"] {
+  & input[type="radio"] {
     position: absolute;
     opacity: 0;
     border-radius: 50%;
@@ -149,21 +127,21 @@ const LabelContainer = styled.label`
     border-radius: 5px;
   }
 
-  &:hover input[type="checkbox"] ~ span {
+  &:hover input[type="radio"] ~ span {
     background-color: transparent;
     border: 1.5px solid #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span {
+  & input[type="radio"]:checked ~ span {
     border: 1.5px solid #da0000;
     background-color: #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span:after {
+  & input[type="radio"]:checked ~ span:after {
     display: block;
   }
 
-  & input[type="checkbox"]:disabled ~ span {
+  & input[type="radio"]:disabled ~ span {
     background-color: #4b4b4b;
     border-color: #4b4b4b;
   }
@@ -195,31 +173,34 @@ const LabelTextContainer = styled.div`
   margin-left: 2.6rem;
 `;
 
-const LabelText = styled.div<CheckboxContainerProps>`
+const LabelText = styled.div`
   height: 100%;
   font-weight: 400;
   color: #a4a4a4;
   line-height: -5.2rem;
-  color: ${({ isFull }) => isFull && "#787878"};
-  text-decoration: ${({ isFull }) => isFull && "line-through"};
+`;
+const PreviousNextButtonClass = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   font-weight: 600;
-  width: 100%;
   margin-top: 3.2rem;
 `;
 
-const Button = styled.button`
+const Button = styled.button<ButtonProps>`
   background-color: transparent;
   border: 0;
   font-size: 1.7rem;
   cursor: pointer;
 
   span {
-    margin-right: 3.4rem;
+    margin-right: ${({ pageActionType }) => (pageActionType === "next" ? "3.4rem" : "0")};
+    margin-left: ${({ pageActionType }) => (pageActionType === "previous" ? "3.4rem" : "0")};
   }
 `;
 
@@ -228,76 +209,71 @@ const index = () => {
   const { studio } = router.query;
   const { register, handleSubmit } = useForm();
 
-  const regularClasses = [
-    {
-      name: "Narae",
-      genre: "왁킹",
-      time: "17:00",
-      isFull: false,
-    },
-    {
-      name: "Terry",
-      genre: "힙합",
-      time: "18:00",
-      isFull: true,
-    },
-    {
-      name: "Hanna",
-      genre: "걸스힙합",
-      time: "16:00",
-      isFull: false,
-    },
-  ];
+  const user = {
+    name: "레이븐",
+    coupons: ["쿠폰1", "쿠폰2", "쿠폰3"],
+  };
 
-  const popUpClasses = [
+  const couponType = [
     {
-      name: "Narae",
-      genre: "왁킹",
-      time: "17:00",
-      isFull: false,
+      name: `쿠폰 사용 (${user.coupons.length}회 남음)`,
+      type: "use",
     },
     {
-      name: "Luke",
-      genre: "힙합",
-      time: "18:00",
-      isFull: true,
+      name: "쿠폰 구매",
+      type: "buy",
     },
   ];
 
   return (
     <Container>
-      <ClassContainer>
-        <ClassInformation>
+      <CouponContainer>
+        <CouponInformation>
           {typeof studio === "string" &&
             (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
           <h2>클래스 신청 - 클래스 선택</h2>
-        </ClassInformation>
+          <CouponDescription>
+            <h3>공지사항</h3>
+            <div>
+              사전 신청 후. 당일 취소는 환불 및 양도불가, 기존 쿠폰 사용 시, 당일취소 및 노쇼는 자동 차감 되니
+              사전신청시 자신의 스케줄과 상황을 확인하여 신중하게 신청해 주시길 바랍니다.
+            </div>
+          </CouponDescription>
+        </CouponInformation>
 
         <CouponRegistrationForm>
           <CouponRegistrationFormContainer>
             <h3>쿠폰</h3>
-            {/* {regularClasses.map(({ name, genre, time, isFull }, index) => {
+            {couponType.map(({ name, type }, index) => {
               return (
-                <LabelContainer key={`${name} ${index}`}>
-                  {isFull ? <input type="checkbox" onClick={() => false} disabled /> : <input type="checkbox" />}
+                <LabelContainer key={`${name})_${type}_${index}`}>
+                  <input type="radio" name="coupon" />
                   <span></span>
                   <LabelTextContainer>
-                    <LabelText isFull={isFull}>{`${name} ${genre}`}</LabelText>
-                    <LabelText isFull={isFull}>{time}</LabelText>
+                    <LabelText>{name}</LabelText>
                   </LabelTextContainer>
                 </LabelContainer>
               );
-            })} */}
+            })}
           </CouponRegistrationFormContainer>
         </CouponRegistrationForm>
-        <ButtonContainer
-          onClick={() => router.push(`/form/studios/${studio}/coupon`, `/form/studios/${studio}/coupon`)}
-        >
-          <Button>
-            <span>다음</span>&gt;
-          </Button>
-        </ButtonContainer>
-      </ClassContainer>
+        <PreviousNextButtonClass>
+          <ButtonContainer
+            onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}
+          >
+            <Button pageActionType="previous">
+              &lt;<span>이전</span>
+            </Button>
+          </ButtonContainer>
+          <ButtonContainer
+            onClick={() => router.push(`/form/studios/${studio}/payment`, `/form/studios/${studio}/payment`)}
+          >
+            <Button pageActionType="next">
+              <span>다음</span>&gt;
+            </Button>
+          </ButtonContainer>
+        </PreviousNextButtonClass>
+      </CouponContainer>
     </Container>
   );
 };
