@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import styled from "styled-components";
-import HeadMeta from "../../Components/HeadMeta";
+import HeadMeta from "../../../Components/HeadMeta";
 
 const Root = styled.main`
   display: flex;
@@ -39,11 +39,10 @@ const Section = styled.section`
 `;
 
 const BuntGreeting = styled.div`
-  font-family: "Montserrat", sans-serif;
-  width: 26.7rem;
-  font-weight: 800;
-  font-size: 1.8rem;
+  font-weight: 600;
+  font-size: 2rem;
   line-height: 2.6rem;
+
   h3 {
     font-weight: 200;
     font-size: 1.6rem;
@@ -56,17 +55,13 @@ const BuntSlogan = styled.div`
   margin-top: 3.5rem;
   font-size: 1.5rem;
   line-height: 2.6rem;
+  font-weight: 400;
+  letter-spacing: 0.03rem;
   font-family: "SF Pro Display", sans-serif;
-
-  span:nth-child(3) {
-    font-family: "Montserrat", sans-serif;
-    font-weight: bold;
-    color: #da0000;
-  }
 `;
 
 const Button = styled.button`
-  width: 26.7rem;
+  width: 20rem;
   color: black;
   background-color: #ffffff;
   height: 5rem;
@@ -74,23 +69,22 @@ const Button = styled.button`
   font-size: 1.6rem;
   font-weight: bold;
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 0 4rem;
   border: 0;
+  margin: 0 auto;
   margin-top: 5.2rem;
   cursor: pointer;
-  span {
-    margin-right: 1.7rem;
-  }
-
-  Image {
-    color: #da0000;
-  }
 `;
 
 const BottomImageContainer = styled.div`
   padding: 0;
   margin: 0;
+`;
+
+const TextYellow = styled.span`
+  color: #bcb628;
 `;
 
 const index = () => {
@@ -107,17 +101,18 @@ const index = () => {
         <Section>
           <div>
             <BuntGreeting>
-              <h2>Bunt</h2>
+              <h2>신청 완료</h2>
               <h3>Dance Platform Service</h3>
             </BuntGreeting>
             <BuntSlogan>
-              <span>댄스 스튜디오 운영</span>
-              <span>BUNT에서 쉽고 간편하게</span>
-              <span>LIFE IS ON STAGE</span>
+              <span>클래스 신청이 완료되었습니다.</span>
+              <span>
+                자세한 신청 내용은 <TextYellow>카카오 알림톡</TextYellow>을 통해
+              </span>
+              <span>확인해주시기 바랍니다.</span>
             </BuntSlogan>
-            <Button onClick={() => router.push("/form/studios", "/form/studios")}>
-              <span>클래스 신청하러 가기</span>{" "}
-              <Image src="/landingPage/ButtonArrow.png" width={18} height={17}></Image>
+            <Button onClick={() => router.push("/", "/")}>
+              <span>처음으로 돌아가기</span>
             </Button>
           </div>
           <BottomImageContainer>

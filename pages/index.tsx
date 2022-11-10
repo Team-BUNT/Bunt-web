@@ -32,12 +32,6 @@ interface IClass {
   hall: IHall;
   isPopUp: boolean;
 }
-const Root = styled.main`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 100vh;
-`;
 
 const Home: NextPage = () => {
   const [enrollment, setEnrollment] = useState<IClass[]>([]);
@@ -60,11 +54,8 @@ const Home: NextPage = () => {
 
   const { register, handleSubmit } = useForm();
 
-  return (
-    <Root>
-      <LandingPage></LandingPage>
-
-      {/* <StudioInformation
+  {
+    /* <StudioInformation
           studioName="Bunt"
           notice={`카드결제시 현장에서 가능합니다.
 사전신청 후 안내 문자로 정확한 가격 안내 해드리고 있습니다. 10/17 ~ 10/23 까지의 수업 사전 신청서입니다.`}
@@ -98,8 +89,13 @@ const Home: NextPage = () => {
 
           <StudentInputForm register={register}></StudentInputForm>
           <button type="submit">신청하기</button>
-        </form> */}
-    </Root>
+        </form> */
+  }
+
+  return (
+    <>
+      <LandingPage></LandingPage>
+    </>
   );
 };
 
