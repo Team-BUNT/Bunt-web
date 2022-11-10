@@ -10,6 +10,10 @@ interface DateContainerProps {
   order: number;
 }
 
+interface CheckboxContainerProps {
+  isFull: boolean;
+}
+
 const Container = styled.section`
   display: flex;
   flex-direction: column;
@@ -81,25 +85,14 @@ const DateContainer = styled.div<DateContainerProps>`
   }
 `;
 
-{
-  /*
-    <label className={styles.checkBoxContainer}>
-      <input type="checkbox" {...register(classID)} onChange={checkHandler} />
-      <span className={styles.checkmark}></span>
-    </label> 
-*/
-}
-
 const ClassRegistrationForm = styled.form`
   width: 100%;
   max-width: 660px;
   min-width: 390px;
-  padding-top: 3rem;
-  margin-top: 3rem;
-  border-top: 0.1rem solid #363636;
 
   h3 {
     font-size: 1.7rem;
+    font-weight: 600;
   }
 
   label {
@@ -119,13 +112,20 @@ const ClassRegistrationForm = styled.form`
   }
 `;
 
+const ClassRegistrationFormContainer = styled.div`
+  padding-top: 3rem;
+  margin-top: 3rem;
+  border-top: 0.1rem solid #363636;
+`;
+
 const LabelContainer = styled.label`
   display: block;
   position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
+  padding-left: 3.5rem;
+  margin-bottom: 1.2rem;
   cursor: pointer;
-  font-size: 22px;
+  font-size: 2.2rem;
+
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -165,6 +165,11 @@ const LabelContainer = styled.label`
     display: block;
   }
 
+  & input[type="checkbox"]:disabled ~ span {
+    background-color: #4b4b4b;
+    border-color: #4b4b4b;
+  }
+
   span:after {
     content: "";
     position: absolute;
@@ -185,10 +190,26 @@ const LabelContainer = styled.label`
   }
 `;
 
+const LabelTextContainer = styled.div`
+  width: calc(100% - 2.6rem);
+  display: flex;
+  justify-content: space-between;
+  margin-left: 2.6rem;
+`;
+
+const LabelText = styled.div<CheckboxContainerProps>`
+  height: 100%;
+  font-weight: 400;
+  color: #a4a4a4;
+  line-height: -5.2rem;
+  color: ${({ isFull }) => isFull && "#787878"};
+  text-decoration: ${({ isFull }) => isFull && "line-through"};
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-
+  font-weight: 600;
   width: 100%;
   margin-top: 3.2rem;
 `;
@@ -209,6 +230,42 @@ const index = () => {
   const { studio } = router.query;
   const { register, handleSubmit } = useForm();
   const week = findThisWeek();
+
+  const regularClasses = [
+    {
+      name: "Narae",
+      genre: "왁킹",
+      time: "17:00",
+      isFull: false,
+    },
+    {
+      name: "Terry",
+      genre: "힙합",
+      time: "18:00",
+      isFull: true,
+    },
+    {
+      name: "Hanna",
+      genre: "걸스힙합",
+      time: "16:00",
+      isFull: false,
+    },
+  ];
+
+  const popUpClasses = [
+    {
+      name: "Narae",
+      genre: "왁킹",
+      time: "17:00",
+      isFull: false,
+    },
+    {
+      name: "Luke",
+      genre: "힙합",
+      time: "18:00",
+      isFull: true,
+    },
+  ];
 
   return (
     <Container>
@@ -233,13 +290,40 @@ const index = () => {
         </CalenderContainer>
 
         <ClassRegistrationForm>
-          <h3>정규 클래스</h3>
-          <LabelContainer>
-            <input type="checkbox" />
-            <span></span>
-          </LabelContainer>
+          <ClassRegistrationFormContainer>
+            <h3>정규 클래스</h3>
+            {regularClasses.map(({ name, genre, time, isFull }, index) => {
+              return (
+                <LabelContainer key={`${name} ${index}`}>
+                  {isFull ? <input type="checkbox" onClick={() => false} disabled /> : <input type="checkbox" />}
+                  <span></span>
+                  <LabelTextContainer>
+                    <LabelText isFull={isFull}>{`${name} ${genre}`}</LabelText>
+                    <LabelText isFull={isFull}>{time}</LabelText>
+                  </LabelTextContainer>
+                </LabelContainer>
+              );
+            })}
+          </ClassRegistrationFormContainer>
+          <ClassRegistrationFormContainer>
+            <h3>팝업 클래스</h3>
+            {popUpClasses.map(({ name, genre, time, isFull }, index) => {
+              return (
+                <LabelContainer key={`${name} ${index}`}>
+                  {isFull ? <input type="checkbox" onClick={() => false} disabled /> : <input type="checkbox" />}
+                  <span></span>
+                  <LabelTextContainer>
+                    <LabelText isFull={isFull}>{`${name} ${genre}`}</LabelText>
+                    <LabelText isFull={isFull}>{time}</LabelText>
+                  </LabelTextContainer>
+                </LabelContainer>
+              );
+            })}
+          </ClassRegistrationFormContainer>
         </ClassRegistrationForm>
-        <ButtonContainer onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}>
+        <ButtonContainer
+          onClick={() => router.push(`/form/studios/${studio}/coupon`, `/form/studios/${studio}/coupon`)}
+        >
           <Button>
             <span>다음</span>&gt;
           </Button>

@@ -90,7 +90,7 @@ const LabelContainer = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-
+  font-weight: 600;
   width: 100%;
   margin-top: 3.2rem;
 `;
