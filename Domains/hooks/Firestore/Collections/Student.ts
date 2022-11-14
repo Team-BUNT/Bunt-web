@@ -20,7 +20,7 @@ interface ICoupon {
 }
 
 interface IStudent {
-  id: string;
+  ID: string;
   subPhoneNumber?: string;
   name?: string;
   enrollments?: string[];

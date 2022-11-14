@@ -1,10 +1,35 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React from "react";
+import testImage from "../../../public/studios/BuntStudentViewTestImage.png";
+import { Student, Studio } from "../../../Domains/hooks/Firestore";
+import { firestore } from "../../../Domains/firebase";
+
+import Image from "next/image";
 import { useRouter } from "next/router";
+
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import Image from "next/image";
-import testImage from "../../../public/studios/BuntStudentViewTestImage.png";
+import { v4 as uuidv4 } from "uuid";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { getStudio } from "../../../pages/api/studios";
+
+interface INotice {
+  bankAccount: string;
+  description: string;
+  imageURL: string;
+}
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+
+interface IStudio {
+  ID: string;
+  location: string;
+  name: string;
+  notice: INotice[];
+  halls: IHall[];
+}
 
 const Container = styled.section`
   display: flex;
@@ -106,10 +131,10 @@ const Button = styled.button`
   }
 `;
 
-const index = () => {
-  const router = useRouter();
-  const { studio } = router.query;
+const index = ({ studio }: any) => {
   const { register, handleSubmit } = useForm();
+
+  console.log(studio);
 
   return (
     <Container>
@@ -126,25 +151,64 @@ const index = () => {
             해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기
           </StudioDescription>
         </StudioInformation>
-        <ClassRegistrationForm>
+        <ClassRegistrationForm
+          onSubmit={handleSubmit(async (data) => {
+            const checkedClasses = [...Object.keys(data).splice(4)].filter((checkingClassId) => data[checkingClassId]);
+
+            //   try {
+            //     checkedClasses.length !== 0 &&
+            //       checkedClasses.forEach(async (checkedClass) => {
+            //         await new Student(firestore, "student").addData({
+            //           ID: uuidv4(),
+            //           enrolledDate: new Date(),
+            //           classID: checkedClass,
+            //           userName: data.name,
+            //           phoneNumber: data.phone,
+            //           paid: false,
+            //         });
+            //       });
+            //   } catch (error) {
+            //     console.error(error);
+            //   }
+          })}
+
+          //   alert(`${data.name}님  수강신청 완료했습니다 !!`);
+        >
           <LabelContainer>
             <label htmlFor="studentName">
               이름 (입금자명)
-              <input type="text" id="studentName" placeholder="Ex. 김민수(김민수)" {...register("name")} />
+              <input
+                type="text"
+                id="studentName"
+                placeholder="Ex. 김민수(김민수)"
+                {...register("name", {
+                  required: true,
+                })}
+              />
             </label>
           </LabelContainer>
           <LabelContainer>
             <label htmlFor="studentPhone">
               연락처
-              <input type="text" id="studentPhone" placeholder="01050946369" {...register("phone")} />
+              <input
+                type="text"
+                id="studentPhone"
+                placeholder="01050946369"
+                {...register("phone", {
+                  required: true,
+                })}
+              />
             </label>
           </LabelContainer>
+          <ButtonContainer>
+            <Button
+              type="submit"
+              // onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}
+            >
+              <span>다음</span>&gt;
+            </Button>
+          </ButtonContainer>
         </ClassRegistrationForm>
-        <ButtonContainer onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}>
-          <Button>
-            <span>다음</span>&gt;
-          </Button>
-        </ButtonContainer>
       </StudioContainer>
     </Container>
   );
