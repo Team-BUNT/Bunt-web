@@ -131,20 +131,31 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ studio }: any) => {
+const index = ({ studio, url }: any) => {
   const { register, handleSubmit } = useForm();
 
-  console.log(studio);
+  /**
+   * Studio
+   * ID: string;
+   * location: string;
+   * name: string;
+   * notice: {
+   *  bankAccount: string;
+   *  description: string;
+   * };
+   * halls: IHall[];
+   */
+  const { name } = studio;
 
   return (
     <Container>
       <StudioContainer>
         <StudioInformation>
-          {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
+          {typeof name === "string" &&
+            (/studio/gi.test(name) ? <h1>{name.toUpperCase()}</h1> : <h1>{`${name.toUpperCase()} STUDIO`}</h1>)}
           <h2>클래스 신청 - 개인정보</h2>
           <ImageContainer>
-            <Image src={testImage} alt="Studio Image" objectFit="cover" width={660} height={218}></Image>
+            <Image src={url} alt="Studio Image" objectFit="cover" width={660} height={218}></Image>
           </ImageContainer>
           <StudioDescription>
             각 스튜디오에 해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기 각 스튜디오에

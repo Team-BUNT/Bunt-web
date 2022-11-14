@@ -51,37 +51,15 @@ const ImageContainer = styled.div`
   cursor: pointer;
 `;
 
-const index = () => {
-  const [classes, setUrl] = useState<IClass[]>([]);
+const index = ({ studioNames, studioURLs }: any) => {
   const router = useRouter();
 
-  const studios = ["bunt", "nfstudio", "movidic", "bonafide"];
-  const getStudiosClasses = (studios: string[]) => {
-    studios.forEach((studio) => {
-      const starsRef = ref(firestorage, `/studios/${studio}.png`);
-      getDownloadURL(starsRef)
-        .then((url) => {
-          setUrl((classes) => [{ url, name: studio }, ...classes]);
-        })
-        .catch((error) => {
-          switch (error.code) {
-            case "storage/object-not-found":
-              break;
-            case "storage/unauthorized":
-              break;
-            case "storage/canceled":
-              break;
-            case "storage/unknown":
-              break;
-          }
-        });
-    });
-  };
-
-  //TODO: Server side prop으로 리팩토링하기
-  useEffect(() => {
-    getStudiosClasses(studios);
-  }, []);
+  const studioInfo = Array.from({ length: studioNames.length }).map((_, index) => {
+    return {
+      name: studioNames[index],
+      url: studioURLs[index],
+    };
+  });
 
   return (
     <Container>
@@ -90,16 +68,14 @@ const index = () => {
           <div>클래스 신청하러 가기</div>
         </ClassTitle>
         <ClassLogo>
-          {classes
-            .filter((url, i) => classes.indexOf(url) === i)
-            .map(({ name, url }, index) => (
-              <ImageContainer
-                key={`${name}${index}`}
-                onClick={() => router.push(`/form/studios/${name}/login`, `/form/studios/${name}/login`)}
-              >
-                <Image layout="responsive" objectFit="cover" width={362} height={283} src={url}></Image>
-              </ImageContainer>
-            ))}
+          {studioInfo.map(({ name, url }, index) => (
+            <ImageContainer
+              key={`${name}${index}`}
+              onClick={() => router.push(`/form/studios/${name}/login`, `/form/studios/${name}/login`)}
+            >
+              <Image layout="responsive" objectFit="cover" width={362} height={283} src={url}></Image>
+            </ImageContainer>
+          ))}
         </ClassLogo>
       </ClassContainer>
     </Container>
