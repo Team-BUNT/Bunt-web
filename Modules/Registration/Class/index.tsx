@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
@@ -225,11 +225,22 @@ const Button = styled.button`
   }
 `;
 
-const index = () => {
+const index = ({ classes }: any) => {
   const router = useRouter();
   const { studio } = router.query;
   const { register, handleSubmit } = useForm();
   const week = findThisWeek();
+
+  const sortWeek = [...week].map((day) =>
+    [...classes].filter(
+      (aClass) =>
+        // new Date(aClass.date.seconds * 1000)
+        new Date(aClass.date.seconds * 1000).getDate() === day.getDate() &&
+        new Date(aClass.date.seconds * 1000).getMonth() === day.getMonth()
+    )
+  );
+
+  console.log(sortWeek);
 
   const regularClasses = [
     {
@@ -269,10 +280,7 @@ const index = () => {
 
   useEffect(() => {
     if (!router.isReady) return;
-    console.log(studio, "🙆‍♀️ 콘솔에 쿼리 찍힘!");
-  }, [router.isReady, studio]);
-
-  console.log(studio);
+  }, [router.isReady]);
 
   return (
     <Container>
