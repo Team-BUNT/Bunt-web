@@ -26,7 +26,6 @@ interface IStudio {
 }
 
 const login = ({ studio, url }: { studio: IStudio; url: string }) => {
-  console.log(url);
   return <Student studio={studio} url={url}></Student>;
 };
 
@@ -36,7 +35,7 @@ export async function getServerSideProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const results = (await getStudio(studio)) as IStudio[];
 
-  const starsRef = ref(firestorage, `/studios/${studio}.png`);
+  const starsRef = ref(firestorage, `/studios/banner/${studio}.png`);
   const firestorageStudioImage = await getDownloadURL(starsRef);
 
   // if (!results) {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
@@ -266,6 +266,13 @@ const index = () => {
       isFull: true,
     },
   ];
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    console.log(studio, "🙆‍♀️ 콘솔에 쿼리 찍힘!");
+  }, [router.isReady, studio]);
+
+  console.log(studio);
 
   return (
     <Container>

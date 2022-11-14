@@ -110,6 +110,19 @@ const LabelContainer = styled.div`
     font-size: 1.5rem;
     font-weight: 400;
   }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    padding-left: 1rem;
+    color: #da0000;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -132,7 +145,12 @@ const Button = styled.button`
 `;
 
 const index = ({ studio, url }: any) => {
-  const { register, handleSubmit } = useForm();
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   /**
    * Studio
@@ -146,6 +164,7 @@ const index = ({ studio, url }: any) => {
    * halls: IHall[];
    */
   const { name } = studio;
+  const { description } = studio.notice;
 
   return (
     <Container>
@@ -157,33 +176,19 @@ const index = ({ studio, url }: any) => {
           <ImageContainer>
             <Image src={url} alt="Studio Image" objectFit="cover" width={660} height={218}></Image>
           </ImageContainer>
-          <StudioDescription>
-            각 스튜디오에 해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기 각 스튜디오에
-            해당하는 description 가져오기 각 스튜디오에 해당하는 description 가져오기
-          </StudioDescription>
+          <StudioDescription>{description}</StudioDescription>
         </StudioInformation>
         <ClassRegistrationForm
           onSubmit={handleSubmit(async (data) => {
-            const checkedClasses = [...Object.keys(data).splice(4)].filter((checkingClassId) => data[checkingClassId]);
-
-            //   try {
-            //     checkedClasses.length !== 0 &&
-            //       checkedClasses.forEach(async (checkedClass) => {
-            //         await new Student(firestore, "student").addData({
-            //           ID: uuidv4(),
-            //           enrolledDate: new Date(),
-            //           classID: checkedClass,
-            //           userName: data.name,
-            //           phoneNumber: data.phone,
-            //           paid: false,
-            //         });
-            //       });
-            //   } catch (error) {
-            //     console.error(error);
-            //   }
+            try {
+              router.push(
+                { pathname: `/form/studios/${name}/class`, query: { name: data.name, phone: data.phone } },
+                `/form/studios/${name}/class`
+              );
+            } catch (error) {
+              console.error(error);
+            }
           })}
-
-          //   alert(`${data.name}님  수강신청 완료했습니다 !!`);
         >
           <LabelContainer>
             <label htmlFor="studentName">
@@ -193,10 +198,19 @@ const index = ({ studio, url }: any) => {
                 id="studentName"
                 placeholder="Ex. 김민수(김민수)"
                 {...register("name", {
-                  required: true,
+                  required: "이름을 입력해주세요.",
+                  minLength: {
+                    value: 2,
+                    message: "이름은 2글자 이상입니다.",
+                  },
+                  maxLength: {
+                    value: 4,
+                    message: "이름은 4글자 이하입니다.",
+                  },
                 })}
               />
             </label>
+            {errors.name && <p>{errors.name.message}</p>}
           </LabelContainer>
           <LabelContainer>
             <label htmlFor="studentPhone">
@@ -206,16 +220,26 @@ const index = ({ studio, url }: any) => {
                 id="studentPhone"
                 placeholder="01050946369"
                 {...register("phone", {
-                  required: true,
+                  required: "번호를 입력해주세요.",
+                  minLength: {
+                    value: 10,
+                    message: "번호는 최소 10글자 이상입니다.",
+                  },
+                  maxLength: {
+                    value: 11,
+                    message: "번호는 최대 11글자 입니다.",
+                  },
+                  pattern: {
+                    value: /^[0-9]{10,11}$/,
+                    message: "적절한 양식으로 번호를 입력해주세요. (Ex. 01012345678)",
+                  },
                 })}
               />
             </label>
+            {errors.phone && <p>{errors.phone.message}</p>}
           </LabelContainer>
           <ButtonContainer>
-            <Button
-              type="submit"
-              // onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}
-            >
+            <Button type="submit">
               <span>다음</span>&gt;
             </Button>
           </ButtonContainer>
