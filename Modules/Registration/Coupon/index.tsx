@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
+import { Class, Enrollment, Student, Studio } from "../../../Domains/hooks/Firestore";
+import { firestore } from "../../../Domains/firebase";
+import { where } from "firebase/firestore";
 
 interface ButtonProps {
   pageActionType: string;
@@ -85,6 +88,13 @@ const CouponRegistrationForm = styled.form`
     color: #787878;
     background-color: #1c1c1e;
     border-radius: 1rem;
+  }
+
+  p {
+    margin-left: 2rem;
+    margin-top: 2rem;
+    font-size: 1.4rem;
+    color: #da0000;
   }
 `;
 
@@ -193,30 +203,34 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button<ButtonProps>`
-  background-color: transparent;
+  background-color: ${({ pageActionType }) => (pageActionType === "complete" ? "#202020" : "transparent")};
+  border-radius: ${({ pageActionType }) => (pageActionType === "complete" ? "0.7rem" : "0")};
+  width: ${({ pageActionType }) => (pageActionType === "complete" ? "15.5rem" : "auto")};
+  height: ${({ pageActionType }) => (pageActionType === "complete" ? "5rem" : "auto")};
   border: 0;
   font-size: 1.7rem;
   cursor: pointer;
-
+  /* complete */
   span {
     margin-right: ${({ pageActionType }) => (pageActionType === "next" ? "3.4rem" : "0")};
     margin-left: ${({ pageActionType }) => (pageActionType === "previous" ? "3.4rem" : "0")};
   }
 `;
 
-const index = () => {
+const index = ({ couponCount }: { couponCount: number }) => {
   const router = useRouter();
-  const { studio } = router.query;
-  const { register, handleSubmit } = useForm();
+  const { studio, name, phone, selectedClass } = router.query;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const user = {
-    name: "레이븐",
-    coupons: ["쿠폰1", "쿠폰2", "쿠폰3"],
-  };
+  const [use, setUse] = useState(false);
 
   const couponType = [
     {
-      name: `쿠폰 사용 (${user.coupons.length}회 남음)`,
+      name: `쿠폰 사용 (${couponCount}회 남음)`,
       type: "use",
     },
     {
@@ -224,6 +238,8 @@ const index = () => {
       type: "buy",
     },
   ];
+
+  const updateStudent = () => {};
 
   return (
     <Container>
@@ -241,13 +257,124 @@ const index = () => {
           </CouponDescription>
         </CouponInformation>
 
-        <CouponRegistrationForm>
+        <CouponRegistrationForm
+          onSubmit={handleSubmit(async (data, e) => {
+            e?.preventDefault();
+
+            try {
+              if (Object.values(data).every((type) => !type)) {
+                return alert("쿠폰 여부를 하나라도 눌러야 합니다.");
+              }
+
+              if (data.coupon === "use") {
+                if (couponCount === 0 || (selectedClass.length > couponCount && Array.isArray(selectedClass))) {
+                  return alert("쿠폰이 부족합니다.");
+                }
+              }
+
+              /** MEMO
+               * 1. student 내에 coupons, enrollments 최신화
+               * 2. coupon을 사용했기 때문에 enrollment paid = true
+               * 3. enrollment 반영
+               */
+              if (e?.nativeEvent.submitter.textContent === "수강완료") {
+                const studios = await new Studio(firestore, "studios").fetchData();
+                const dancers = await new Class(firestore, "classes").fetchData();
+
+                const studioId = [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+
+                if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
+                  const classIds = selectedClass.map(
+                    (dancerName) => [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
+                  );
+
+                  classIds.forEach(async (classId) => {
+                    const enrollment = {
+                      ID: `${studioId} ${phone}`,
+                      attendance: false,
+                      classID: classId,
+                      enrolledDate: new Date(),
+                      info: "",
+                      paid: true,
+                      paymentType: "쿠폰 사용",
+                      phoneNumber: typeof phone === "string" ? phone : "",
+                      studioID: studioId,
+                      userName: typeof name === "string" ? name : "",
+                    };
+
+                    // await new Enrollment(firestore, "enrollment").addData(enrollment);
+                  });
+
+                  // router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                  return;
+                }
+
+                const classId = [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
+
+                const enrollment = {
+                  ID: `${studioId} ${phone}`,
+                  attendance: false,
+                  classID: classId,
+                  enrolledDate: new Date(),
+                  info: "",
+                  paid: true,
+                  paymentType: "쿠폰 사용",
+                  phoneNumber: typeof phone === "string" ? phone : "",
+                  studioID: studioId,
+                  userName: typeof name === "string" ? name : "",
+                };
+
+                // coupon enrollment 추가
+
+                const studentId = `${studioId} ${phone}`;
+                // const studentObject = await new Student(firestore, "student").updateData(
+                //   studentId,
+                //   {
+                //     studioID: studioId,
+                //     expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                //     isFreePass: false,
+                //     studentID: studentId,
+                //   },
+                //   enrollment
+                // );
+
+                // await new Enrollment(firestore, "enrollment").addData(enrollment);
+
+                // router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                return;
+              }
+
+              router.push(`/form/studios/${studio}/payment`, {
+                query: {
+                  selectedClass,
+                  name,
+                  phone,
+                  couponCount,
+                },
+                pathname: `/form/studios/${studio}/payment`,
+              });
+            } catch (error) {
+              console.error(error);
+            }
+          })}
+        >
           <CouponRegistrationFormContainer>
             <h3>쿠폰</h3>
             {couponType.map(({ name, type }, index) => {
               return (
                 <LabelContainer key={`${name})_${type}_${index}`}>
-                  <input type="radio" name="coupon" />
+                  {couponCount === 0 && type === "use" ? (
+                    <input type="radio" onClick={() => false} disabled />
+                  ) : (
+                    <input
+                      type="radio"
+                      value={type}
+                      {...register("coupon")}
+                      onChange={(e) => {
+                        e.target.value === "use" ? setUse(true) : setUse(false);
+                      }}
+                    />
+                  )}
                   <span></span>
                   <LabelTextContainer>
                     <LabelText>{name}</LabelText>
@@ -256,23 +383,39 @@ const index = () => {
               );
             })}
           </CouponRegistrationFormContainer>
+          <PreviousNextButtonClass>
+            <ButtonContainer>
+              <Button
+                pageActionType="previous"
+                onClick={() =>
+                  router.push(`/form/studios/${studio}/class`, {
+                    query: {
+                      name,
+                      phone,
+                    },
+                    pathname: `/form/studios/${studio}/class`,
+                  })
+                }
+                type="button"
+              >
+                &lt;<span>이전</span>
+              </Button>
+            </ButtonContainer>
+            {!use ? (
+              <ButtonContainer>
+                <Button pageActionType="next" type="submit">
+                  <span>다음</span>&gt;
+                </Button>
+              </ButtonContainer>
+            ) : (
+              <ButtonContainer>
+                <Button pageActionType="complete" type="submit">
+                  <span>수강완료</span>
+                </Button>
+              </ButtonContainer>
+            )}
+          </PreviousNextButtonClass>
         </CouponRegistrationForm>
-        <PreviousNextButtonClass>
-          <ButtonContainer
-            onClick={() => router.push(`/form/studios/${studio}/class`, `/form/studios/${studio}/class`)}
-          >
-            <Button pageActionType="previous">
-              &lt;<span>이전</span>
-            </Button>
-          </ButtonContainer>
-          <ButtonContainer
-            onClick={() => router.push(`/form/studios/${studio}/payment`, `/form/studios/${studio}/payment`)}
-          >
-            <Button pageActionType="next">
-              <span>다음</span>&gt;
-            </Button>
-          </ButtonContainer>
-        </PreviousNextButtonClass>
       </CouponContainer>
     </Container>
   );

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { appendErrors, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
@@ -234,8 +234,13 @@ const Button = styled.button`
 
 const index = ({ classes }: any) => {
   const router = useRouter();
-  const { studio } = router.query;
-  const { register, handleSubmit } = useForm();
+  const { studio, name, phone } = router.query;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const week = findThisWeek();
 
   const sortWeek = [...week].map((day) =>
@@ -250,6 +255,8 @@ const index = ({ classes }: any) => {
   const [targetClasses, settargetClasses] = useState(sortWeek);
 
   const [day, setDay] = useState(0);
+  const [studentName, setstudentName] = useState(name);
+  const [studentPhone, setstudentPhone] = useState(phone);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -283,10 +290,14 @@ const index = ({ classes }: any) => {
           onSubmit={handleSubmit(async (data, e) => {
             e?.preventDefault();
 
+            if (Object.values(data).every((dancer) => !dancer)) return alert("수업을 하나라도 선택해야 합니다.");
+
             try {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
                   selectedClass: [...Object.keys(data)].filter((dancer) => data[dancer] === true),
+                  name: studentName,
+                  phone: studentPhone,
                 },
                 pathname: `/form/studios/${studio}/coupon`,
               });
@@ -359,6 +370,7 @@ const index = ({ classes }: any) => {
                 })
             )}
           </ClassRegistrationFormContainer>
+
           <ButtonContainer>
             <Button type="submit">
               <span>다음</span>&gt;

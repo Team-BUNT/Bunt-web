@@ -5,6 +5,7 @@ import {
   collection,
   collectionGroup,
   CollectionReference,
+  doc,
   DocumentData,
   Firestore,
   getDocs,
@@ -12,13 +13,28 @@ import {
   query,
   QueryConstraint,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 interface ICoupon {
-  studioId: string;
-  expiredDate: Timestamp;
+  studioID: string;
+  expiredDate: Date;
+  isFreePass: boolean;
+  studentID: string;
 }
 
+interface IEnrollment {
+  ID: string;
+  classID: string;
+  userName?: string;
+  phoneNumber?: string;
+  enrolledDate?: Date;
+  paid?: Boolean;
+  paymentType?: string;
+  attendance?: Boolean;
+  info?: string;
+  studioID?: string;
+}
 interface IStudent {
   ID: string;
   subPhoneNumber?: string;
@@ -35,8 +51,8 @@ export default class Student extends FirestoreFetcher {
   constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
     super(db, documentId);
     this.condition = condition;
-    this.studentRef = collection(this.db, "students");
-    this.studentGroupRef = collectionGroup(this.db, "students");
+    this.studentRef = collection(this.db, "student");
+    this.studentGroupRef = collectionGroup(this.db, "student");
   }
 
   async fetchData() {
@@ -76,8 +92,23 @@ export default class Student extends FirestoreFetcher {
   async addData(data: IStudent) {
     try {
       await addDoc(this.studentRef, data);
+      return "Done";
     } catch (error) {
       console.error("Error가 발생했습니다. ", error);
     }
+  }
+
+  async updateData(studentId: string, newCoupons: ICoupon[] | ICoupon, newEnrollments: IEnrollment[] | IEnrollment) {
+    const studentRef = doc(this.db, "student", studentId);
+    const tempStudentAll = await this.getStudentAll();
+
+    const { coupons, enrollments } = Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
+    console.log(coupons, enrollments);
+
+    await updateDoc(studentRef, {
+      coupons: [...coupons, newCoupons],
+      enrollments: [...enrollments, newEnrollments],
+    });
+    return "Done";
   }
 }

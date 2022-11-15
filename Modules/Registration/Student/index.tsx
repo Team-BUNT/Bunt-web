@@ -195,7 +195,7 @@ const index = ({ studio, url }: any) => {
         >
           <LabelContainer>
             <label htmlFor="studentName">
-              이름 (입금자명)
+              이름
               <input
                 type="text"
                 id="studentName"
