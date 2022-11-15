@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { Class, Enrollment, Student, Studio } from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
-import { where } from "firebase/firestore";
 
 interface ButtonProps {
   pageActionType: string;
@@ -277,11 +276,12 @@ const index = ({ couponCount }: { couponCount: number }) => {
                * 2. coupon을 사용했기 때문에 enrollment paid = true
                * 3. enrollment 반영
                */
+
               if (e?.nativeEvent.submitter.textContent === "수강완료") {
                 const studios = await new Studio(firestore, "studios").fetchData();
                 const dancers = await new Class(firestore, "classes").fetchData();
-
                 const studioId = [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+                const studentId = `${studioId} ${phone}`;
 
                 if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
                   const classIds = selectedClass.map(
@@ -302,10 +302,21 @@ const index = ({ couponCount }: { couponCount: number }) => {
                       userName: typeof name === "string" ? name : "",
                     };
 
-                    // await new Enrollment(firestore, "enrollment").addData(enrollment);
+                    const studentObject = await new Student(firestore, "student").updateData(
+                      studentId,
+                      {
+                        studioID: studioId,
+                        expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                        isFreePass: false,
+                        studentID: studentId,
+                      },
+                      enrollment
+                    );
+
+                    await new Enrollment(firestore, "enrollment").addData(enrollment);
                   });
 
-                  // router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                  router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
                   return;
                 }
 
@@ -324,23 +335,20 @@ const index = ({ couponCount }: { couponCount: number }) => {
                   userName: typeof name === "string" ? name : "",
                 };
 
-                // coupon enrollment 추가
+                const studentObject = await new Student(firestore, "student").updateData(
+                  studentId,
+                  {
+                    studioID: studioId,
+                    expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                    isFreePass: false,
+                    studentID: studentId,
+                  },
+                  enrollment
+                );
 
-                const studentId = `${studioId} ${phone}`;
-                // const studentObject = await new Student(firestore, "student").updateData(
-                //   studentId,
-                //   {
-                //     studioID: studioId,
-                //     expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-                //     isFreePass: false,
-                //     studentID: studentId,
-                //   },
-                //   enrollment
-                // );
+                await new Enrollment(firestore, "enrollment").addData(enrollment);
 
-                // await new Enrollment(firestore, "enrollment").addData(enrollment);
-
-                // router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
                 return;
               }
 

@@ -24,8 +24,6 @@ export default coupon;
 export async function getServerSideProps(context: any) {
   const { name, phone, studio } = context.query;
 
-  const studioId = await getStudio(studio);
-
   const student = await getStudent(name, phone);
 
   if (!student) {

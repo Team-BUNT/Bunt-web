@@ -99,16 +99,25 @@ export default class Student extends FirestoreFetcher {
   }
 
   async updateData(studentId: string, newCoupons: ICoupon[] | ICoupon, newEnrollments: IEnrollment[] | IEnrollment) {
+    console.log(this.db, studentId);
     const studentRef = doc(this.db, "student", studentId);
     const tempStudentAll = await this.getStudentAll();
-
     const { coupons, enrollments } = Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
-    console.log(coupons, enrollments);
 
-    await updateDoc(studentRef, {
-      coupons: [...coupons, newCoupons],
-      enrollments: [...enrollments, newEnrollments],
-    });
-    return "Done";
+    if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+      await updateDoc(studentRef, {
+        coupons: [...coupons, newCoupons],
+        enrollments: [...enrollments, newEnrollments],
+      });
+      return "Done";
+    }
+
+    if (Array.isArray(newCoupons) && Array.isArray(newEnrollments)) {
+      await updateDoc(studentRef, {
+        coupons: [...coupons, ...newCoupons],
+        enrollments: [...enrollments, ...newEnrollments],
+      });
+      return "Done";
+    }
   }
 }
