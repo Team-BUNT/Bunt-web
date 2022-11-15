@@ -271,7 +271,13 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
               }
 
               if (data.coupon === "use") {
-                if (couponCount === 0 || (selectedClass.length > couponCount && Array.isArray(selectedClass))) {
+                if (
+                  couponCount === 0 ||
+                  (typeof selectedClass !== "string" &&
+                    selectedClass &&
+                    selectedClass.length > couponCount &&
+                    Array.isArray(selectedClass))
+                ) {
                   return alert("쿠폰이 부족합니다.");
                 }
               }
@@ -282,15 +288,19 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
                * 3. enrollment 반영
                */
 
-              if (e?.nativeEvent.submitter.textContent === "수강완료") {
+              const target = e?.nativeEvent as SubmitEvent;
+              if (target !== null && target.submitter !== null && target.submitter.textContent === "수강완료") {
                 const studios = await new Studio(firestore, "studios").fetchData();
                 const dancers = await new Class(firestore, "classes").fetchData();
-                const studioId = [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+                const studioId =
+                  !(studios instanceof Error) && [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
                 const studentId = `${studioId} ${phone}`;
 
                 if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
                   const classIds = selectedClass.map(
-                    (dancerName) => [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
+                    (dancerName) =>
+                      !(dancers instanceof Error) &&
+                      [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
                   );
 
                   classIds.forEach(async (classId) => {
@@ -325,7 +335,9 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
                   return;
                 }
 
-                const classId = [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
+                const classId =
+                  !(dancers instanceof Error) &&
+                  [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
 
                 const enrollment = {
                   ID: `${studioId} ${phone}`,

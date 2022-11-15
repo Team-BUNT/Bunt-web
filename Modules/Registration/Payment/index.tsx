@@ -560,7 +560,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                     })}
                   />
                 </label>
-                {errors.name && <p>{errors.name.message}</p>}
+                <p>{errors.name && (errors.name.message as string)}</p>
               </LabelInputContainer>
               <DepositeInformation>
                 <h3>계좌 정보</h3>
@@ -574,11 +574,12 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
           <PreviousNextButtonClass>
             <ButtonContainer
               onClick={() => {
-                const user = JSON.parse(localStorage.getItem("user"));
+                const user = localStorage.getItem("user");
+                const { name, phone } = typeof user === "string" && JSON.parse(user);
                 router.push(`/form/studios/${studio}/coupon`, {
                   query: {
-                    name: user !== null && user.name,
-                    phone: user !== null && user.phone,
+                    name,
+                    phone,
                   },
                   pathname: `/form/studios/${studio}/coupon`,
                 });
