@@ -446,7 +446,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                     userName: typeof name === "string" ? name : "",
                   };
 
-                  const studentObject = await new Student(firestore, "student").updateData(
+                  await new Student(firestore, "student").updateData(
                     studentId,
                     {
                       studioID: studioId,
@@ -468,6 +468,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                 !(dancers instanceof Error) &&
                 [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
 
+              console.log(classId);
               const enrollment = {
                 ID: `${studioId} ${phone}`,
                 attendance: false,
@@ -481,7 +482,8 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                 userName: typeof name === "string" ? name : "",
               };
 
-              const studentObject = await new Student(firestore, "student").updateData(
+              console.log(enrollment);
+              await new Student(firestore, "student").updateData(
                 studentId,
                 {
                   studioID: studioId,
@@ -498,6 +500,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
               return;
             } catch (error) {
               console.error(error);
+              router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
             }
           })}
         >
