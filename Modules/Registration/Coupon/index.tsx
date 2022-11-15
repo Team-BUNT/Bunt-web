@@ -317,7 +317,7 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
                       userName: typeof name === "string" ? name : "",
                     };
 
-                    const studentObject = await new Student(firestore, "student").updateData(
+                    await new Student(firestore, "student").updateData(
                       studentId,
                       {
                         studioID: studioId,
@@ -352,7 +352,7 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
                   userName: typeof name === "string" ? name : "",
                 };
 
-                const studentObject = await new Student(firestore, "student").updateData(
+                await new Student(firestore, "student").updateData(
                   studentId,
                   {
                     studioID: studioId,
