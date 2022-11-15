@@ -181,8 +181,13 @@ const index = ({ studio, url }: any) => {
         <ClassRegistrationForm
           onSubmit={handleSubmit(async (data) => {
             try {
-              localStorage.setItem("user", JSON.stringify({ name: data.name, phone: data.phone }));
-              router.push(`/form/studios/${name}/class`);
+              router.push(`/form/studios/${name}/class`, {
+                query: {
+                  name: data.name,
+                  phone: data.phone,
+                },
+                pathname: `/form/studios/${name}/class`,
+              });
             } catch (error) {
               console.error(error);
             }
