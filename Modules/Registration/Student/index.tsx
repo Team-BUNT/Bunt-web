@@ -179,15 +179,52 @@ const index = ({ studio, url }: any) => {
           <StudioDescription>{description}</StudioDescription>
         </StudioInformation>
         <ClassRegistrationForm
-          onSubmit={handleSubmit(async (data) => {
+          onSubmit={handleSubmit(async ({ name, phone }) => {
+            const studentClass = new Student(firestore, "student");
+
+            const allStudent = await studentClass.fetchData();
+            const allStudio = await new Studio(firestore, "studios").fetchData();
+
+            const studioId =
+              !(allStudio instanceof Error) && [...allStudio].filter((aStudio) => aStudio.name === studio)[0].ID;
+
+            const hasStudent =
+              !(allStudent instanceof Error) &&
+              allStudent.filter((aStudent) => aStudent.name === name && aStudent.phoneNumber === phone).length !== 0;
+
+            if (hasStudent) {
+              try {
+                router.push(`/form/studios/${name}/class`, {
+                  query: {
+                    name,
+                    phone,
+                  },
+                  pathname: `/form/studios/${name}/class`,
+                });
+                return;
+              } catch (error) {
+                console.error(error);
+              }
+            }
+
             try {
+              studentClass.addData({
+                ID: `${studioId} ${phone}`,
+                coupons: [],
+                enrollments: [],
+                name,
+                phoneNumber: phone,
+                studioID: studioId,
+                subPhoneNumber: "",
+              });
               router.push(`/form/studios/${name}/class`, {
                 query: {
-                  name: data.name,
-                  phone: data.phone,
+                  name,
+                  phone,
                 },
                 pathname: `/form/studios/${name}/class`,
               });
+              return;
             } catch (error) {
               console.error(error);
             }

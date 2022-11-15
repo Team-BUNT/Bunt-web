@@ -37,9 +37,11 @@ interface IEnrollment {
 }
 interface IStudent {
   ID: string;
+  phoneNumber: string;
   subPhoneNumber?: string;
   name?: string;
   enrollments?: string[];
+  studioID: string;
   coupons?: ICoupon[];
 }
 
@@ -102,7 +104,8 @@ export default class Student extends FirestoreFetcher {
     console.log(this.db, studentId);
     const studentRef = doc(this.db, "student", studentId);
     const tempStudentAll = await this.getStudentAll();
-    const { coupons, enrollments } = Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
+    const { coupons, enrollments } =
+      !(tempStudentAll instanceof Error) && Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
 
     // 쿠폰을 추가하는 형태가 아닌 제거하는 형태
     if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
