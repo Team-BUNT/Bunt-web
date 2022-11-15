@@ -266,7 +266,7 @@ const index = ({ name, phone, couponCount }: { name: string; phone: string; coup
             e?.preventDefault();
 
             try {
-              if (Object.values(data).every((type) => !type)) {
+              if (data.coupon === null) {
                 return alert("쿠폰 여부를 하나라도 눌러야 합니다.");
               }
 
