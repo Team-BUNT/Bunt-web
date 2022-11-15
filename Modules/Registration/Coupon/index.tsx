@@ -216,9 +216,10 @@ const Button = styled.button<ButtonProps>`
   }
 `;
 
-const index = ({ couponCount }: { couponCount: number }) => {
+const index = ({ name, phone, couponCount }: { name: string; phone: string; couponCount: number }) => {
   const router = useRouter();
-  const { studio, name, phone, selectedClass } = router.query;
+  const { studio, selectedClass } = router.query;
+
   const {
     register,
     handleSubmit,
@@ -237,6 +238,10 @@ const index = ({ couponCount }: { couponCount: number }) => {
       type: "buy",
     },
   ];
+
+  useEffect(() => {
+    if (!router.isReady) return;
+  }, [router.isReady]);
 
   const updateStudent = () => {};
 

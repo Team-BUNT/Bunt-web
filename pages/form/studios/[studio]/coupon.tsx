@@ -15,39 +15,44 @@ interface ICoupon {
   expiredDate: Timestamp;
 }
 
-const coupon = ({ name, phone, couponCount }: { couponCount: number; name: string; phone: number }) => {
-  return <Coupon couponCount={couponCount}></Coupon>;
+const coupon = ({ name, phone, couponCount }: { couponCount: number; name: string; phone: string }) => {
+  return <Coupon name={name} phone={phone} couponCount={couponCount}></Coupon>;
 };
 
 export default coupon;
 
 export async function getServerSideProps(context: any) {
-  const { name, phone, studio } = context.query;
+  try {
+    const { name, phone, studio } = await context.query;
+    const student = await getStudent(name, phone);
 
-  const student = await getStudent(name, phone);
+    if (!student || !name || !phone) {
+      return {
+        props: {
+          name,
+          phone,
+          couponCount: 0,
+        },
+      };
+    }
 
-  if (!student) {
+    if (student[0]) {
+      return {
+        props: {
+          name,
+          phone,
+          couponCount: student[0].coupons.length,
+        },
+      };
+    }
+  } catch (error) {
+    const { name, phone, studio } = await context.query;
+    console.error(error);
     return {
-      props: {
-        couponCount: 0,
+      redirect: {
+        destination: encodeURI(`/form/studios/${studio}/class?name=${name}&phone=${phone}`),
+        statusCode: 307,
       },
     };
   }
-
-  // if (!results) {
-  //   return {
-  //     redirect: {
-  //       destination: "/",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
-
-  return {
-    props: {
-      name,
-      phone,
-      couponCount: student[0].coupons.length,
-    },
-  };
 }

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import styled, { keyframes } from "styled-components";
+import { Class, Enrollment, Student, Studio } from "../../../Domains/hooks/Firestore";
+import { firestore } from "../../../Domains/firebase";
 
 interface ButtonProps {
   pageActionType: string;
@@ -185,6 +187,13 @@ const LabelInputContainer = styled.label`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  p {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    padding-left: 1rem;
+    color: #da0000;
+  }
 `;
 
 const LabelText = styled.div`
@@ -264,7 +273,10 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button<ButtonProps>`
-  background-color: transparent;
+  background-color: ${({ pageActionType }) => (pageActionType === "complete" ? "#202020" : "transparent")};
+  border-radius: ${({ pageActionType }) => (pageActionType === "complete" ? "0.7rem" : "0")};
+  width: ${({ pageActionType }) => (pageActionType === "complete" ? "15.5rem" : "auto")};
+  height: ${({ pageActionType }) => (pageActionType === "complete" ? "5rem" : "auto")};
   border: 0;
   font-size: 1.7rem;
   cursor: pointer;
@@ -299,14 +311,17 @@ const Cheap = styled.div`
   visibility: hidden;
 `;
 
-const index = () => {
+const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }: any) => {
   const router = useRouter();
-  const { studio } = router.query;
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [deposite, setDeposite] = useState(false);
 
+  const STUDIO_ADMIN_ACCOUNT = bankAccount;
   const COUPON_TYPE = "모든 쿠폰의 유효기간은 구매 후, 4주 입니다.";
-  const STUDIO_ADMIN_ACCOUNT = "국민은행 993101-01-269374 안미진";
   const CLIPBOARD_MESSAGE = "신청폼 링크가 복사되었습니다.";
 
   const couponType = [
@@ -367,6 +382,10 @@ const index = () => {
     );
   };
 
+  useEffect(() => {
+    if (!router.isReady) return;
+  }, [router.isReady]);
+
   return (
     <Container>
       <CouponContainer>
@@ -387,13 +406,107 @@ const index = () => {
           </CouponDescription>
         </CouponInformation>
 
-        <CouponRegistrationForm>
+        <CouponRegistrationForm
+          onSubmit={handleSubmit(async (data, e) => {
+            e?.preventDefault();
+            const { coupon, payment } = data;
+
+            const user = localStorage.getItem("user");
+            const { name, phone } = typeof user === "string" && JSON.parse(user);
+
+            /** Todo
+             * 1. coupon 개수에 따라 student에 coupon 추가
+             * 2. enrollment 등록
+             */
+
+            try {
+              const studios = await new Studio(firestore, "studios").fetchData();
+              const dancers = await new Class(firestore, "classes").fetchData();
+              const studioId =
+                !(studios instanceof Error) && [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+              const studentId = `${studioId} ${phone}`;
+
+              if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
+                const classIds = selectedClass.map(
+                  (dancerName) =>
+                    !(dancers instanceof Error) &&
+                    [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
+                );
+                classIds.forEach(async (classId) => {
+                  const enrollment = {
+                    ID: `${studioId} ${phone}`,
+                    attendance: false,
+                    classID: classId,
+                    enrolledDate: new Date(),
+                    info: "",
+                    paid: true,
+                    paymentType: "쿠폰 사용",
+                    phoneNumber: typeof phone === "string" ? phone : "",
+                    studioID: studioId,
+                    userName: typeof name === "string" ? name : "",
+                  };
+
+                  const studentObject = await new Student(firestore, "student").updateData(
+                    studentId,
+                    {
+                      studioID: studioId,
+                      expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                      isFreePass: coupon === "프리패스" ? true : false,
+                      studentID: studentId,
+                    },
+                    enrollment
+                  );
+
+                  await new Enrollment(firestore, "enrollment").addData(enrollment);
+                });
+
+                router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                return;
+              }
+
+              const classId =
+                !(dancers instanceof Error) &&
+                [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
+
+              const enrollment = {
+                ID: `${studioId} ${phone}`,
+                attendance: false,
+                classID: classId,
+                enrolledDate: new Date(),
+                info: "",
+                paid: true,
+                paymentType: "쿠폰 사용",
+                phoneNumber: typeof phone === "string" ? phone : "",
+                studioID: studioId,
+                userName: typeof name === "string" ? name : "",
+              };
+
+              const studentObject = await new Student(firestore, "student").updateData(
+                studentId,
+                {
+                  studioID: studioId,
+                  expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                  isFreePass: coupon === "프리패스" ? true : false,
+                  studentID: studentId,
+                },
+                enrollment
+              );
+
+              await new Enrollment(firestore, "enrollment").addData(enrollment);
+
+              router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+              return;
+            } catch (error) {
+              console.error(error);
+            }
+          })}
+        >
           <CouponRegistrationFormContainer>
             <h3>쿠폰 종류</h3>
             {couponType.map(({ type }, index) => {
               return (
                 <LabelContainer key={type + index}>
-                  <input type="radio" name="coupon" />
+                  <input type="radio" value={type} {...register("coupon")} />
                   <span></span>
                   <LabelTextContainer>
                     <LabelText>{type}</LabelText>
@@ -402,8 +515,6 @@ const index = () => {
               );
             })}
           </CouponRegistrationFormContainer>
-        </CouponRegistrationForm>
-        <CouponRegistrationForm>
           <CouponRegistrationFormContainer>
             <h3>결제방법</h3>
             {paymentMethod.map(({ type }, index) => {
@@ -411,12 +522,13 @@ const index = () => {
                 <LabelContainer key={type + index}>
                   <input
                     type="radio"
-                    name="coupon"
+                    value={type}
                     id={type}
                     onClick={() => {
                       const depositeElement = document.getElementById("무통장 입금") as HTMLInputElement;
                       setDeposite(depositeElement.checked);
                     }}
+                    {...register("payment")}
                   />
                   <span></span>
                   <LabelTextContainer>
@@ -426,40 +538,63 @@ const index = () => {
               );
             })}
           </CouponRegistrationFormContainer>
+          {deposite && (
+            <DepositeContainer>
+              <LabelInputContainer>
+                <label htmlFor="studentName">
+                  입금자명
+                  <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Ex. 김민수"
+                    {...register("name", {
+                      required: "이름을 입력해주세요.",
+                      minLength: {
+                        value: 2,
+                        message: "이름은 2글자 이상입니다.",
+                      },
+                      maxLength: {
+                        value: 4,
+                        message: "이름은 4글자 이하입니다.",
+                      },
+                    })}
+                  />
+                </label>
+                {errors.name && <p>{errors.name.message}</p>}
+              </LabelInputContainer>
+              <DepositeInformation>
+                <h3>계좌 정보</h3>
+                <div>
+                  <span>{STUDIO_ADMIN_ACCOUNT}</span>
+                  <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>복사</button>
+                </div>
+              </DepositeInformation>
+            </DepositeContainer>
+          )}
+          <PreviousNextButtonClass>
+            <ButtonContainer
+              onClick={() => {
+                const user = JSON.parse(localStorage.getItem("user"));
+                router.push(`/form/studios/${studio}/coupon`, {
+                  query: {
+                    name: user !== null && user.name,
+                    phone: user !== null && user.phone,
+                  },
+                  pathname: `/form/studios/${studio}/coupon`,
+                });
+              }}
+            >
+              <Button pageActionType="previous">
+                &lt;<span>이전</span>
+              </Button>
+            </ButtonContainer>
+            <ButtonContainer>
+              <Button pageActionType="complete" type="submit">
+                <span>신청완료</span>
+              </Button>
+            </ButtonContainer>
+          </PreviousNextButtonClass>
         </CouponRegistrationForm>
-        {deposite && (
-          <DepositeContainer>
-            <LabelInputContainer>
-              <label htmlFor="studentName">
-                입금자명
-                <input type="text" id="studentName" placeholder="Ex. 김민수" {...register("name")} />
-              </label>
-            </LabelInputContainer>
-            <DepositeInformation>
-              <h3>계좌 정보</h3>
-              <div>
-                <span>{STUDIO_ADMIN_ACCOUNT}</span>
-                <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>복사</button>
-              </div>
-            </DepositeInformation>
-          </DepositeContainer>
-        )}
-        <PreviousNextButtonClass>
-          <ButtonContainer
-            onClick={() => router.push(`/form/studios/${studio}/coupon`, `/form/studios/${studio}/coupon`)}
-          >
-            <Button pageActionType="previous">
-              &lt;<span>이전</span>
-            </Button>
-          </ButtonContainer>
-          <ButtonContainer
-            onClick={() => router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`)}
-          >
-            <Button pageActionType="complete">
-              <span>신청완료</span>
-            </Button>
-          </ButtonContainer>
-        </PreviousNextButtonClass>
       </CouponContainer>
       <Cheap id="cheap">
         <div>{CLIPBOARD_MESSAGE}</div>
