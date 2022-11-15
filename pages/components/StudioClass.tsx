@@ -2,7 +2,7 @@ import styles from "../../styles/Home.module.css";
 
 import { ChangeEvent, useState } from "react";
 
-import { FieldValues, UseFormRegister, useFormState } from "react-hook-form";
+import { FieldValues, UseFormRegister } from "react-hook-form";
 
 interface IClass {
   classTime: string;

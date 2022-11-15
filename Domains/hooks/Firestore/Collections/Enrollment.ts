@@ -24,6 +24,7 @@ interface IEnrollment {
   paymentType?: string;
   attendance?: Boolean;
   info?: string;
+  studioID?: string;
 }
 
 export default class Enrollment extends FirestoreFetcher {

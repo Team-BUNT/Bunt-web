@@ -25,7 +25,7 @@ interface IHall {
 }
 
 interface IStudio {
-  id: string;
+  ID: string;
   name?: string;
   location?: string;
   notice?: INotice;

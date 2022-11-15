@@ -19,7 +19,7 @@ interface IHall {
   capacity: number;
 }
 interface IClass {
-  id: string;
+  ID: string;
   studioId: string;
   title?: string;
   instructorName?: string;
