@@ -2,7 +2,6 @@ import { Timestamp } from "firebase/firestore";
 import React from "react";
 import Coupon from "../../../../Modules/Registration/Coupon/index";
 import { getStudent } from "../../../api/students";
-import { getStudio } from "../../../api/studios";
 
 interface IStudent {
   ID: string;

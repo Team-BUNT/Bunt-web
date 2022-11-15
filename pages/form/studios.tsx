@@ -2,9 +2,6 @@ import Studios from "../../Modules/Registration/Studio/index";
 
 import React from "react";
 import { getAllStudioBannerImageURL, getAllStudios } from "../api/studios";
-import { firestorage } from "../../Domains/firebase";
-import { getDownloadURL, ref } from "firebase/storage";
-import { Studio } from "../../Domains/hooks/Firestore";
 
 interface INotice {
   bankAccount: string;
