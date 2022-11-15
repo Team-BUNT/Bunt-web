@@ -179,24 +179,25 @@ const index = ({ studio, url }: any) => {
           <StudioDescription>{description}</StudioDescription>
         </StudioInformation>
         <ClassRegistrationForm
-          onSubmit={handleSubmit(async ({ name, phone }) => {
+          onSubmit={handleSubmit(async ({ userName, phone }) => {
             const studentClass = new Student(firestore, "student");
 
             const allStudent = await studentClass.fetchData();
             const allStudio = await new Studio(firestore, "studios").fetchData();
 
             const studioId =
-              !(allStudio instanceof Error) && [...allStudio].filter((aStudio) => aStudio.name === studio)[0].ID;
+              !(allStudio instanceof Error) && [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
 
             const hasStudent =
               !(allStudent instanceof Error) &&
-              allStudent.filter((aStudent) => aStudent.name === name && aStudent.phoneNumber === phone).length !== 0;
+              allStudent.filter((aStudent) => aStudent.name === userName && aStudent.phoneNumber === phone).length !==
+                0;
 
             if (hasStudent) {
               try {
                 router.push(`/form/studios/${name}/class`, {
                   query: {
-                    name,
+                    name: userName,
                     phone,
                   },
                   pathname: `/form/studios/${name}/class`,
@@ -212,14 +213,14 @@ const index = ({ studio, url }: any) => {
                 ID: `${studioId} ${phone}`,
                 coupons: [],
                 enrollments: [],
-                name,
+                name: userName,
                 phoneNumber: phone,
                 studioID: studioId,
                 subPhoneNumber: "",
               });
               router.push(`/form/studios/${name}/class`, {
                 query: {
-                  name,
+                  name: userName,
                   phone,
                 },
                 pathname: `/form/studios/${name}/class`,
@@ -237,7 +238,7 @@ const index = ({ studio, url }: any) => {
                 type="text"
                 id="studentName"
                 placeholder="Ex. 김민수(김민수)"
-                {...register("name", {
+                {...register("userName", {
                   required: "이름을 입력해주세요.",
                   minLength: {
                     value: 2,
