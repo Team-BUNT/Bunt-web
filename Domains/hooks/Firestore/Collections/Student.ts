@@ -104,7 +104,7 @@ export default class Student extends FirestoreFetcher {
     console.log(this.db, studentId);
     const studentRef = doc(this.db, "student", studentId);
     const tempStudentAll = await this.getStudentAll();
-    const { coupons, enrollments } =
+    const { coupons, enrollments }: any =
       !(tempStudentAll instanceof Error) && Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
 
     // 쿠폰을 추가하는 형태가 아닌 제거하는 형태

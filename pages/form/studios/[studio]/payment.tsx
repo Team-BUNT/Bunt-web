@@ -2,7 +2,7 @@ import React from "react";
 import Payment from "../../../../Modules/Registration/Payment/index";
 import { getStudio } from "../../../api/studios";
 
-const payment = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }) => (
+const payment = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }: any) => (
   <Payment
     selectedClass={selectedClass}
     studentName={studentName}

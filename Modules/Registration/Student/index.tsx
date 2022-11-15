@@ -251,7 +251,7 @@ const index = ({ studio, url }: any) => {
                 })}
               />
             </label>
-            {errors.name && <p>{errors.name.message}</p>}
+            <p>{errors.userName && (errors.userName.message as string)}</p>
           </LabelContainer>
           <LabelContainer>
             <label htmlFor="studentPhone">
@@ -277,7 +277,7 @@ const index = ({ studio, url }: any) => {
                 })}
               />
             </label>
-            {errors.phone && <p>{errors.phone.message}</p>}
+            <p>{errors.phone && (errors.phone.message as string)}</p>
           </LabelContainer>
           <ButtonContainer>
             <Button type="submit">
