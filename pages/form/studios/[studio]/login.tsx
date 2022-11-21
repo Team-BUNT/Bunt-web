@@ -31,7 +31,7 @@ const login = ({ studio, url }: { studio: IStudio; url: string }) => {
 
 export default login;
 
-export async function getStaticProps(context: { query: { studio: any } }) {
+export async function getServerSideProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const results = (await getStudio(studio)) as IStudio[];
 

@@ -8,7 +8,7 @@ const studios = ({ classes }: any) => <Class classes={classes}></Class>;
 
 export default studios;
 
-export async function getStaticProps(context: { query: { studio: any } }) {
+export async function getServerSideProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const studioId = await getStudio(studio);
   if (studioId) {

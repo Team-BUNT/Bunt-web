@@ -28,7 +28,7 @@ const coupon = ({
 
 export default coupon;
 
-export async function getStaticProps(context: any) {
+export async function getServerSideProps(context: any) {
   try {
     const { name, phone, studio } = await context.query;
     const student = await getStudent(name, phone);
