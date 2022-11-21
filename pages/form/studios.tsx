@@ -28,14 +28,13 @@ const studios = ({ studioNames, studioURLs }: any) => {
 
 export default studios;
 
-export async function getStaticProps() {
-  console.time("timeChecker");
+export async function getServerSideProps() {
+  console.time("studio");
   const studioNames = await getAllStudios();
   const studioURLs =
     studioNames &&
     (await getAllStudioBannerImageURL([...studioNames].map(String)));
-  console.timeEnd("timeChecker");
-
+  console.timeEnd("studio");
   // if (!results) {
   //   return {
   //     redirect: {

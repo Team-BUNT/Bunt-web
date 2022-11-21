@@ -35,7 +35,7 @@ export async function getServerSideProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const results = (await getStudio(studio)) as IStudio[];
 
-  const starsRef = ref(firestorage, `/studios/banner/${studio}.png`);
+  const starsRef = ref(firestorage, `/studios/banner/${studio}.webp`);
   const firestorageStudioImage = await getDownloadURL(starsRef);
 
   // if (!results) {

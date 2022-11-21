@@ -30,7 +30,9 @@ export const getAllStudioBannerImageURL = async (studioNames: string[]) => {
   try {
     const array = Promise.all(
       [...studioNames].map(async (studioName) => {
-        const url = await getDownloadURL(ref(firestorage, `/studios/banner/${studioName}.png`));
+        const url = await getDownloadURL(
+          ref(firestorage, `/studios/banner/${studioName}.webp`)
+        );
         return url;
       })
     );
