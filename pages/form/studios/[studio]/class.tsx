@@ -8,11 +8,13 @@ const studios = ({ classes }: any) => <Class classes={classes}></Class>;
 
 export default studios;
 
-export async function getServerSideProps(context: { query: { studio: any } }) {
+export async function getStaticProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const studioId = await getStudio(studio);
   if (studioId) {
-    const classes = await getClass(studioId[0].ID).then((e) => JSON.parse(JSON.stringify(e)));
+    const classes = await getClass(studioId[0].ID).then((e) =>
+      JSON.parse(JSON.stringify(e))
+    );
 
     return {
       props: {
