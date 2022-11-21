@@ -28,9 +28,13 @@ const studios = ({ studioNames, studioURLs }: any) => {
 
 export default studios;
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
+  console.time("timeChecker");
   const studioNames = await getAllStudios();
-  const studioURLs = studioNames && (await getAllStudioBannerImageURL([...studioNames].map(String)));
+  const studioURLs =
+    studioNames &&
+    (await getAllStudioBannerImageURL([...studioNames].map(String)));
+  console.timeEnd("timeChecker");
 
   // if (!results) {
   //   return {

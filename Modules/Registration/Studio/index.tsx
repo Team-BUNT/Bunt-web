@@ -54,12 +54,14 @@ const ImageContainer = styled.div`
 const index = ({ studioNames, studioURLs }: any) => {
   const router = useRouter();
 
-  const studioInfo = Array.from({ length: studioNames.length }).map((_, index) => {
-    return {
-      name: studioNames[index],
-      url: studioURLs[index],
-    };
-  });
+  const studioInfo = Array.from({ length: studioNames.length }).map(
+    (_, index) => {
+      return {
+        name: studioNames[index],
+        url: studioURLs[index],
+      };
+    }
+  );
 
   return (
     <Container>
@@ -71,9 +73,20 @@ const index = ({ studioNames, studioURLs }: any) => {
           {studioInfo.map(({ name, url }, index) => (
             <ImageContainer
               key={`${name}${index}`}
-              onClick={() => router.push(`/form/studios/${name}/login`, `/form/studios/${name}/login`)}
+              onClick={() =>
+                router.push(
+                  `/form/studios/${name}/login`,
+                  `/form/studios/${name}/login`
+                )
+              }
             >
-              <Image layout="responsive" objectFit="cover" width={362} height={283} src={url}></Image>
+              <Image
+                layout="responsive"
+                objectFit="cover"
+                width={362}
+                height={283}
+                src={url}
+              ></Image>
             </ImageContainer>
           ))}
         </ClassLogo>
