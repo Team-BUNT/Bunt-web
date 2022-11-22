@@ -144,7 +144,7 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ studio, url }: any) => {
+const index = ({ studio }: any) => {
   const router = useRouter();
   const {
     register,
@@ -163,18 +163,30 @@ const index = ({ studio, url }: any) => {
    * };
    * halls: IHall[];
    */
+
   const { name } = studio;
   const { description } = studio.notice;
+  const studioBannerImage = `/studios/banner/${name}.webp`;
 
   return (
     <Container>
       <StudioContainer>
         <StudioInformation>
           {typeof name === "string" &&
-            (/studio/gi.test(name) ? <h1>{name.toUpperCase()}</h1> : <h1>{`${name.toUpperCase()} STUDIO`}</h1>)}
+            (/studio/gi.test(name) ? (
+              <h1>{name.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${name.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 개인정보</h2>
           <ImageContainer>
-            <Image src={url} alt="Studio Image" objectFit="cover" width={660} height={218}></Image>
+            <Image
+              src={studioBannerImage}
+              alt="Studio Image"
+              objectFit="cover"
+              width={660}
+              height={218}
+            ></Image>
           </ImageContainer>
           <StudioDescription>{description}</StudioDescription>
         </StudioInformation>
@@ -183,15 +195,21 @@ const index = ({ studio, url }: any) => {
             const studentClass = new Student(firestore, "student");
 
             const allStudent = await studentClass.fetchData();
-            const allStudio = await new Studio(firestore, "studios").fetchData();
+            const allStudio = await new Studio(
+              firestore,
+              "studios"
+            ).fetchData();
 
             const studioId =
-              !(allStudio instanceof Error) && [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
+              !(allStudio instanceof Error) &&
+              [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
 
             const hasStudent =
               !(allStudent instanceof Error) &&
-              allStudent.filter((aStudent) => aStudent.name === userName && aStudent.phoneNumber === phone).length !==
-                0;
+              allStudent.filter(
+                (aStudent) =>
+                  aStudent.name === userName && aStudent.phoneNumber === phone
+              ).length !== 0;
 
             if (hasStudent) {
               try {
@@ -272,7 +290,8 @@ const index = ({ studio, url }: any) => {
                   },
                   pattern: {
                     value: /^[0-9]{10,11}$/,
-                    message: "적절한 양식으로 번호를 입력해주세요. (Ex. 01012345678)",
+                    message:
+                      "적절한 양식으로 번호를 입력해주세요. (Ex. 01012345678)",
                   },
                 })}
               />

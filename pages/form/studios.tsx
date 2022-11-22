@@ -22,19 +22,15 @@ interface IStudio {
   halls: IHall[];
 }
 
-const studios = ({ studioNames, studioURLs }: any) => {
-  return <Studios studioNames={studioNames} studioURLs={studioURLs}></Studios>;
+const studios = ({ studioNames }: any) => {
+  return <Studios studioNames={studioNames}></Studios>;
 };
 
 export default studios;
 
-export async function getServerSideProps() {
-  console.time("studio");
+export async function getStaticProps() {
   const studioNames = await getAllStudios();
-  const studioURLs =
-    studioNames &&
-    (await getAllStudioBannerImageURL([...studioNames].map(String)));
-  console.timeEnd("studio");
+
   // if (!results) {
   //   return {
   //     redirect: {
@@ -47,7 +43,6 @@ export async function getServerSideProps() {
   return {
     props: {
       studioNames,
-      studioURLs,
     },
   };
 }

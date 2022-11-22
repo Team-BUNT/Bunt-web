@@ -94,7 +94,8 @@ const BottomImageContainer = styled.div`
 `;
 
 const index = () => {
-  const buntIcon = `/bunt.png`;
+  const buntIconImage = `/bunt.png`;
+  const danceImage = `/landingPage/Dance.png`;
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter();
   return (
@@ -102,7 +103,12 @@ const index = () => {
       <Container>
         <HeadMeta title="Bunt"></HeadMeta>
         <Header>
-          <Image src={buntIcon} width={125} height={125} alt="Bunt logo"></Image>
+          <Image
+            src={buntIconImage}
+            width={125}
+            height={125}
+            alt="Bunt logo"
+          ></Image>
         </Header>
         <Section>
           <div>
@@ -115,13 +121,14 @@ const index = () => {
               <span>BUNT에서 쉽고 간편하게</span>
               <span>LIFE IS ON STAGE</span>
             </BuntSlogan>
-            <Button onClick={() => router.push("/form/studios", "/form/studios")}>
+            <Button
+              onClick={() => router.push("/form/studios", "/form/studios")}
+            >
               <span>클래스 신청하러 가기</span>{" "}
-              <Image src="/landingPage/ButtonArrow.png" width={18} height={17}></Image>
             </Button>
           </div>
           <BottomImageContainer>
-            <Image src="/landingPage/Dance.png" width={720} height={270}></Image>
+            <Image src={danceImage} width={720} height={270}></Image>
           </BottomImageContainer>
         </Section>
       </Container>

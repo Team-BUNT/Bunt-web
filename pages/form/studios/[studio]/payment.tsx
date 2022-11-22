@@ -22,7 +22,7 @@ const payment = ({
 
 export default payment;
 
-export async function getServerSideProps(context: {
+export async function getStaticProps(context: {
   query: {
     selectedClass: string;
     name: string;

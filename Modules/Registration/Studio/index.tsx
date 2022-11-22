@@ -51,14 +51,14 @@ const ImageContainer = styled.div`
   cursor: pointer;
 `;
 
-const index = ({ studioNames, studioURLs }: any) => {
+const index = ({ studioNames }: any) => {
   const router = useRouter();
 
   const studioInfo = Array.from({ length: studioNames.length }).map(
     (_, index) => {
       return {
         name: studioNames[index],
-        url: studioURLs[index],
+        url: `/studios/${studioNames[index]}.webp`,
       };
     }
   );
@@ -74,10 +74,11 @@ const index = ({ studioNames, studioURLs }: any) => {
             <ImageContainer
               key={`${name}${index}`}
               onClick={() =>
-                router.push(
-                  `/form/studios/${name}/login`,
-                  `/form/studios/${name}/login`
-                )
+                router.push(`/form/studios/${name}/login`, {
+                  query: {
+                    name,
+                  },
+                })
               }
             >
               <Image

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { firestorage } from "../../../../Domains/firebase";
 import Student from "../../../../Modules/Registration/Student/index";
-import { getStudio } from "../../../api/studios";
+import { getAllStudios, getStudio } from "../../../api/studios";
 
 interface INotice {
   bankAccount: string;
@@ -25,18 +25,34 @@ interface IStudio {
   halls: IHall[];
 }
 
-const login = ({ studio, url }: { studio: IStudio; url: string }) => {
-  return <Student studio={studio} url={url}></Student>;
+const login = ({ targetStudio }: any) => {
+  return <Student studio={targetStudio}></Student>;
 };
 
 export default login;
 
-export async function getServerSideProps(context: { query: { studio: any } }) {
-  const { studio } = context.query;
-  const results = (await getStudio(studio)) as IStudio[];
+// export async function getStaticPaths(context: any) {
+//   const studios = await getAllStudios();
+//   const studioNames =
+//     studios &&
+//     studios.map((studioName) => {
+//       return {
+//         params: studioName,
+//       };
+//     });
 
-  const starsRef = ref(firestorage, `/studios/banner/${studio}.webp`);
-  const firestorageStudioImage = await getDownloadURL(starsRef);
+//   return (
+//     studioNames !== undefined && {
+//       paths: [...studioNames],
+//       fallback: true,
+//     }
+//   );
+// }
+
+export async function getServerSideProps(context: any) {
+  const { studio } = context.query;
+
+  const targetStudio = await getStudio(studio);
 
   // if (!results) {
   //   return {
@@ -49,8 +65,7 @@ export async function getServerSideProps(context: { query: { studio: any } }) {
 
   return {
     props: {
-      studio: results && results[0],
-      url: firestorageStudioImage,
+      targetStudio: targetStudio && targetStudio[0],
     },
   };
 }
