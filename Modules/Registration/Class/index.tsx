@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { appendErrors, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
@@ -210,7 +210,8 @@ const LabelText = styled.div<CheckboxContainerProps>`
   color: #a4a4a4;
   line-height: -5.2rem;
   color: ${({ applicantsCount }) => applicantsCount === 0 && "#787878"};
-  text-decoration: ${({ applicantsCount }) => applicantsCount === 0 && "line-through"};
+  text-decoration: ${({ applicantsCount }) =>
+    applicantsCount === 0 && "line-through"};
 `;
 
 const ButtonContainer = styled.div`
@@ -269,7 +270,11 @@ const index = ({ classes }: any) => {
       <ClassContainer>
         <ClassInformation>
           {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
+            (/studio/gi.test(studio) ? (
+              <h1>{studio.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 클래스 선택</h2>
         </ClassInformation>
         <CalenderContainer>
@@ -278,7 +283,11 @@ const index = ({ classes }: any) => {
           </h3>
           <DateContainers>
             {week.map((day, index) => (
-              <DateContainer key={`${day}_${index}`} order={index} onClick={(event) => dateOnClick(event, index)}>
+              <DateContainer
+                key={`${day}_${index}`}
+                order={index}
+                onClick={(event) => dateOnClick(event, index)}
+              >
                 <div>{day.getDate()}</div>
                 <div>{dayFormatter(day, index)}</div>
               </DateContainer>
@@ -290,12 +299,15 @@ const index = ({ classes }: any) => {
           onSubmit={handleSubmit(async (data, e) => {
             e?.preventDefault();
 
-            if (Object.values(data).every((dancer) => !dancer)) return alert("수업을 하나라도 선택해야 합니다.");
+            if (Object.values(data).every((dancer) => !dancer))
+              return alert("수업을 하나라도 선택해야 합니다.");
 
             try {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
-                  selectedClass: [...Object.keys(data)].filter((dancer) => data[dancer] === true),
+                  selectedClass: [...Object.keys(data)].filter(
+                    (dancer) => data[dancer] === true
+                  ),
                   name: studentName,
                   phone: studentPhone,
                 },
@@ -308,66 +320,92 @@ const index = ({ classes }: any) => {
         >
           <ClassRegistrationFormContainer>
             <h3>정규 클래스</h3>
-            {[...targetClasses][day].filter((value) => !value.isPopUp).length === 0 ? (
+            {[...targetClasses][day].filter((value) => !value.isPopUp)
+              .length === 0 ? (
               <LabelContainer>
                 <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
               </LabelContainer>
             ) : (
               [...targetClasses][day]
                 .filter((value) => !value.isPopUp)
-                .map(({ instructorName, title, date, applicantsCount }, index) => {
-                  return (
-                    <LabelContainer key={`${instructorName} ${index}`}>
-                      {applicantsCount === 0 ? (
-                        <input type="checkbox" onClick={() => false} disabled />
-                      ) : (
-                        <input type="checkbox" {...register(`${instructorName}`)} />
-                      )}
-                      <span></span>
-                      <LabelTextContainer>
-                        <LabelText applicantsCount={applicantsCount}>{`${instructorName} ${title}`}</LabelText>
-                        <LabelText applicantsCount={applicantsCount}>{`${String(
-                          new Date(date.seconds * 1000).getHours()
-                        ).padStart(2, "0")}:${String(new Date(date.seconds * 1000).getMinutes()).padStart(
-                          2,
-                          "0"
-                        )}`}</LabelText>
-                      </LabelTextContainer>
-                    </LabelContainer>
-                  );
-                })
+                .map(
+                  ({ instructorName, title, date, applicantsCount }, index) => {
+                    return (
+                      <LabelContainer key={`${instructorName} ${index}`}>
+                        {applicantsCount === 0 ? (
+                          <input
+                            type="checkbox"
+                            onClick={() => false}
+                            disabled
+                          />
+                        ) : (
+                          <input
+                            type="checkbox"
+                            {...register(`${instructorName}`)}
+                          />
+                        )}
+                        <span></span>
+                        <LabelTextContainer>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                          >{`${instructorName} ${title}`}</LabelText>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                          >{`${String(
+                            new Date(date.seconds * 1000).getHours()
+                          ).padStart(2, "0")}:${String(
+                            new Date(date.seconds * 1000).getMinutes()
+                          ).padStart(2, "0")}`}</LabelText>
+                        </LabelTextContainer>
+                      </LabelContainer>
+                    );
+                  }
+                )
             )}
           </ClassRegistrationFormContainer>
           <ClassRegistrationFormContainer>
             <h3>팝업 클래스</h3>
-            {[...targetClasses][day].filter((value) => value.isPopUp).length === 0 ? (
+            {[...targetClasses][day].filter((value) => value.isPopUp).length ===
+            0 ? (
               <LabelContainer>
                 <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
               </LabelContainer>
             ) : (
               [...targetClasses][day]
                 .filter((value) => value.isPopUp)
-                .map(({ instructorName, title, date, applicantsCount }, index) => {
-                  return (
-                    <LabelContainer key={`${instructorName} ${index}`}>
-                      {applicantsCount === 0 ? (
-                        <input type="checkbox" onClick={() => false} disabled />
-                      ) : (
-                        <input type="checkbox" {...register(`${instructorName}`)} />
-                      )}
-                      <span></span>
-                      <LabelTextContainer>
-                        <LabelText applicantsCount={applicantsCount}>{`${instructorName} ${title}`}</LabelText>
-                        <LabelText applicantsCount={applicantsCount}>{`${String(
-                          new Date(date.seconds * 1000).getHours()
-                        ).padStart(2, "0")}:${String(new Date(date.seconds * 1000).getMinutes()).padStart(
-                          2,
-                          "0"
-                        )}`}</LabelText>
-                      </LabelTextContainer>
-                    </LabelContainer>
-                  );
-                })
+                .map(
+                  ({ instructorName, title, date, applicantsCount }, index) => {
+                    return (
+                      <LabelContainer key={`${instructorName} ${index}`}>
+                        {applicantsCount === 0 ? (
+                          <input
+                            type="checkbox"
+                            onClick={() => false}
+                            disabled
+                          />
+                        ) : (
+                          <input
+                            type="checkbox"
+                            {...register(`${instructorName}`)}
+                          />
+                        )}
+                        <span></span>
+                        <LabelTextContainer>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                          >{`${instructorName} ${title}`}</LabelText>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                          >{`${String(
+                            new Date(date.seconds * 1000).getHours()
+                          ).padStart(2, "0")}:${String(
+                            new Date(date.seconds * 1000).getMinutes()
+                          ).padStart(2, "0")}`}</LabelText>
+                        </LabelTextContainer>
+                      </LabelContainer>
+                    );
+                  }
+                )
             )}
           </ClassRegistrationFormContainer>
 

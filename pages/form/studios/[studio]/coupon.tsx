@@ -14,7 +14,15 @@ interface ICoupon {
   expiredDate: Timestamp;
 }
 
-const coupon = ({ name, phone, couponCount }: { couponCount: number; name: string; phone: string }) => {
+const coupon = ({
+  name,
+  phone,
+  couponCount,
+}: {
+  couponCount: number;
+  name: string;
+  phone: string;
+}) => {
   return <Coupon name={name} phone={phone} couponCount={couponCount}></Coupon>;
 };
 
@@ -49,7 +57,9 @@ export async function getServerSideProps(context: any) {
     console.error(error);
     return {
       redirect: {
-        destination: encodeURI(`/form/studios/${studio}/class?name=${name}&phone=${phone}`),
+        destination: encodeURI(
+          `/form/studios/${studio}/class?name=${name}&phone=${phone}`
+        ),
         statusCode: 307,
       },
     };

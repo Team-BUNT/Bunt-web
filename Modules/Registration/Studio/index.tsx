@@ -1,12 +1,9 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from "react";
-import { firestorage } from "../../../Domains/firebase";
 
 import { useRouter } from "next/router";
 import Image from "next/image";
 
-import { getDownloadURL, ref } from "firebase/storage";
 import styled from "styled-components";
 
 interface IClass {
@@ -51,15 +48,17 @@ const ImageContainer = styled.div`
   cursor: pointer;
 `;
 
-const index = ({ studioNames, studioURLs }: any) => {
+const index = ({ studioNames }: any) => {
   const router = useRouter();
 
-  const studioInfo = Array.from({ length: studioNames.length }).map((_, index) => {
-    return {
-      name: studioNames[index],
-      url: studioURLs[index],
-    };
-  });
+  const studioInfo = Array.from({ length: studioNames.length }).map(
+    (_, index) => {
+      return {
+        name: studioNames[index],
+        url: `/studios/${studioNames[index]}.webp`,
+      };
+    }
+  );
 
   return (
     <Container>
@@ -71,9 +70,15 @@ const index = ({ studioNames, studioURLs }: any) => {
           {studioInfo.map(({ name, url }, index) => (
             <ImageContainer
               key={`${name}${index}`}
-              onClick={() => router.push(`/form/studios/${name}/login`, `/form/studios/${name}/login`)}
+              onClick={() => router.push(`/form/studios/${name}/login`)}
             >
-              <Image layout="responsive" objectFit="cover" width={362} height={283} src={url}></Image>
+              <Image
+                layout="responsive"
+                objectFit="cover"
+                width={362}
+                height={283}
+                src={url}
+              ></Image>
             </ImageContainer>
           ))}
         </ClassLogo>

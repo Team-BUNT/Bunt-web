@@ -1,7 +1,7 @@
 import Studios from "../../Modules/Registration/Studio/index";
 
 import React from "react";
-import { getAllStudioBannerImageURL, getAllStudios } from "../api/studios";
+import { getAllStudios } from "../api/studios";
 
 interface INotice {
   bankAccount: string;
@@ -22,15 +22,14 @@ interface IStudio {
   halls: IHall[];
 }
 
-const studios = ({ studioNames, studioURLs }: any) => {
-  return <Studios studioNames={studioNames} studioURLs={studioURLs}></Studios>;
+const studios = ({ studioNames }: any) => {
+  return <Studios studioNames={studioNames}></Studios>;
 };
 
 export default studios;
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const studioNames = await getAllStudios();
-  const studioURLs = studioNames && (await getAllStudioBannerImageURL([...studioNames].map(String)));
 
   // if (!results) {
   //   return {
@@ -44,7 +43,6 @@ export async function getServerSideProps() {
   return {
     props: {
       studioNames,
-      studioURLs,
     },
   };
 }

@@ -2,7 +2,14 @@ import React from "react";
 import Payment from "../../../../Modules/Registration/Payment/index";
 import { getStudio } from "../../../api/studios";
 
-const payment = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }: any) => (
+const payment = ({
+  selectedClass,
+  studentName,
+  studentPhoneNumber,
+  couponCount,
+  studio,
+  bankAccount,
+}: any) => (
   <Payment
     selectedClass={selectedClass}
     studentName={studentName}
@@ -16,7 +23,13 @@ const payment = ({ selectedClass, studentName, studentPhoneNumber, couponCount, 
 export default payment;
 
 export async function getServerSideProps(context: {
-  query: { selectedClass: string; name: string; phone: string; couponCount: string; studio: string };
+  query: {
+    selectedClass: string;
+    name: string;
+    phone: string;
+    couponCount: string;
+    studio: string;
+  };
 }) {
   const { selectedClass, name, phone, couponCount, studio } = context.query;
 

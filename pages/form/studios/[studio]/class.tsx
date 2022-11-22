@@ -1,4 +1,3 @@
-import { ref } from "firebase/storage";
 import React from "react";
 import Class from "../../../../Modules/Registration/Class/index";
 import { getClass } from "../../../api/classes";
@@ -12,7 +11,9 @@ export async function getServerSideProps(context: { query: { studio: any } }) {
   const { studio } = context.query;
   const studioId = await getStudio(studio);
   if (studioId) {
-    const classes = await getClass(studioId[0].ID).then((e) => JSON.parse(JSON.stringify(e)));
+    const classes = await getClass(studioId[0].ID).then((e) =>
+      JSON.parse(JSON.stringify(e))
+    );
 
     return {
       props: {

@@ -2,8 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import styled, { keyframes } from "styled-components";
-import { Class, Enrollment, Student, Studio } from "../../../Domains/hooks/Firestore";
+import styled from "styled-components";
+import {
+  Class,
+  Enrollment,
+  Student,
+  Studio,
+} from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
 
 interface ButtonProps {
@@ -273,10 +278,14 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button<ButtonProps>`
-  background-color: ${({ pageActionType }) => (pageActionType === "complete" ? "#202020" : "transparent")};
-  border-radius: ${({ pageActionType }) => (pageActionType === "complete" ? "0.7rem" : "0")};
-  width: ${({ pageActionType }) => (pageActionType === "complete" ? "15.5rem" : "auto")};
-  height: ${({ pageActionType }) => (pageActionType === "complete" ? "5rem" : "auto")};
+  background-color: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "#202020" : "transparent"};
+  border-radius: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "0.7rem" : "0"};
+  width: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "15.5rem" : "auto"};
+  height: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "5rem" : "auto"};
   border: 0;
   font-size: 1.7rem;
   cursor: pointer;
@@ -286,11 +295,15 @@ const Button = styled.button<ButtonProps>`
     justify-content: center;
     align-items: center;
 
-    width: ${({ pageActionType }) => pageActionType === "complete" && "15.5rem"};
+    width: ${({ pageActionType }) =>
+      pageActionType === "complete" && "15.5rem"};
     height: ${({ pageActionType }) => pageActionType === "complete" && "5rem"};
-    border-radius: ${({ pageActionType }) => pageActionType === "complete" && "0.7rem"};
-    background-color: ${({ pageActionType }) => pageActionType === "complete" && "#202020"};
-    margin-left: ${({ pageActionType }) => (pageActionType === "previous" ? "3.4rem" : "0")};
+    border-radius: ${({ pageActionType }) =>
+      pageActionType === "complete" && "0.7rem"};
+    background-color: ${({ pageActionType }) =>
+      pageActionType === "complete" && "#202020"};
+    margin-left: ${({ pageActionType }) =>
+      pageActionType === "previous" ? "3.4rem" : "0"};
   }
 `;
 
@@ -311,7 +324,14 @@ const Cheap = styled.div`
   visibility: hidden;
 `;
 
-const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }: any) => {
+const index = ({
+  selectedClass,
+  studentName,
+  studentPhoneNumber,
+  couponCount,
+  studio,
+  bankAccount,
+}: any) => {
   const router = useRouter();
   const {
     register,
@@ -391,7 +411,11 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
       <CouponContainer>
         <CouponInformation>
           {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
+            (/studio/gi.test(studio) ? (
+              <h1>{studio.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 결제</h2>
           <CouponDescription>
             <h3>쿠폰 가격</h3>
@@ -412,7 +436,8 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
             const { coupon, payment } = data;
 
             const user = localStorage.getItem("user");
-            const { name, phone } = typeof user === "string" && JSON.parse(user);
+            const { name, phone } =
+              typeof user === "string" && JSON.parse(user);
 
             /** Todo
              * 1. coupon 개수에 따라 student에 coupon 추가
@@ -420,17 +445,23 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
              */
 
             try {
-              const studios = await new Studio(firestore, "studios").fetchData();
+              const studios = await new Studio(
+                firestore,
+                "studios"
+              ).fetchData();
               const dancers = await new Class(firestore, "classes").fetchData();
               const studioId =
-                !(studios instanceof Error) && [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+                !(studios instanceof Error) &&
+                [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
               const studentId = `${studioId} ${phone}`;
 
               if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
                 const classIds = selectedClass.map(
                   (dancerName) =>
                     !(dancers instanceof Error) &&
-                    [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
+                    [...dancers].filter(
+                      (dance) => dance.instructorName === dancerName
+                    )[0].ID
                 );
                 classIds.forEach(async (classId) => {
                   const enrollment = {
@@ -446,27 +477,39 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                     userName: typeof name === "string" ? name : "",
                   };
 
-                  const studentObject = await new Student(firestore, "student").updateData(
+                  const studentObject = await new Student(
+                    firestore,
+                    "student"
+                  ).updateData(
                     studentId,
                     {
                       studioID: studioId,
-                      expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                      expiredDate: new Date(
+                        new Date().setDate(new Date().getDate() + 30)
+                      ),
                       isFreePass: coupon === "프리패스" ? true : false,
                       studentID: studentId,
                     },
                     enrollment
                   );
 
-                  await new Enrollment(firestore, "enrollment").addData(enrollment);
+                  await new Enrollment(firestore, "enrollment").addData(
+                    enrollment
+                  );
                 });
 
-                router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+                router.push(
+                  `/form/studios/${studio}/complete`,
+                  `/form/studios/${studio}/complete`
+                );
                 return;
               }
 
               const classId =
                 !(dancers instanceof Error) &&
-                [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
+                [...dancers].filter(
+                  (dance) => dance.instructorName === selectedClass
+                )[0].ID;
 
               const enrollment = {
                 ID: `${studioId} ${phone}`,
@@ -481,11 +524,16 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                 userName: typeof name === "string" ? name : "",
               };
 
-              const studentObject = await new Student(firestore, "student").updateData(
+              const studentObject = await new Student(
+                firestore,
+                "student"
+              ).updateData(
                 studentId,
                 {
                   studioID: studioId,
-                  expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+                  expiredDate: new Date(
+                    new Date().setDate(new Date().getDate() + 30)
+                  ),
                   isFreePass: coupon === "프리패스" ? true : false,
                   studentID: studentId,
                 },
@@ -494,7 +542,10 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
 
               await new Enrollment(firestore, "enrollment").addData(enrollment);
 
-              router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
+              router.push(
+                `/form/studios/${studio}/complete`,
+                `/form/studios/${studio}/complete`
+              );
               return;
             } catch (error) {
               console.error(error);
@@ -525,7 +576,9 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                     value={type}
                     id={type}
                     onClick={() => {
-                      const depositeElement = document.getElementById("무통장 입금") as HTMLInputElement;
+                      const depositeElement = document.getElementById(
+                        "무통장 입금"
+                      ) as HTMLInputElement;
                       setDeposite(depositeElement.checked);
                     }}
                     {...register("payment")}
@@ -566,7 +619,9 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                 <h3>계좌 정보</h3>
                 <div>
                   <span>{STUDIO_ADMIN_ACCOUNT}</span>
-                  <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>복사</button>
+                  <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>
+                    복사
+                  </button>
                 </div>
               </DepositeInformation>
             </DepositeContainer>
@@ -575,7 +630,8 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
             <ButtonContainer
               onClick={() => {
                 const user = localStorage.getItem("user");
-                const { name, phone } = typeof user === "string" && JSON.parse(user);
+                const { name, phone } =
+                  typeof user === "string" && JSON.parse(user);
                 router.push(`/form/studios/${studio}/coupon`, {
                   query: {
                     name,
