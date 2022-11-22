@@ -138,7 +138,7 @@ const LabelContainer = styled.label`
   -ms-user-select: none;
   user-select: none;
 
-  & input[type="checkbox"] {
+  & input[type="radio"] {
     position: absolute;
     opacity: 0;
     border-radius: 50%;
@@ -158,21 +158,21 @@ const LabelContainer = styled.label`
     border-radius: 5px;
   }
 
-  &:hover input[type="checkbox"] ~ span {
+  &:hover input[type="radio"] ~ span {
     background-color: transparent;
     border: 1.5px solid #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span {
+  & input[type="radio"]:checked ~ span {
     border: 1.5px solid #da0000;
     background-color: #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span:after {
+  & input[type="radio"]:checked ~ span:after {
     display: block;
   }
 
-  & input[type="checkbox"]:disabled ~ span {
+  & input[type="radio"]:disabled ~ span {
     background-color: #4b4b4b;
     border-color: #4b4b4b;
   }
@@ -333,14 +333,10 @@ const index = ({ classes }: any) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
                         {applicantsCount === 0 ? (
-                          <input
-                            type="checkbox"
-                            onClick={() => false}
-                            disabled
-                          />
+                          <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
-                            type="checkbox"
+                            type="radio"
                             {...register(`${instructorName}`)}
                           />
                         )}
@@ -378,14 +374,10 @@ const index = ({ classes }: any) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
                         {applicantsCount === 0 ? (
-                          <input
-                            type="checkbox"
-                            onClick={() => false}
-                            disabled
-                          />
+                          <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
-                            type="checkbox"
+                            type="radio"
                             {...register(`${instructorName}`)}
                           />
                         )}
