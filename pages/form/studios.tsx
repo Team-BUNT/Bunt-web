@@ -1,7 +1,7 @@
 import Studios from "../../Modules/Registration/Studio/index";
 
 import React from "react";
-import { getAllStudioBannerImageURL, getAllStudios } from "../api/studios";
+import { getAllStudios } from "../api/studios";
 
 interface INotice {
   bankAccount: string;

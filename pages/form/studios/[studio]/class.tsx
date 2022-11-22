@@ -1,4 +1,3 @@
-import { ref } from "firebase/storage";
 import React from "react";
 import Class from "../../../../Modules/Registration/Class/index";
 import { getClass } from "../../../api/classes";

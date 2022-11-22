@@ -1,5 +1,4 @@
-import { getDownloadURL, ref } from "firebase/storage";
-import { firestorage, firestore } from "../../Domains/firebase";
+import { firestore } from "../../Domains/firebase";
 import { Studio } from "../../Domains/hooks/Firestore";
 
 export const getStudio = async (studio: string) => {

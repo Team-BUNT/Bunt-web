@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { getDownloadURL, ref } from "firebase/storage";
-import { useRouter } from "next/router";
+
 import React from "react";
-import { firestorage } from "../../../../Domains/firebase";
 import Student from "../../../../Modules/Registration/Student/index";
-import { getAllStudios, getStudio } from "../../../api/studios";
+import { getStudio } from "../../../api/studios";
 
 interface INotice {
   bankAccount: string;

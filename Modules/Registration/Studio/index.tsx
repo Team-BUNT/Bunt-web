@@ -1,12 +1,9 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from "react";
-import { firestorage } from "../../../Domains/firebase";
 
 import { useRouter } from "next/router";
 import Image from "next/image";
 
-import { getDownloadURL, ref } from "firebase/storage";
 import styled from "styled-components";
 
 interface IClass {

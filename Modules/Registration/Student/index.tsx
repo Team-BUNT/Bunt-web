@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import testImage from "../../../public/studios/BuntStudentViewTestImage.png";
+
 import { Student, Studio } from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
 
@@ -8,9 +8,6 @@ import { useRouter } from "next/router";
 
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import { v4 as uuidv4 } from "uuid";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { getStudio } from "../../../pages/api/studios";
 
 interface INotice {
   bankAccount: string;
