@@ -48,7 +48,9 @@ export async function getServerSideProps(context: any) {
         props: {
           name,
           phone,
-          couponCount: student[0].coupons.length,
+          couponCount: student[0].coupons.filter(
+            (coupon: any) => !!coupon.classID
+          ).length,
         },
       };
     }

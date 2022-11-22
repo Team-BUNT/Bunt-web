@@ -483,6 +483,7 @@ const index = ({
                   ).updateData(
                     studentId,
                     {
+                      classID: classId,
                       studioID: studioId,
                       expiredDate: new Date(
                         new Date().setDate(new Date().getDate() + 30)
@@ -530,6 +531,7 @@ const index = ({
               ).updateData(
                 studentId,
                 {
+                  classID: classId,
                   studioID: studioId,
                   expiredDate: new Date(
                     new Date().setDate(new Date().getDate() + 30)

@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 
 interface ICoupon {
+  classID: null | string;
   studioID: string;
   expiredDate: Date;
   isFreePass: boolean;
@@ -50,7 +51,11 @@ export default class Student extends FirestoreFetcher {
   studentRef: CollectionReference<DocumentData>;
   studentGroupRef: Query<DocumentData>;
 
-  constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
+  constructor(
+    db: Firestore,
+    documentId: string,
+    condition?: QueryConstraint[]
+  ) {
     super(db, documentId);
     this.condition = condition;
     this.studentRef = collection(this.db, "student");
@@ -79,7 +84,8 @@ export default class Student extends FirestoreFetcher {
   }
 
   private async getStudents() {
-    if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
+    if (this.condition === undefined)
+      return new Error("조건을 입력해야 합니다.");
 
     const studentsRef = query(this.studentGroupRef, ...this.condition);
     const querySnapshot = await getDocs(studentsRef);
@@ -100,17 +106,39 @@ export default class Student extends FirestoreFetcher {
     }
   }
 
-  async updateData(studentId: string, newCoupons: ICoupon[] | ICoupon, newEnrollments: IEnrollment[] | IEnrollment) {
-    console.log(this.db, studentId);
+  async updateData(
+    studentId: string,
+    newCoupons: ICoupon[] | ICoupon,
+    newEnrollments: IEnrollment[] | IEnrollment
+  ) {
     const studentRef = doc(this.db, "student", studentId);
     const tempStudentAll = await this.getStudentAll();
     const { coupons, enrollments }: any =
-      !(tempStudentAll instanceof Error) && Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
+      !(tempStudentAll instanceof Error) &&
+      Array.from(tempStudentAll).filter(
+        (student) => student.ID === studentId
+      )[0];
 
-    // 쿠폰을 추가하는 형태가 아닌 제거하는 형태
     if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+      if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+        await updateDoc(studentRef, {
+          enrollments: [...enrollments, newEnrollments],
+        });
+
+      const noneClassIdCoupons = [...coupons].filter(
+        (coupon) => !coupon.classID
+      );
+      const haveClassIdCoupons = [...coupons].filter(
+        (coupon) => coupon.classID
+      );
+
+      const sortedCoupons = [...noneClassIdCoupons]
+        .filter((coupon) => !coupon.classID)
+        .sort((a, b) => b.expiredDate - a.expiredDate);
+      sortedCoupons[0].classID = newEnrollments.classID;
+
       await updateDoc(studentRef, {
-        coupons: [...coupons, newCoupons],
+        coupons: [...haveClassIdCoupons, ...sortedCoupons],
         enrollments: [...enrollments, newEnrollments],
       });
       return "Done";
