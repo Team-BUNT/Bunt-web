@@ -435,6 +435,7 @@ const index = ({
                 return;
               }
 
+              // 쿠폰 구매를 누르고 다음 버튼을 누를 시
               router.push(`/form/studios/${studio}/payment`, {
                 query: {
                   selectedClass,

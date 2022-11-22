@@ -120,9 +120,11 @@ const ClassRegistrationForm = styled.form`
 `;
 
 const ClassRegistrationFormContainer = styled.div`
-  padding-top: 3rem;
-  margin-top: 3rem;
-  border-top: 0.1rem solid #363636;
+  h3 {
+    padding-top: 3rem;
+    margin-top: 3rem;
+    border-top: 0.1rem solid #363636;
+  }
 `;
 
 const LabelContainer = styled.label`
@@ -296,18 +298,15 @@ const index = ({ classes }: any) => {
         </CalenderContainer>
 
         <ClassRegistrationForm
-          onSubmit={handleSubmit(async (data, e) => {
+          onSubmit={handleSubmit(async ({ dancer }, e) => {
             e?.preventDefault();
 
-            if (Object.values(data).every((dancer) => !dancer))
-              return alert("수업을 하나라도 선택해야 합니다.");
+            if (!dancer) return alert("수업을 하나라도 선택해야 합니다.");
 
             try {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
-                  selectedClass: [...Object.keys(data)].filter(
-                    (dancer) => data[dancer] === true
-                  ),
+                  selectedClass: [dancer].length,
                   name: studentName,
                   phone: studentPhone,
                 },
@@ -337,7 +336,9 @@ const index = ({ classes }: any) => {
                         ) : (
                           <input
                             type="radio"
-                            {...register(`${instructorName}`)}
+                            id="dancer"
+                            value={`${instructorName}`}
+                            {...register(`dancer`)}
                           />
                         )}
                         <span></span>
@@ -358,8 +359,7 @@ const index = ({ classes }: any) => {
                   }
                 )
             )}
-          </ClassRegistrationFormContainer>
-          <ClassRegistrationFormContainer>
+
             <h3>팝업 클래스</h3>
             {[...targetClasses][day].filter((value) => value.isPopUp).length ===
             0 ? (
@@ -378,7 +378,9 @@ const index = ({ classes }: any) => {
                         ) : (
                           <input
                             type="radio"
-                            {...register(`${instructorName}`)}
+                            id="dancer"
+                            value={`${instructorName}`}
+                            {...register("dancer")}
                           />
                         )}
                         <span></span>
