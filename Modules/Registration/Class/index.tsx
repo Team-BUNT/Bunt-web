@@ -306,7 +306,7 @@ const index = ({ classes }: any) => {
             try {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
-                  selectedClass: [dancer].length,
+                  selectedClass: dancer,
                   name: studentName,
                   phone: studentPhone,
                 },

@@ -10,6 +10,7 @@ import {
   Studio,
 } from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
+import { getClass } from "../../../pages/api/classes";
 
 interface ButtonProps {
   pageActionType: string;
@@ -231,13 +232,15 @@ const index = ({
   name,
   phone,
   couponCount,
+  selectedClass,
 }: {
   name: string;
   phone: string;
   couponCount: number;
+  selectedClass: string;
 }) => {
   const router = useRouter();
-  const { studio, selectedClass } = router.query;
+  const { studio } = router.query;
 
   const {
     register,
@@ -295,13 +298,7 @@ const index = ({
               }
 
               if (data.coupon === "use") {
-                if (
-                  couponCount === 0 ||
-                  (typeof selectedClass !== "string" &&
-                    selectedClass &&
-                    selectedClass.length > couponCount &&
-                    Array.isArray(selectedClass))
-                ) {
+                if (couponCount === 0) {
                   return alert("쿠폰이 부족합니다.");
                 }
               }
@@ -333,60 +330,60 @@ const index = ({
                 const studentId = `${studioId} ${phone}`;
 
                 // 선택된 Class가 여러개일 때
-                if (
-                  Array.isArray(selectedClass) &&
-                  selectedClass.length !== 0
-                ) {
-                  const classIds = selectedClass.map(
-                    (dancerName) =>
-                      !(dancers instanceof Error) &&
-                      [...dancers].filter(
-                        (dance) => dance.instructorName === dancerName
-                      )[0].ID
-                  );
+                // if (
+                //   Array.isArray(selectedClass) &&
+                //   selectedClass.length !== 0
+                // ) {
+                //   const classIds = selectedClass.map(
+                //     (dancerName) =>
+                //       !(dancers instanceof Error) &&
+                //       [...dancers].filter(
+                //         (dance) => dance.instructorName === dancerName
+                //       )[0].ID
+                //   );
 
-                  classIds.forEach(async (classId) => {
-                    const enrollment = {
-                      ID: `${studioId} ${phone}`,
-                      attendance: false,
-                      classID: classId,
-                      enrolledDate: new Date(),
-                      info: "",
-                      paid: true,
-                      paymentType: "쿠폰 사용",
-                      phoneNumber: typeof phone === "string" ? phone : "",
-                      studioID: studioId,
-                      userName: typeof name === "string" ? name : "",
-                    };
+                //   classIds.forEach(async (classId) => {
+                //     const enrollment = {
+                //       ID: `${studioId} ${phone}`,
+                //       attendance: false,
+                //       classID: classId,
+                //       enrolledDate: new Date(),
+                //       info: "",
+                //       paid: true,
+                //       paymentType: "쿠폰 사용",
+                //       phoneNumber: typeof phone === "string" ? phone : "",
+                //       studioID: studioId,
+                //       userName: typeof name === "string" ? name : "",
+                //     };
 
-                    const studentObject = await new Student(
-                      firestore,
-                      "student"
-                    ).updateData(
-                      studentId,
-                      {
-                        classID: classId,
-                        studioID: studioId,
-                        expiredDate: new Date(
-                          new Date().setDate(new Date().getDate() + 30)
-                        ),
-                        isFreePass: false,
-                        studentID: studentId,
-                      },
-                      enrollment
-                    );
+                //     const studentObject = await new Student(
+                //       firestore,
+                //       "student"
+                //     ).updateData(
+                //       studentId,
+                //       {
+                //         classID: classId,
+                //         studioID: studioId,
+                //         expiredDate: new Date(
+                //           new Date().setDate(new Date().getDate() + 30)
+                //         ),
+                //         isFreePass: false,
+                //         studentID: studentId,
+                //       },
+                //       enrollment
+                //     );
 
-                    await new Enrollment(firestore, "enrollment").addData(
-                      enrollment
-                    );
-                  });
+                //     await new Enrollment(firestore, "enrollment").addData(
+                //       enrollment
+                //     );
+                //   });
 
-                  router.push(
-                    `/form/studios/${studio}/complete`,
-                    `/form/studios/${studio}/complete`
-                  );
-                  return;
-                }
+                //   router.push(
+                //     `/form/studios/${studio}/complete`,
+                //     `/form/studios/${studio}/complete`
+                //   );
+                //   return;
+                // }
 
                 // 선택된 클래스가 하나일 때
                 const classId =

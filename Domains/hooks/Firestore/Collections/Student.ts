@@ -109,47 +109,107 @@ export default class Student extends FirestoreFetcher {
   async updateData(
     studentId: string,
     newCoupons: ICoupon[] | ICoupon,
-    newEnrollments: IEnrollment[] | IEnrollment
+    newEnrollments: IEnrollment[] | IEnrollment,
+    couponType = "쿠폰 사용"
   ) {
-    const studentRef = doc(this.db, "student", studentId);
-    const tempStudentAll = await this.getStudentAll();
-    const { coupons, enrollments }: any =
-      !(tempStudentAll instanceof Error) &&
-      Array.from(tempStudentAll).filter(
-        (student) => student.ID === studentId
-      )[0];
+    if (couponType === "쿠폰 사용") {
+      const studentRef = doc(this.db, "student", studentId);
+      const tempStudentAll = await this.getStudentAll();
 
-    if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
-      if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+      const { coupons, enrollments }: any =
+        !(tempStudentAll instanceof Error) &&
+        Array.from(tempStudentAll).filter(
+          (student) => student.ID === studentId
+        )[0];
+
+      if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+        if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+          });
+
+        const noneClassIdCoupons = [...coupons].filter(
+          (coupon) => !coupon.classID
+        );
+        const haveClassIdCoupons = [...coupons].filter(
+          (coupon) => coupon.classID
+        );
+
+        const sortedCoupons = [...noneClassIdCoupons]
+          .filter((coupon) => !coupon.classID)
+          .sort((a, b) => b.expiredDate - a.expiredDate);
+        Array.isArray(sortedCoupons) &&
+          sortedCoupons.length !== 0 &&
+          (sortedCoupons[0].classID = newEnrollments.classID);
+
         await updateDoc(studentRef, {
+          coupons: [...haveClassIdCoupons, ...sortedCoupons],
           enrollments: [...enrollments, newEnrollments],
         });
+        return "Done";
+      }
+    } else {
+      const studentRef = doc(this.db, "student", studentId);
+      const tempStudentAll = await this.getStudentAll();
+      const parseCoupon = parseInt(couponType);
 
-      const noneClassIdCoupons = [...coupons].filter(
-        (coupon) => !coupon.classID
-      );
-      const haveClassIdCoupons = [...coupons].filter(
-        (coupon) => coupon.classID
-      );
+      const { coupons, enrollments }: any =
+        !(tempStudentAll instanceof Error) &&
+        Array.from(tempStudentAll).filter(
+          (student) => student.ID === studentId
+        )[0];
 
-      const sortedCoupons = [...noneClassIdCoupons]
-        .filter((coupon) => !coupon.classID)
-        .sort((a, b) => b.expiredDate - a.expiredDate);
-      sortedCoupons[0].classID = newEnrollments.classID;
+      if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+        if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+          });
 
-      await updateDoc(studentRef, {
-        coupons: [...haveClassIdCoupons, ...sortedCoupons],
-        enrollments: [...enrollments, newEnrollments],
-      });
-      return "Done";
+        if (couponType === "프리패스") {
+          const freePassCoupon = { ...newCoupons };
+          freePassCoupon.isFreePass = true;
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+            coupons: [...coupons, newCoupons],
+          });
+        }
+
+        const noneClassIdCoupons = [...coupons].filter(
+          (coupon) => !coupon.classID
+        );
+        const haveClassIdCoupons = [...coupons].filter(
+          (coupon) => coupon.classID
+        );
+
+        const sortedCoupons = [...noneClassIdCoupons]
+          .filter((coupon) => !coupon.classID)
+          .sort((a, b) => b.expiredDate - a.expiredDate);
+
+        const unusedCoupon = { ...newCoupons };
+        unusedCoupon.classID = "";
+
+        await updateDoc(studentRef, {
+          coupons: [
+            ...sortedCoupons,
+            ...haveClassIdCoupons,
+            newCoupons,
+            ...Array.from({
+              length: parseCoupon - 1,
+            }).fill(unusedCoupon),
+          ],
+          enrollments: [...enrollments, newEnrollments],
+        });
+        return "Done";
+      }
     }
 
-    if (Array.isArray(newCoupons) && Array.isArray(newEnrollments)) {
-      await updateDoc(studentRef, {
-        coupons: [...coupons, ...newCoupons],
-        enrollments: [...enrollments, ...newEnrollments],
-      });
-      return "Done";
-    }
+    // 여러 클래스를 등록할 때
+    // if (Array.isArray(newCoupons) && Array.isArray(newEnrollments)) {
+    //   await updateDoc(studentRef, {
+    //     coupons: [...coupons, ...newCoupons],
+    //     enrollments: [...enrollments, ...newEnrollments],
+    //   });
+    //   return "Done";
+    // }
   }
 }

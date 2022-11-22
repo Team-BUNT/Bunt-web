@@ -18,19 +18,28 @@ const coupon = ({
   name,
   phone,
   couponCount,
+  selectedClass,
 }: {
   couponCount: number;
   name: string;
   phone: string;
+  selectedClass: string;
 }) => {
-  return <Coupon name={name} phone={phone} couponCount={couponCount}></Coupon>;
+  return (
+    <Coupon
+      name={name}
+      phone={phone}
+      couponCount={couponCount}
+      selectedClass={selectedClass}
+    ></Coupon>
+  );
 };
 
 export default coupon;
 
 export async function getServerSideProps(context: any) {
   try {
-    const { name, phone, studio } = await context.query;
+    const { name, phone, selectedClass } = await context.query;
     const student = await getStudent(name, phone);
 
     if (!student || !name || !phone) {
@@ -49,8 +58,9 @@ export async function getServerSideProps(context: any) {
           name,
           phone,
           couponCount: student[0].coupons.filter(
-            (coupon: any) => !!coupon.classID
+            (coupon: any) => !coupon.classID
           ).length,
+          selectedClass,
         },
       };
     }
