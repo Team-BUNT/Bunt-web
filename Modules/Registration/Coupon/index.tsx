@@ -11,6 +11,9 @@ import {
 } from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
 import { getClass } from "../../../pages/api/classes";
+import { useFirebaseFunction } from "../../../Domains/hooks/useFirebaseFunction";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
+import { Timestamp } from "firebase/firestore";
 
 interface ButtonProps {
   pageActionType: string;
@@ -265,8 +268,6 @@ const index = ({
     if (!router.isReady) return;
   }, [router.isReady]);
 
-  const updateStudent = () => {};
-
   return (
     <Container>
       <CouponContainer>
@@ -303,12 +304,6 @@ const index = ({
                 }
               }
 
-              /** MEMO
-               * 1. student 내에 coupons, enrollments 최신화
-               * 2. coupon을 사용했기 때문에 enrollment paid = true
-               * 3. enrollment 반영
-               */
-
               const target = e?.nativeEvent as SubmitEvent;
               if (
                 target !== null &&
@@ -328,70 +323,12 @@ const index = ({
                   [...studios].filter((aStudio) => aStudio.name === studio)[0]
                     .ID;
                 const studentId = `${studioId} ${phone}`;
-
-                // 선택된 Class가 여러개일 때
-                // if (
-                //   Array.isArray(selectedClass) &&
-                //   selectedClass.length !== 0
-                // ) {
-                //   const classIds = selectedClass.map(
-                //     (dancerName) =>
-                //       !(dancers instanceof Error) &&
-                //       [...dancers].filter(
-                //         (dance) => dance.instructorName === dancerName
-                //       )[0].ID
-                //   );
-
-                //   classIds.forEach(async (classId) => {
-                //     const enrollment = {
-                //       ID: `${studioId} ${phone}`,
-                //       attendance: false,
-                //       classID: classId,
-                //       enrolledDate: new Date(),
-                //       info: "",
-                //       paid: true,
-                //       paymentType: "쿠폰 사용",
-                //       phoneNumber: typeof phone === "string" ? phone : "",
-                //       studioID: studioId,
-                //       userName: typeof name === "string" ? name : "",
-                //     };
-
-                //     const studentObject = await new Student(
-                //       firestore,
-                //       "student"
-                //     ).updateData(
-                //       studentId,
-                //       {
-                //         classID: classId,
-                //         studioID: studioId,
-                //         expiredDate: new Date(
-                //           new Date().setDate(new Date().getDate() + 30)
-                //         ),
-                //         isFreePass: false,
-                //         studentID: studentId,
-                //       },
-                //       enrollment
-                //     );
-
-                //     await new Enrollment(firestore, "enrollment").addData(
-                //       enrollment
-                //     );
-                //   });
-
-                //   router.push(
-                //     `/form/studios/${studio}/complete`,
-                //     `/form/studios/${studio}/complete`
-                //   );
-                //   return;
-                // }
-
                 // 선택된 클래스가 하나일 때
                 const classId =
                   !(dancers instanceof Error) &&
                   [...dancers].filter(
                     (dance) => dance.instructorName === selectedClass
                   )[0].ID;
-
                 const enrollment = {
                   ID: `${studioId} ${phone}`,
                   attendance: false,
@@ -404,8 +341,6 @@ const index = ({
                   studioID: studioId,
                   userName: typeof name === "string" ? name : "",
                 };
-
-                // student의
                 await new Student(firestore, "student").updateData(
                   studentId,
                   {
@@ -419,11 +354,43 @@ const index = ({
                   },
                   enrollment
                 );
-
                 // 쿠폰으로 수강했을 경우 enrollment에 등록
                 await new Enrollment(firestore, "enrollment").addData(
                   enrollment
                 );
+
+                // 알림톡
+                const studioAddress =
+                  !(studios instanceof Error) &&
+                  [...studios].filter((aStudio) => aStudio.name === studio)[0]
+                    .location;
+                const dancer: any =
+                  !(dancers instanceof Error) &&
+                  [...dancers]
+                    .filter((dance) => dance.instructorName === selectedClass)
+                    .filter((schedule) => {
+                      const today = new Date().getDate();
+                      const nextSevenDaysAfter = new Date().setDate(
+                        new Date().getDate() + 7
+                      );
+                      return (
+                        today <= new Date(schedule.date.toDate()).getDate() &&
+                        nextSevenDaysAfter >=
+                          new Date(schedule.date.toDate()).getDate()
+                      );
+                    })[0];
+
+                const { title, date } = dancer;
+
+                useFirebaseFunction({
+                  to: phone,
+                  studioName: typeof studio === "string" ? studio : "",
+                  studioAddress: studioAddress,
+                  instructorName: selectedClass,
+                  genre: title,
+                  time: dateFormatter(new Date(date.toDate())),
+                  payment: "쿠폰 사용",
+                });
 
                 router.push(
                   `/form/studios/${studio}/complete`,
