@@ -10,6 +10,8 @@ import {
   Studio,
 } from "../../../Domains/hooks/Firestore";
 import { firestore } from "../../../Domains/firebase";
+import { useFirebaseFunction } from "../../../Domains/hooks/useFirebaseFunction";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
 
 interface ButtonProps {
   pageActionType: string;
@@ -506,6 +508,49 @@ const index = ({
               }
 
               await new Enrollment(firestore, "enrollment").addData(enrollment);
+
+              const targetStudio: any =
+                !(studios instanceof Error) &&
+                [...studios].filter((aStudio) => aStudio.name === studio)[0];
+
+              const dancer: any =
+                !(dancers instanceof Error) &&
+                [...dancers]
+                  .filter((dance) => dance.instructorName === selectedClass)
+                  .filter((schedule) => {
+                    const today = new Date().getDate();
+                    const nextSevenDaysAfter = new Date().setDate(
+                      new Date().getDate() + 7
+                    );
+                    return (
+                      today <= new Date(schedule.date.toDate()).getDate() &&
+                      nextSevenDaysAfter >=
+                        new Date(schedule.date.toDate()).getDate()
+                    );
+                  })[0];
+
+              const { title, date } = dancer;
+              const { location, notice } = targetStudio;
+              console.log(notice.ban);
+              payment === "무통장 입금"
+                ? useFirebaseFunction({
+                    to: studentPhoneNumber,
+                    studioName: typeof studio === "string" ? studio : "",
+                    studioAddress: location,
+                    instructorName: selectedClass,
+                    genre: title,
+                    time: dateFormatter(new Date(date.toDate())),
+                    studioAccountNumber: notice.bankAccount,
+                  })
+                : useFirebaseFunction({
+                    to: studentPhoneNumber,
+                    studioName: typeof studio === "string" ? studio : "",
+                    studioAddress: location,
+                    instructorName: selectedClass,
+                    genre: title,
+                    time: dateFormatter(new Date(date.toDate())),
+                    payment,
+                  });
 
               router.push(
                 `/form/studios/${studio}/complete`,

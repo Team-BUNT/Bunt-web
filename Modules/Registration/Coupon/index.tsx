@@ -12,6 +12,8 @@ import {
 import { firestore } from "../../../Domains/firebase";
 import { getClass } from "../../../pages/api/classes";
 import { useFirebaseFunction } from "../../../Domains/hooks/useFirebaseFunction";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
+import { Timestamp } from "firebase/firestore";
 
 interface ButtonProps {
   pageActionType: string;
@@ -308,87 +310,107 @@ const index = ({
                 target.submitter !== null &&
                 target.submitter.textContent === "수강완료"
               ) {
-                // const studios = await new Studio(
-                //   firestore,
-                //   "studios"
-                // ).fetchData();
-                // const dancers = await new Class(
-                //   firestore,
-                //   "classes"
-                // ).fetchData();
-                // const studioId =
-                //   !(studios instanceof Error) &&
-                //   [...studios].filter((aStudio) => aStudio.name === studio)[0]
-                //     .ID;
-                // const studentId = `${studioId} ${phone}`;
-                // // 선택된 클래스가 하나일 때
-                // const classId =
-                //   !(dancers instanceof Error) &&
-                //   [...dancers].filter(
-                //     (dance) => dance.instructorName === selectedClass
-                //   )[0].ID;
-                // const enrollment = {
-                //   ID: `${studioId} ${phone}`,
-                //   attendance: false,
-                //   classID: classId,
-                //   enrolledDate: new Date(),
-                //   info: "",
-                //   paid: true,
-                //   paymentType: "쿠폰 사용",
-                //   phoneNumber: typeof phone === "string" ? phone : "",
-                //   studioID: studioId,
-                //   userName: typeof name === "string" ? name : "",
-                // };
-                // await new Student(firestore, "student").updateData(
-                //   studentId,
-                //   {
-                //     classID: classId,
-                //     studioID: studioId,
-                //     expiredDate: new Date(
-                //       new Date().setDate(new Date().getDate() + 30)
-                //     ),
-                //     isFreePass: false,
-                //     studentID: studentId,
-                //   },
-                //   enrollment
-                // );
-                // // 쿠폰으로 수강했을 경우 enrollment에 등록
-                // await new Enrollment(firestore, "enrollment").addData(
-                //   enrollment
-                // );
-                // //TODO: 쿠폰으로 수강했을 시 알림톡 전달
-                console.log(name, phone, selectedClass);
-                // const studioAddress = !(studios instanceof Error) &&
-                //    [...studios].filter((aStudio) => aStudio.name === studio)[0]
-                //      .location;
-                // // useFirebaseFunction({
-                // //   to:phone,
-                // //   studioName: studio,
-                // //   studioAddress: '',
-                // //   instructorName: '',
-                // //   genre: '',
-                // //   time: '',
-                // //   payment: ''
-                // // })
-                // router.push(
-                //   `/form/studios/${studio}/complete`,
-                //   `/form/studios/${studio}/complete`
-                // );
-                // return;
+                const studios = await new Studio(
+                  firestore,
+                  "studios"
+                ).fetchData();
+                const dancers = await new Class(
+                  firestore,
+                  "classes"
+                ).fetchData();
+                const studioId =
+                  !(studios instanceof Error) &&
+                  [...studios].filter((aStudio) => aStudio.name === studio)[0]
+                    .ID;
+                const studentId = `${studioId} ${phone}`;
+                // 선택된 클래스가 하나일 때
+                const classId =
+                  !(dancers instanceof Error) &&
+                  [...dancers].filter(
+                    (dance) => dance.instructorName === selectedClass
+                  )[0].ID;
+                const enrollment = {
+                  ID: `${studioId} ${phone}`,
+                  attendance: false,
+                  classID: classId,
+                  enrolledDate: new Date(),
+                  info: "",
+                  paid: true,
+                  paymentType: "쿠폰 사용",
+                  phoneNumber: typeof phone === "string" ? phone : "",
+                  studioID: studioId,
+                  userName: typeof name === "string" ? name : "",
+                };
+                await new Student(firestore, "student").updateData(
+                  studentId,
+                  {
+                    classID: classId,
+                    studioID: studioId,
+                    expiredDate: new Date(
+                      new Date().setDate(new Date().getDate() + 30)
+                    ),
+                    isFreePass: false,
+                    studentID: studentId,
+                  },
+                  enrollment
+                );
+                // 쿠폰으로 수강했을 경우 enrollment에 등록
+                await new Enrollment(firestore, "enrollment").addData(
+                  enrollment
+                );
+
+                // 알림톡
+                const studioAddress =
+                  !(studios instanceof Error) &&
+                  [...studios].filter((aStudio) => aStudio.name === studio)[0]
+                    .location;
+                const dancer: any =
+                  !(dancers instanceof Error) &&
+                  [...dancers]
+                    .filter((dance) => dance.instructorName === selectedClass)
+                    .filter((schedule) => {
+                      const today = new Date().getDate();
+                      const nextSevenDaysAfter = new Date().setDate(
+                        new Date().getDate() + 7
+                      );
+                      return (
+                        today <= new Date(schedule.date.toDate()).getDate() &&
+                        nextSevenDaysAfter >=
+                          new Date(schedule.date.toDate()).getDate()
+                      );
+                    })[0];
+
+                const { title, date } = dancer;
+
+                useFirebaseFunction({
+                  to: phone,
+                  studioName: typeof studio === "string" ? studio : "",
+                  studioAddress: studioAddress,
+                  instructorName: selectedClass,
+                  genre: title,
+                  time: dateFormatter(new Date(date.toDate())),
+                  payment: "쿠폰 사용",
+                });
+
+                router.push(
+                  `/form/studios/${studio}/complete`,
+                  `/form/studios/${studio}/complete`
+                );
+                return;
               }
 
               // 쿠폰 구매를 누르고 다음 버튼을 누를 시
-              //   router.push(`/form/studios/${studio}/payment`, {
-              //     query: {
-              //       selectedClass,
-              //       name,
-              //       phone,
-              //       couponCount,
-              //     },
-              //     pathname: `/form/studios/${studio}/payment`,
-              //   });
+              router.push(`/form/studios/${studio}/payment`, {
+                query: {
+                  selectedClass,
+                  name,
+                  phone,
+                  couponCount,
+                },
+                pathname: `/form/studios/${studio}/payment`,
+              });
             } catch (error) {
-              //   console.error(error);
+              console.error(error);
             }
           })}
         >
