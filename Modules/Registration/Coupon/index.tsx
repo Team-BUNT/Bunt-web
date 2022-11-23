@@ -363,6 +363,8 @@ const index = ({
                   enrollment
                 );
 
+                //TODO: 쿠폰으로 수강했을 시 알림톡 전달
+
                 router.push(
                   `/form/studios/${studio}/complete`,
                   `/form/studios/${studio}/complete`

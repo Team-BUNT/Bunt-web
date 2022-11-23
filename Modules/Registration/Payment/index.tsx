@@ -437,7 +437,6 @@ const index = ({
 
             const user = localStorage.getItem("user");
 
-            // ToDo json으로 저장되는 user 리팩토링
             const { name, phone } =
               typeof user === "string" && JSON.parse(user);
 
