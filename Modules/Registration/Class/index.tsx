@@ -120,9 +120,11 @@ const ClassRegistrationForm = styled.form`
 `;
 
 const ClassRegistrationFormContainer = styled.div`
-  padding-top: 3rem;
-  margin-top: 3rem;
-  border-top: 0.1rem solid #363636;
+  h3 {
+    padding-top: 3rem;
+    margin-top: 3rem;
+    border-top: 0.1rem solid #363636;
+  }
 `;
 
 const LabelContainer = styled.label`
@@ -138,7 +140,7 @@ const LabelContainer = styled.label`
   -ms-user-select: none;
   user-select: none;
 
-  & input[type="checkbox"] {
+  & input[type="radio"] {
     position: absolute;
     opacity: 0;
     border-radius: 50%;
@@ -158,21 +160,21 @@ const LabelContainer = styled.label`
     border-radius: 5px;
   }
 
-  &:hover input[type="checkbox"] ~ span {
+  &:hover input[type="radio"] ~ span {
     background-color: transparent;
     border: 1.5px solid #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span {
+  & input[type="radio"]:checked ~ span {
     border: 1.5px solid #da0000;
     background-color: #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span:after {
+  & input[type="radio"]:checked ~ span:after {
     display: block;
   }
 
-  & input[type="checkbox"]:disabled ~ span {
+  & input[type="radio"]:disabled ~ span {
     background-color: #4b4b4b;
     border-color: #4b4b4b;
   }
@@ -296,18 +298,15 @@ const index = ({ classes }: any) => {
         </CalenderContainer>
 
         <ClassRegistrationForm
-          onSubmit={handleSubmit(async (data, e) => {
+          onSubmit={handleSubmit(async ({ dancer }, e) => {
             e?.preventDefault();
 
-            if (Object.values(data).every((dancer) => !dancer))
-              return alert("수업을 하나라도 선택해야 합니다.");
+            if (!dancer) return alert("수업을 하나라도 선택해야 합니다.");
 
             try {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
-                  selectedClass: [...Object.keys(data)].filter(
-                    (dancer) => data[dancer] === true
-                  ),
+                  selectedClass: dancer,
                   name: studentName,
                   phone: studentPhone,
                 },
@@ -333,15 +332,13 @@ const index = ({ classes }: any) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
                         {applicantsCount === 0 ? (
-                          <input
-                            type="checkbox"
-                            onClick={() => false}
-                            disabled
-                          />
+                          <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
-                            type="checkbox"
-                            {...register(`${instructorName}`)}
+                            type="radio"
+                            id="dancer"
+                            value={`${instructorName}`}
+                            {...register(`dancer`)}
                           />
                         )}
                         <span></span>
@@ -362,8 +359,7 @@ const index = ({ classes }: any) => {
                   }
                 )
             )}
-          </ClassRegistrationFormContainer>
-          <ClassRegistrationFormContainer>
+
             <h3>팝업 클래스</h3>
             {[...targetClasses][day].filter((value) => value.isPopUp).length ===
             0 ? (
@@ -378,15 +374,13 @@ const index = ({ classes }: any) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
                         {applicantsCount === 0 ? (
-                          <input
-                            type="checkbox"
-                            onClick={() => false}
-                            disabled
-                          />
+                          <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
-                            type="checkbox"
-                            {...register(`${instructorName}`)}
+                            type="radio"
+                            id="dancer"
+                            value={`${instructorName}`}
+                            {...register("dancer")}
                           />
                         )}
                         <span></span>

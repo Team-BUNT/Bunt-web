@@ -436,13 +436,10 @@ const index = ({
             const { coupon, payment } = data;
 
             const user = localStorage.getItem("user");
+
+            // ToDo json으로 저장되는 user 리팩토링
             const { name, phone } =
               typeof user === "string" && JSON.parse(user);
-
-            /** Todo
-             * 1. coupon 개수에 따라 student에 coupon 추가
-             * 2. enrollment 등록
-             */
 
             try {
               const studios = await new Studio(
@@ -453,7 +450,7 @@ const index = ({
               const studioId =
                 !(studios instanceof Error) &&
                 [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
-              const studentId = `${studioId} ${phone}`;
+              const studentId = `${studioId} ${studentPhoneNumber}`;
 
               if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
                 const classIds = selectedClass.map(
@@ -465,33 +462,52 @@ const index = ({
                 );
                 classIds.forEach(async (classId) => {
                   const enrollment = {
-                    ID: `${studioId} ${phone}`,
+                    ID: `${studioId} ${studentPhoneNumber}`,
                     attendance: false,
                     classID: classId,
                     enrolledDate: new Date(),
                     info: "",
                     paid: true,
                     paymentType: "쿠폰 사용",
-                    phoneNumber: typeof phone === "string" ? phone : "",
+                    phoneNumber:
+                      typeof studentPhoneNumber === "string"
+                        ? studentPhoneNumber
+                        : "",
                     studioID: studioId,
-                    userName: typeof name === "string" ? name : "",
+                    userName:
+                      typeof studentName === "string" ? studentName : "",
                   };
 
-                  const studentObject = await new Student(
-                    firestore,
-                    "student"
-                  ).updateData(
-                    studentId,
-                    {
-                      studioID: studioId,
-                      expiredDate: new Date(
-                        new Date().setDate(new Date().getDate() + 30)
-                      ),
-                      isFreePass: coupon === "프리패스" ? true : false,
-                      studentID: studentId,
-                    },
-                    enrollment
-                  );
+                  if (coupon === "프리패스") {
+                    await new Student(firestore, "student").updateData(
+                      studentId,
+                      {
+                        classID: classId,
+                        studioID: studioId,
+                        expiredDate: new Date(
+                          new Date().setDate(new Date().getDate() + 30)
+                        ),
+                        isFreePass: true,
+                        studentID: studentId,
+                      },
+                      enrollment
+                    );
+                  } else {
+                    await new Student(firestore, "student").updateData(
+                      studentId,
+                      {
+                        classID: classId,
+                        studioID: studioId,
+                        expiredDate: new Date(
+                          new Date().setDate(new Date().getDate() + 30)
+                        ),
+                        isFreePass: false,
+                        studentID: studentId,
+                      },
+                      enrollment,
+                      coupon
+                    );
+                  }
 
                   await new Enrollment(firestore, "enrollment").addData(
                     enrollment
@@ -511,34 +527,54 @@ const index = ({
                   (dance) => dance.instructorName === selectedClass
                 )[0].ID;
 
+              // 지금 문제가 쿠폰이 회수만큼 생성되고 들어가야함 근데 그러지 않고 있음
               const enrollment = {
-                ID: `${studioId} ${phone}`,
+                ID: `${studioId} ${studentPhoneNumber}`,
                 attendance: false,
                 classID: classId,
                 enrolledDate: new Date(),
                 info: "",
                 paid: true,
                 paymentType: "쿠폰 사용",
-                phoneNumber: typeof phone === "string" ? phone : "",
+                phoneNumber:
+                  typeof studentPhoneNumber === "string"
+                    ? studentPhoneNumber
+                    : "",
                 studioID: studioId,
-                userName: typeof name === "string" ? name : "",
+                userName: typeof studentName === "string" ? studentName : "",
               };
 
-              const studentObject = await new Student(
-                firestore,
-                "student"
-              ).updateData(
-                studentId,
-                {
-                  studioID: studioId,
-                  expiredDate: new Date(
-                    new Date().setDate(new Date().getDate() + 30)
-                  ),
-                  isFreePass: coupon === "프리패스" ? true : false,
-                  studentID: studentId,
-                },
-                enrollment
-              );
+              if (coupon === "프리패스") {
+                await new Student(firestore, "student").updateData(
+                  studentId,
+                  {
+                    classID: classId,
+                    studioID: studioId,
+                    expiredDate: new Date(
+                      new Date().setDate(new Date().getDate() + 30)
+                    ),
+                    isFreePass: true,
+                    studentID: studentId,
+                  },
+                  enrollment,
+                  "프리패스"
+                );
+              } else {
+                await new Student(firestore, "student").updateData(
+                  studentId,
+                  {
+                    classID: classId,
+                    studioID: studioId,
+                    expiredDate: new Date(
+                      new Date().setDate(new Date().getDate() + 30)
+                    ),
+                    isFreePass: false,
+                    studentID: studentId,
+                  },
+                  enrollment,
+                  coupon
+                );
+              }
 
               await new Enrollment(firestore, "enrollment").addData(enrollment);
 
