@@ -12,6 +12,7 @@ import {
   Query,
   query,
   QueryConstraint,
+  setDoc,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -99,7 +100,9 @@ export default class Student extends FirestoreFetcher {
 
   async addData(data: IStudent) {
     try {
-      await addDoc(this.studentRef, data);
+      const studentDocRef = doc(this.db, "student", data.ID);
+
+      await setDoc(studentDocRef, data);
       return "Done";
     } catch (error) {
       console.error("Error가 발생했습니다. ", error);
