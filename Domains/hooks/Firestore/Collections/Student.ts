@@ -202,14 +202,5 @@ export default class Student extends FirestoreFetcher {
         return "Done";
       }
     }
-
-    // 여러 클래스를 등록할 때
-    // if (Array.isArray(newCoupons) && Array.isArray(newEnrollments)) {
-    //   await updateDoc(studentRef, {
-    //     coupons: [...coupons, ...newCoupons],
-    //     enrollments: [...enrollments, ...newEnrollments],
-    //   });
-    //   return "Done";
-    // }
   }
 }

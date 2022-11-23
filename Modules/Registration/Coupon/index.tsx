@@ -303,12 +303,6 @@ const index = ({
                 }
               }
 
-              /** MEMO
-               * 1. student 내에 coupons, enrollments 최신화
-               * 2. coupon을 사용했기 때문에 enrollment paid = true
-               * 3. enrollment 반영
-               */
-
               const target = e?.nativeEvent as SubmitEvent;
               if (
                 target !== null &&
@@ -328,62 +322,6 @@ const index = ({
                   [...studios].filter((aStudio) => aStudio.name === studio)[0]
                     .ID;
                 const studentId = `${studioId} ${phone}`;
-
-                // 선택된 Class가 여러개일 때
-                // if (
-                //   Array.isArray(selectedClass) &&
-                //   selectedClass.length !== 0
-                // ) {
-                //   const classIds = selectedClass.map(
-                //     (dancerName) =>
-                //       !(dancers instanceof Error) &&
-                //       [...dancers].filter(
-                //         (dance) => dance.instructorName === dancerName
-                //       )[0].ID
-                //   );
-
-                //   classIds.forEach(async (classId) => {
-                //     const enrollment = {
-                //       ID: `${studioId} ${phone}`,
-                //       attendance: false,
-                //       classID: classId,
-                //       enrolledDate: new Date(),
-                //       info: "",
-                //       paid: true,
-                //       paymentType: "쿠폰 사용",
-                //       phoneNumber: typeof phone === "string" ? phone : "",
-                //       studioID: studioId,
-                //       userName: typeof name === "string" ? name : "",
-                //     };
-
-                //     const studentObject = await new Student(
-                //       firestore,
-                //       "student"
-                //     ).updateData(
-                //       studentId,
-                //       {
-                //         classID: classId,
-                //         studioID: studioId,
-                //         expiredDate: new Date(
-                //           new Date().setDate(new Date().getDate() + 30)
-                //         ),
-                //         isFreePass: false,
-                //         studentID: studentId,
-                //       },
-                //       enrollment
-                //     );
-
-                //     await new Enrollment(firestore, "enrollment").addData(
-                //       enrollment
-                //     );
-                //   });
-
-                //   router.push(
-                //     `/form/studios/${studio}/complete`,
-                //     `/form/studios/${studio}/complete`
-                //   );
-                //   return;
-                // }
 
                 // 선택된 클래스가 하나일 때
                 const classId =

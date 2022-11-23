@@ -452,82 +452,12 @@ const index = ({
                 [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
               const studentId = `${studioId} ${studentPhoneNumber}`;
 
-              if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
-                const classIds = selectedClass.map(
-                  (dancerName) =>
-                    !(dancers instanceof Error) &&
-                    [...dancers].filter(
-                      (dance) => dance.instructorName === dancerName
-                    )[0].ID
-                );
-                classIds.forEach(async (classId) => {
-                  const enrollment = {
-                    ID: `${studioId} ${studentPhoneNumber}`,
-                    attendance: false,
-                    classID: classId,
-                    enrolledDate: new Date(),
-                    info: "",
-                    paid: true,
-                    paymentType: "쿠폰 사용",
-                    phoneNumber:
-                      typeof studentPhoneNumber === "string"
-                        ? studentPhoneNumber
-                        : "",
-                    studioID: studioId,
-                    userName:
-                      typeof studentName === "string" ? studentName : "",
-                  };
-
-                  if (coupon === "프리패스") {
-                    await new Student(firestore, "student").updateData(
-                      studentId,
-                      {
-                        classID: classId,
-                        studioID: studioId,
-                        expiredDate: new Date(
-                          new Date().setDate(new Date().getDate() + 30)
-                        ),
-                        isFreePass: true,
-                        studentID: studentId,
-                      },
-                      enrollment
-                    );
-                  } else {
-                    await new Student(firestore, "student").updateData(
-                      studentId,
-                      {
-                        classID: classId,
-                        studioID: studioId,
-                        expiredDate: new Date(
-                          new Date().setDate(new Date().getDate() + 30)
-                        ),
-                        isFreePass: false,
-                        studentID: studentId,
-                      },
-                      enrollment,
-                      coupon
-                    );
-                  }
-
-                  await new Enrollment(firestore, "enrollment").addData(
-                    enrollment
-                  );
-                });
-
-                router.push(
-                  `/form/studios/${studio}/complete`,
-                  `/form/studios/${studio}/complete`
-                );
-                return;
-              }
-
               const classId =
                 !(dancers instanceof Error) &&
                 [...dancers].filter(
                   (dance) => dance.instructorName === selectedClass
                 )[0].ID;
 
-              // 지금 문제가 쿠폰이 회수만큼 생성되고 들어가야함 근데 그러지 않고 있음
               const enrollment = {
                 ID: `${studioId} ${studentPhoneNumber}`,
                 attendance: false,
