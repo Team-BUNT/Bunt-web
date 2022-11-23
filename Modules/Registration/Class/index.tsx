@@ -12,6 +12,7 @@ interface DateContainerProps {
 
 interface CheckboxContainerProps {
   applicantsCount: number;
+  capacity: number;
 }
 
 const Container = styled.section`
@@ -211,9 +212,10 @@ const LabelText = styled.div<CheckboxContainerProps>`
   font-weight: 400;
   color: #a4a4a4;
   line-height: -5.2rem;
-  color: ${({ applicantsCount }) => applicantsCount === 0 && "#787878"};
-  text-decoration: ${({ applicantsCount }) =>
-    applicantsCount === 0 && "line-through"};
+  color: ${({ capacity, applicantsCount }) =>
+    capacity <= applicantsCount && "#787878"};
+  text-decoration: ${({ capacity, applicantsCount }) =>
+    capacity <= applicantsCount && "line-through"};
 `;
 
 const ButtonContainer = styled.div`
@@ -328,10 +330,13 @@ const index = ({ classes }: any) => {
               [...targetClasses][day]
                 .filter((value) => !value.isPopUp)
                 .map(
-                  ({ instructorName, title, date, applicantsCount }, index) => {
+                  (
+                    { instructorName, title, date, applicantsCount, hall },
+                    index
+                  ) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
-                        {applicantsCount === 0 ? (
+                        {hall.capacity <= applicantsCount ? (
                           <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
@@ -345,9 +350,11 @@ const index = ({ classes }: any) => {
                         <LabelTextContainer>
                           <LabelText
                             applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
                           >{`${instructorName} ${title}`}</LabelText>
                           <LabelText
                             applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
                           >{`${String(
                             new Date(date.seconds * 1000).getHours()
                           ).padStart(2, "0")}:${String(
@@ -370,10 +377,13 @@ const index = ({ classes }: any) => {
               [...targetClasses][day]
                 .filter((value) => value.isPopUp)
                 .map(
-                  ({ instructorName, title, date, applicantsCount }, index) => {
+                  (
+                    { instructorName, title, date, applicantsCount, hall },
+                    index
+                  ) => {
                     return (
                       <LabelContainer key={`${instructorName} ${index}`}>
-                        {applicantsCount === 0 ? (
+                        {hall.capacity <= applicantsCount ? (
                           <input type="radio" onClick={() => false} disabled />
                         ) : (
                           <input
@@ -387,9 +397,11 @@ const index = ({ classes }: any) => {
                         <LabelTextContainer>
                           <LabelText
                             applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
                           >{`${instructorName} ${title}`}</LabelText>
                           <LabelText
                             applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
                           >{`${String(
                             new Date(date.seconds * 1000).getHours()
                           ).padStart(2, "0")}:${String(
