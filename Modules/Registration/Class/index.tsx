@@ -324,7 +324,9 @@ const index = ({ classes }: any) => {
             {[...targetClasses][day].filter((value) => !value.isPopUp)
               .length === 0 ? (
               <LabelContainer>
-                <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
+                <LabelText capacity={1} applicantsCount={1}>
+                  수업이 없습니다.
+                </LabelText>
               </LabelContainer>
             ) : (
               [...targetClasses][day]
@@ -371,7 +373,9 @@ const index = ({ classes }: any) => {
             {[...targetClasses][day].filter((value) => value.isPopUp).length ===
             0 ? (
               <LabelContainer>
-                <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
+                <LabelText capacity={1} applicantsCount={1}>
+                  수업이 없습니다.
+                </LabelText>
               </LabelContainer>
             ) : (
               [...targetClasses][day]
