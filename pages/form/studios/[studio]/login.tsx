@@ -2,7 +2,7 @@
 
 import React from "react";
 import Student from "../../../../Modules/Registration/Student/index";
-import { getStudio } from "../../../api/studios";
+import { getAllStudios, getStudio } from "../../../api/studios";
 
 interface INotice {
   bankAccount: string;
@@ -29,27 +29,8 @@ const login = ({ targetStudio }: any) => {
 
 export default login;
 
-// export async function getStaticPaths(context: any) {
-//   const studios = await getAllStudios();
-//   const studioNames =
-//     studios &&
-//     studios.map((studioName) => {
-//       return {
-//         params: studioName,
-//       };
-//     });
-
-//   return (
-//     studioNames !== undefined && {
-//       paths: [...studioNames],
-//       fallback: true,
-//     }
-//   );
-// }
-
 export async function getServerSideProps(context: any) {
   const { studio } = context.query;
-
   const targetStudio = await getStudio(studio);
 
   // if (!results) {

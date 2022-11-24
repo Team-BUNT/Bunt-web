@@ -237,9 +237,9 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ classes }: any) => {
+const index = ({ classes, name, phone }: any) => {
   const router = useRouter();
-  const { studio, name, phone } = router.query;
+  const { studio } = router.query;
 
   const {
     register,
@@ -265,7 +265,7 @@ const index = ({ classes }: any) => {
 
   useEffect(() => {
     if (!router.isReady) return;
-  }, [router.isReady]);
+  }, [router.isReady, name, phone]);
 
   const dateOnClick = (event: React.MouseEvent, order: number) => setDay(order);
 
@@ -309,8 +309,8 @@ const index = ({ classes }: any) => {
               router.push(`/form/studios/${studio}/coupon`, {
                 query: {
                   selectedClass: dancer,
-                  name: studentName,
-                  phone: studentPhone,
+                  name,
+                  phone,
                 },
                 pathname: `/form/studios/${studio}/coupon`,
               });

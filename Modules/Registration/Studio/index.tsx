@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 
 import styled from "styled-components";
+import { useEffect } from "react";
 
 interface IClass {
   name: string;

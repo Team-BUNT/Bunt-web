@@ -531,7 +531,7 @@ const index = ({
 
               const { title, date } = dancer;
               const { location, notice } = targetStudio;
-              console.log(notice.ban);
+
               payment === "무통장 입금"
                 ? useFirebaseFunction({
                     to: studentPhoneNumber,

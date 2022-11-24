@@ -224,7 +224,7 @@ const index = ({ studio }: any) => {
             }
 
             try {
-              studentClass.addData({
+              await studentClass.addData({
                 ID: `${studioId} ${phone}`,
                 coupons: [],
                 enrollments: [],
@@ -233,6 +233,7 @@ const index = ({ studio }: any) => {
                 studioID: studioId,
                 subPhoneNumber: "",
               });
+
               router.push(`/form/studios/${name}/class`, {
                 query: {
                   name: userName,
