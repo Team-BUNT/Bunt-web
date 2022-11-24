@@ -71,7 +71,7 @@ const index = ({ studioNames }: any) => {
           {studioInfo.map(({ name, url }, index) => (
             <ImageContainer
               key={`${name}${index}`}
-              onClick={() => router.push(`/form/studios/${name}/login`)}
+              onClick={() => router.push(`/form/studios/login/${name}`)}
             >
               <Image
                 layout="responsive"

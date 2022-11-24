@@ -210,12 +210,12 @@ const index = ({ studio }: any) => {
 
             if (hasStudent) {
               try {
-                router.push(`/form/studios/${name}/class`, {
+                router.push(`/form/studios/class/${name}`, {
                   query: {
                     name: userName,
                     phone,
                   },
-                  pathname: `/form/studios/${name}/class`,
+                  pathname: `/form/studios/class/${name}`,
                 });
                 return;
               } catch (error) {
@@ -234,12 +234,12 @@ const index = ({ studio }: any) => {
                 subPhoneNumber: "",
               });
 
-              router.push(`/form/studios/${name}/class`, {
+              router.push(`/form/studios/class/${name}`, {
                 query: {
                   name: userName,
                   phone,
                 },
-                pathname: `/form/studios/${name}/class`,
+                pathname: `/form/studios/class/${name}`,
               });
               return;
             } catch (error) {

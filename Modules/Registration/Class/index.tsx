@@ -306,13 +306,13 @@ const index = ({ classes, name, phone }: any) => {
             if (!dancer) return alert("수업을 하나라도 선택해야 합니다.");
 
             try {
-              router.push(`/form/studios/${studio}/coupon`, {
+              router.push(`/form/studios/coupon/${studio}`, {
                 query: {
                   selectedClass: dancer,
                   name,
                   phone,
                 },
-                pathname: `/form/studios/${studio}/coupon`,
+                pathname: `/form/studios/coupon/${studio}`,
               });
             } catch (error) {
               console.error(error);

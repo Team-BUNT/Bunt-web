@@ -395,21 +395,21 @@ const index = ({
                 });
 
                 router.push(
-                  `/form/studios/${studio}/complete`,
-                  `/form/studios/${studio}/complete`
+                  `/form/studios/complete/${studio}`,
+                  `/form/studios/complete/${studio}`
                 );
                 return;
               }
 
               // 쿠폰 구매를 누르고 다음 버튼을 누를 시
-              router.push(`/form/studios/${studio}/payment`, {
+              router.push(`/form/studios/payment/${studio}`, {
                 query: {
                   selectedClass,
                   name,
                   phone,
                   couponCount,
                 },
-                pathname: `/form/studios/${studio}/payment`,
+                pathname: `/form/studios/payment/${studio}`,
               });
             } catch (error) {
               console.error(error);
@@ -453,12 +453,12 @@ const index = ({
               <Button
                 pageActionType="previous"
                 onClick={() =>
-                  router.push(`/form/studios/${studio}/class`, {
+                  router.push(`/form/studios/class/${studio}`, {
                     query: {
                       name,
                       phone,
                     },
-                    pathname: `/form/studios/${studio}/class`,
+                    pathname: `/form/studios/class/${studio}`,
                   })
                 }
                 type="button"
