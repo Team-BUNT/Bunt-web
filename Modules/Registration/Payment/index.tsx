@@ -460,7 +460,7 @@ const index = ({
                 )[0].ID;
 
               const enrollment = {
-                ID: `${studioId} ${studentPhoneNumber}`,
+                ID: `${classId} ${studentPhoneNumber}`,
                 attendance: false,
                 classID: classId,
                 enrolledDate: new Date(),

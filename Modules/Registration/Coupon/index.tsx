@@ -294,7 +294,7 @@ const index = ({
         <CouponRegistrationForm
           onSubmit={handleSubmit(async (data, e) => {
             e?.preventDefault();
-            console.log(buy, use);
+
             try {
               if (!buy && !use) {
                 return alert("쿠폰 여부를 하나라도 눌러야 합니다.");
@@ -332,7 +332,7 @@ const index = ({
                     (dance) => dance.instructorName === selectedClass
                   )[0].ID;
                 const enrollment = {
-                  ID: `${studioId} ${phone}`,
+                  ID: `${classId} ${phone}`,
                   attendance: false,
                   classID: classId,
                   enrolledDate: new Date(),
