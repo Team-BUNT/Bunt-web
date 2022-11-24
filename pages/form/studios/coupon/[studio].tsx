@@ -39,7 +39,7 @@ export default coupon;
 
 export async function getServerSideProps(context: any) {
   // 여기서 name과 phone이 없음
-
+  console.log(context.query);
   try {
     const { name, phone, selectedClass } = await context.query;
     const student = await getStudent(name, phone);

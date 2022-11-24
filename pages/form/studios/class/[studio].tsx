@@ -13,6 +13,7 @@ export async function getServerSideProps(context: {
   query: { studio: string; name: string; phone: string };
 }) {
   const { studio, name, phone } = context.query;
+  console.log(studio, name, phone);
   const studioId = await getStudio(studio);
   if (studioId) {
     const classes = await getClass(studioId[0].ID).then((e) =>
