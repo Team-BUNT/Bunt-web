@@ -127,6 +127,7 @@ const LabelContainer = styled.label`
 
   & input[type="radio"] {
     position: absolute;
+    -webkit-appearance: radio;
     opacity: 0;
     border-radius: 50%;
     cursor: pointer;
@@ -251,6 +252,7 @@ const index = ({
     formState: { errors },
   } = useForm();
 
+  const [buy, setBuy] = useState(false);
   const [use, setUse] = useState(false);
 
   const couponType = [
@@ -292,9 +294,9 @@ const index = ({
         <CouponRegistrationForm
           onSubmit={handleSubmit(async (data, e) => {
             e?.preventDefault();
-
+            console.log(buy, use);
             try {
-              if (Object.values(data).every((type) => !type)) {
+              if (!buy && !use) {
                 return alert("쿠폰 여부를 하나라도 눌러야 합니다.");
               }
 
@@ -420,13 +422,20 @@ const index = ({
               return (
                 <LabelContainer key={`${name})_${type}_${index}`}>
                   {couponCount === 0 && type === "use" ? (
-                    <input type="radio" onClick={() => false} disabled />
+                    <input
+                      type="radio"
+                      value={type}
+                      {...register("coupon")}
+                      onClick={() => false}
+                      disabled
+                    />
                   ) : (
                     <input
                       type="radio"
                       value={type}
                       {...register("coupon")}
                       onChange={(e) => {
+                        e.target.value === "buy" ? setBuy(true) : setBuy(false);
                         e.target.value === "use" ? setUse(true) : setUse(false);
                       }}
                     />
