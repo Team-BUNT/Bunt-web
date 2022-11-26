@@ -197,6 +197,8 @@ const index = ({ studio }: any) => {
               "studios"
             ).fetchData();
 
+            console.log("student login", userName, phone);
+
             const studioId =
               !(allStudio instanceof Error) &&
               [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;

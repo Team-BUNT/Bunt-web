@@ -13,9 +13,11 @@ export async function getServerSideProps(context: {
   query: { studio: string; name: string; phone: string };
 }) {
   const { studio, name, phone } = context.query;
-  console.log(studio, name, phone);
+
+  // 여기가 시작점
+  console.log("server side", name, phone);
   const studioId = await getStudio(studio);
-  if (studioId) {
+  if (studioId && name && phone) {
     const classes = await getClass(studioId[0].ID).then((e) =>
       JSON.parse(JSON.stringify(e))
     );
@@ -23,18 +25,19 @@ export async function getServerSideProps(context: {
     return {
       props: {
         classes,
-        name,
-        phone,
+        name: name && JSON.stringify(name),
+        phone: phone && phone,
       },
     };
   }
 
-  // if (!results) {
-  //   return {
-  //     redirect: {
-  //       destination: "/",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  if (!name || !phone) {
+    return {
+      redirect: {
+        destiantion: "*",
+        permanent: false,
+        statusCode: 307,
+      },
+    };
+  }
 }

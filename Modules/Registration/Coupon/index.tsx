@@ -268,7 +268,7 @@ const index = ({
 
   useEffect(() => {
     if (!router.isReady) return;
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router]);
 
   return (
     <Container>

@@ -3,11 +3,33 @@
 
 import { useRouter } from "next/router";
 import Image from "next/image";
+import userSWR from "swr";
 
 import styled from "styled-components";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import useSWR from "swr";
 
-interface IClass {
+interface INotice {
+  imageURL: string;
+  description: string;
+  bankAccount: string;
+}
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+
+interface IStudio {
+  ID: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
+
+interface IStudioInfo {
   name: string;
   url: string;
 }
@@ -49,17 +71,36 @@ const ImageContainer = styled.div`
   cursor: pointer;
 `;
 
-const index = ({ studioNames }: any) => {
+const index = () => {
   const router = useRouter();
+  const [studios, setStudios] = useState<IStudioInfo[]>([]);
 
-  const studioInfo = Array.from({ length: studioNames.length }).map(
-    (_, index) => {
-      return {
-        name: studioNames[index],
-        url: `/studios/${studioNames[index]}.webp`,
-      };
+  const fetcher = async (url: string) => await axios.get(url);
+  const { data, error } =
+    process.env.NEXT_PUBLIC_MODE === "development"
+      ? useSWR(
+          `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`,
+          fetcher
+        )
+      : useSWR(
+          `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`,
+          fetcher
+        );
+
+  useEffect(() => {
+    if (data) {
+      setStudios((state: IStudioInfo[]) => {
+        const studioInfo = [...data.data].map(({ name }) => {
+          return {
+            name,
+            url: `/studios/${name}.webp`,
+          };
+        });
+
+        return [...state, ...studioInfo];
+      });
     }
-  );
+  }, [data]);
 
   return (
     <Container>
@@ -68,7 +109,7 @@ const index = ({ studioNames }: any) => {
           <div>클래스 신청하러 가기</div>
         </ClassTitle>
         <ClassLogo>
-          {studioInfo.map(({ name, url }, index) => (
+          {studios.map(({ name, url }, index) => (
             <ImageContainer
               key={`${name}${index}`}
               onClick={() => router.push(`/form/studios/login/${name}`)}
@@ -79,6 +120,7 @@ const index = ({ studioNames }: any) => {
                 width={362}
                 height={283}
                 src={url}
+                priority
               ></Image>
             </ImageContainer>
           ))}

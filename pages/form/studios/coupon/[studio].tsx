@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import React from "react";
+import React, { useEffect } from "react";
 import Coupon from "../../../../Modules/Registration/Coupon/index";
 import { getStudent } from "../../../api/students";
 
@@ -39,17 +39,27 @@ export default coupon;
 
 export async function getServerSideProps(context: any) {
   // 여기서 name과 phone이 없음
-  console.log(context.query);
   try {
     const { name, phone, selectedClass } = await context.query;
+
     const student = await getStudent(name, phone);
+
+    // if (student === undefined) {
+    //   return {
+    //     redirect: {
+    //       destination: "*",
+    //       permanent: true,
+    //       statusCode: 307,
+    //     },
+    //   };
+    // }
 
     if (!student || !name || !phone) {
       return {
-        props: {
-          name,
-          phone,
-          couponCount: 0,
+        redirect: {
+          destination: "*",
+          permanent: true,
+          statusCode: 307,
         },
       };
     }
