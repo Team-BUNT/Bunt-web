@@ -1,8 +1,5 @@
 import React from "react";
 import Class from "../../../../Modules/Registration/Class/index";
-import { getClass } from "../../../api/classes";
-import { getStudio } from "../../../api/studios";
-
 const studios = ({ classes, name, phone }: any) => (
   <Class classes={classes} name={name} phone={phone}></Class>
 );

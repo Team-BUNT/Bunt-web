@@ -97,7 +97,7 @@ export default class Student extends FirestoreFetcher {
   async addData(data: IStudent) {
     try {
       const studentDocRef = doc(this.db, "student", data.ID);
-
+      console.log("send");
       await setDoc(studentDocRef, data);
       return "Done";
     } catch (error) {

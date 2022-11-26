@@ -1,8 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { Student, Studio } from "../../../Domains/hooks/Firestore";
-import { firestore } from "../../../Domains/firebase";
-
 import Image from "next/image";
 import { useRouter } from "next/router";
 
@@ -214,8 +211,6 @@ const index = () => {
           url: `/studios/banner/${name}.webp`,
         };
       });
-
-      localStorage.setItem("url", `/studios/banner/${name}.webp`);
     }
   }, [data, router.isReady]);
 
@@ -223,32 +218,46 @@ const index = () => {
   // if (!data) return <div>loaidng</div>;
 
   const onSubmit = async ({ studentName, studentPhone }: any) => {
-    const studentClass = new Student(firestore, "student");
+    const fetcher = async (url: string, postData = {}) =>
+      await axios.post(url, postData);
+    const matchedStudent =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/getStudent`,
+            {
+              phone: studentPhone,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/getStudent`,
+            {
+              phone: studentPhone,
+            }
+          );
 
-    const allStudent = await studentClass.fetchData();
-    const allStudio = await new Studio(firestore, "studios").fetchData();
+    const matchedStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.name,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.name,
+            }
+          );
 
-    console.log("student login", studentName, studentPhone);
-
-    const studioId =
-      !(allStudio instanceof Error) &&
-      [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
-
-    const hasStudent =
-      !(allStudent instanceof Error) &&
-      allStudent.filter(
-        (aStudent) =>
-          aStudent.name === studentName && aStudent.phoneNumber === studentPhone
-      ).length !== 0;
-
-    if (hasStudent) {
+    if (matchedStudent.data) {
       try {
-        router.push(`/form/studios/class/${name}`, {
+        router.push(`/form/studios/class/${studioInfo.name}`, {
           query: {
-            name: studentName,
+            studentName,
             studentPhone,
           },
-          pathname: `/form/studios/class/${name}`,
+          pathname: `/form/studios/class/${studioInfo.name}`,
         });
         return;
       } catch (error) {
@@ -257,22 +266,30 @@ const index = () => {
     }
 
     try {
-      await studentClass.addData({
-        ID: `${studioId} ${studentPhone}`,
-        coupons: [],
-        enrollments: [],
-        name: studentName,
-        phoneNumber: studentPhone,
-        studioID: studioId,
-        subPhoneNumber: "",
-      });
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/addStudent`,
+            {
+              studioId: matchedStudio.data.ID,
+              studentPhone,
+              studentName,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/addStudent`,
+            {
+              studioId: matchedStudio.data.ID,
+              studentPhone,
+              studentName,
+            }
+          );
 
-      router.push(`/form/studios/class/${name}`, {
+      router.push(`/form/studios/class/${studioInfo.name}`, {
         query: {
-          name: studentName,
+          studentName,
           studentPhone,
         },
-        pathname: `/form/studios/class/${name}`,
+        pathname: `/form/studios/class/${studioInfo.name}`,
       });
       return;
     } catch (error) {
