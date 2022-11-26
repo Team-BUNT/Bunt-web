@@ -31,11 +31,11 @@ interface IClass {
 }
 
 export default class Class extends FirestoreFetcher {
-  condition?: QueryConstraint[];
+  condition?: QueryConstraint;
   classRef: CollectionReference<DocumentData>;
   classGroupRef: Query<DocumentData>;
 
-  constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
+  constructor(db: Firestore, documentId: string, condition?: QueryConstraint) {
     super(db, documentId);
     this.condition = condition;
     this.classRef = collection(this.db, "classes");
@@ -48,7 +48,7 @@ export default class Class extends FirestoreFetcher {
     if (this.documentId === undefined || this.documentId.trim() === "")
       return new Error("documentId를 인자로 줘야합니다.");
 
-    return this.condition !== undefined && this.condition.length !== 0
+    return this.condition !== undefined
       ? await this.getclasses()
       : await this.getclassAll();
   }
@@ -64,9 +64,10 @@ export default class Class extends FirestoreFetcher {
   }
 
   private async getclasses() {
-    if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
+    if (this.condition === undefined)
+      return new Error("조건을 입력해야 합니다.");
 
-    const classesRef = query(this.classGroupRef, ...this.condition);
+    const classesRef = query(this.classGroupRef, this.condition);
     const querySnapshot = await getDocs(classesRef);
 
     if (querySnapshot.empty) return new Error("값이 없습니다.");

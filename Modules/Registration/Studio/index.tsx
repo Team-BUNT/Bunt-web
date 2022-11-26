@@ -10,25 +10,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 
-interface INotice {
-  imageURL: string;
-  description: string;
-  bankAccount: string;
-}
-
-interface IHall {
-  name: string;
-  capacity: number;
-}
-
-interface IStudio {
-  ID: string;
-  name?: string;
-  location?: string;
-  notice?: INotice;
-  halls?: IHall[];
-}
-
 interface IStudioInfo {
   name: string;
   url: string;
@@ -87,6 +68,9 @@ const index = () => {
           fetcher
         );
 
+  //TODO: Error 페이지 구현
+  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+
   useEffect(() => {
     if (data) {
       setStudios((state: IStudioInfo[]) => {
@@ -101,6 +85,9 @@ const index = () => {
       });
     }
   }, [data]);
+
+  //TODO: Loading page 구현
+  // if (!data) return <div>loaidng</div>;
 
   return (
     <Container>

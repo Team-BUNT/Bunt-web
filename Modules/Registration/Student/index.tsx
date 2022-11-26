@@ -8,11 +8,12 @@ import { useRouter } from "next/router";
 
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import axios from "axios";
 
 interface INotice {
-  bankAccount: string;
   description: string;
-  imageURL: string;
 }
 
 interface IHall {
@@ -22,10 +23,15 @@ interface IHall {
 
 interface IStudio {
   ID: string;
-  location: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
+
+interface IStudioInfo {
   name: string;
-  notice: INotice[];
-  halls: IHall[];
+  url: string;
 }
 
 const Container = styled.section`
@@ -141,13 +147,15 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ studio }: any) => {
+const index = () => {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const { studio } = router.query;
 
   /**
    * Studio
@@ -161,94 +169,144 @@ const index = ({ studio }: any) => {
    * halls: IHall[];
    */
 
-  const { name } = studio;
-  const { description } = studio.notice;
-  const studioBannerImage = `/studios/banner/${name}.webp`;
+  const [matchedStudio, setMatchedStudio] = useState<IStudio>({
+    ID: "",
+    name: "",
+    location: "",
+    notice: { description: "" },
+  });
+  const [studioInfo, setStudioInfo] = useState({
+    name: "",
+    url: "",
+  });
+
+  const fetcher = async (url: string) =>
+    await axios.post(url, {
+      studioName: studio,
+    });
+
+  const { data, error } =
+    process.env.NEXT_PUBLIC_MODE === "development"
+      ? useSWR(
+          `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+          fetcher
+        )
+      : useSWR(
+          `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+          fetcher
+        );
+
+  //TODO: Error 페이지 구현
+  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (data) {
+      setMatchedStudio((_) => {
+        return { ...data.data };
+      });
+
+      const { name } = data.data;
+      setStudioInfo((_) => {
+        return {
+          name,
+          url: `/studios/banner/${name}.webp`,
+        };
+      });
+
+      localStorage.setItem("url", `/studios/banner/${name}.webp`);
+    }
+  }, [data, router.isReady]);
+
+  //TODO: Loading page 구현
+  // if (!data) return <div>loaidng</div>;
+
+  const onSubmit = async ({ studentName, studentPhone }: any) => {
+    const studentClass = new Student(firestore, "student");
+
+    const allStudent = await studentClass.fetchData();
+    const allStudio = await new Studio(firestore, "studios").fetchData();
+
+    console.log("student login", studentName, studentPhone);
+
+    const studioId =
+      !(allStudio instanceof Error) &&
+      [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
+
+    const hasStudent =
+      !(allStudent instanceof Error) &&
+      allStudent.filter(
+        (aStudent) =>
+          aStudent.name === studentName && aStudent.phoneNumber === studentPhone
+      ).length !== 0;
+
+    if (hasStudent) {
+      try {
+        router.push(`/form/studios/class/${name}`, {
+          query: {
+            name: studentName,
+            studentPhone,
+          },
+          pathname: `/form/studios/class/${name}`,
+        });
+        return;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    try {
+      await studentClass.addData({
+        ID: `${studioId} ${studentPhone}`,
+        coupons: [],
+        enrollments: [],
+        name: studentName,
+        phoneNumber: studentPhone,
+        studioID: studioId,
+        subPhoneNumber: "",
+      });
+
+      router.push(`/form/studios/class/${name}`, {
+        query: {
+          name: studentName,
+          studentPhone,
+        },
+        pathname: `/form/studios/class/${name}`,
+      });
+      return;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Container>
       <StudioContainer>
         <StudioInformation>
-          {typeof name === "string" &&
-            (/studio/gi.test(name) ? (
-              <h1>{name.toUpperCase()}</h1>
+          {typeof studioInfo.name === "string" &&
+            (/studio/gi.test(studioInfo.name) ? (
+              <h1>{studioInfo.name.toUpperCase()}</h1>
             ) : (
-              <h1>{`${name.toUpperCase()} STUDIO`}</h1>
+              <h1>{`${studioInfo.name.toUpperCase()} STUDIO`}</h1>
             ))}
           <h2>클래스 신청 - 개인정보</h2>
           <ImageContainer>
-            <Image
-              src={studioBannerImage}
-              alt="Studio Image"
-              objectFit="cover"
-              width={660}
-              height={218}
-            ></Image>
+            {
+              <Image
+                src={studioInfo.url}
+                alt="Studio Image"
+                objectFit="cover"
+                width={660}
+                height={218}
+              ></Image>
+            }
           </ImageContainer>
-          <StudioDescription>{description}</StudioDescription>
+          <StudioDescription>
+            {matchedStudio.notice?.description}
+          </StudioDescription>
         </StudioInformation>
-        <ClassRegistrationForm
-          onSubmit={handleSubmit(async ({ userName, phone }) => {
-            const studentClass = new Student(firestore, "student");
-
-            const allStudent = await studentClass.fetchData();
-            const allStudio = await new Studio(
-              firestore,
-              "studios"
-            ).fetchData();
-
-            console.log("student login", userName, phone);
-
-            const studioId =
-              !(allStudio instanceof Error) &&
-              [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
-
-            const hasStudent =
-              !(allStudent instanceof Error) &&
-              allStudent.filter(
-                (aStudent) =>
-                  aStudent.name === userName && aStudent.phoneNumber === phone
-              ).length !== 0;
-
-            if (hasStudent) {
-              try {
-                router.push(`/form/studios/class/${name}`, {
-                  query: {
-                    name: userName,
-                    phone,
-                  },
-                  pathname: `/form/studios/class/${name}`,
-                });
-                return;
-              } catch (error) {
-                console.error(error);
-              }
-            }
-
-            try {
-              await studentClass.addData({
-                ID: `${studioId} ${phone}`,
-                coupons: [],
-                enrollments: [],
-                name: userName,
-                phoneNumber: phone,
-                studioID: studioId,
-                subPhoneNumber: "",
-              });
-
-              router.push(`/form/studios/class/${name}`, {
-                query: {
-                  name: userName,
-                  phone,
-                },
-                pathname: `/form/studios/class/${name}`,
-              });
-              return;
-            } catch (error) {
-              console.error(error);
-            }
-          })}
-        >
+        <ClassRegistrationForm onSubmit={handleSubmit(onSubmit)}>
           <LabelContainer>
             <label htmlFor="studentName">
               이름
@@ -256,7 +314,7 @@ const index = ({ studio }: any) => {
                 type="text"
                 id="studentName"
                 placeholder="Ex. 김민수(김민수)"
-                {...register("userName", {
+                {...register("studentName", {
                   required: "이름을 입력해주세요.",
                   minLength: {
                     value: 2,
@@ -269,7 +327,9 @@ const index = ({ studio }: any) => {
                 })}
               />
             </label>
-            <p>{errors.userName && (errors.userName.message as string)}</p>
+            <p>
+              {errors.studentName && (errors.studentName.message as string)}
+            </p>
           </LabelContainer>
           <LabelContainer>
             <label htmlFor="studentPhone">
@@ -278,7 +338,7 @@ const index = ({ studio }: any) => {
                 type="text"
                 id="studentPhone"
                 placeholder="01050946369"
-                {...register("phone", {
+                {...register("studentPhone", {
                   required: "번호를 입력해주세요.",
                   minLength: {
                     value: 10,
