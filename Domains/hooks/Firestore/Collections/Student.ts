@@ -48,15 +48,11 @@ interface IStudent {
 }
 
 export default class Student extends FirestoreFetcher {
-  condition?: QueryConstraint[];
+  condition?: QueryConstraint;
   studentRef: CollectionReference<DocumentData>;
   studentGroupRef: Query<DocumentData>;
 
-  constructor(
-    db: Firestore,
-    documentId: string,
-    condition?: QueryConstraint[]
-  ) {
+  constructor(db: Firestore, documentId: string, condition?: QueryConstraint) {
     super(db, documentId);
     this.condition = condition;
     this.studentRef = collection(this.db, "student");
@@ -69,7 +65,7 @@ export default class Student extends FirestoreFetcher {
     if (this.documentId === undefined || this.documentId.trim() === "")
       return new Error("documentId를 인자로 줘야합니다.");
 
-    return this.condition !== undefined && this.condition.length !== 0
+    return this.condition !== undefined
       ? await this.getStudents()
       : await this.getStudentAll();
   }
@@ -88,7 +84,7 @@ export default class Student extends FirestoreFetcher {
     if (this.condition === undefined)
       return new Error("조건을 입력해야 합니다.");
 
-    const studentsRef = query(this.studentGroupRef, ...this.condition);
+    const studentsRef = query(this.studentGroupRef, this.condition);
     const querySnapshot = await getDocs(studentsRef);
 
     if (querySnapshot.empty) return new Error("값이 없습니다.");

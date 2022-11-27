@@ -1,10 +1,14 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable jsx-a11y/alt-text */
+
+import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import styled from "styled-components";
+import useSWR from "swr";
 import HeadMeta from "../../Components/HeadMeta";
 
 const Root = styled.main`
@@ -93,11 +97,14 @@ const BottomImageContainer = styled.div`
   margin: 0;
 `;
 
+const fetcher = (url: string) => axios.get(url);
+
 const index = () => {
   const buntIconImage = `/bunt.png`;
   const danceImage = `/landingPage/Dance.png`;
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter();
+
   return (
     <Root>
       <Container>

@@ -3,10 +3,14 @@
 
 import { useRouter } from "next/router";
 import Image from "next/image";
+import userSWR from "swr";
 
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import useSWR from "swr";
 
-interface IClass {
+interface IStudioInfo {
   name: string;
   url: string;
 }
@@ -48,17 +52,42 @@ const ImageContainer = styled.div`
   cursor: pointer;
 `;
 
-const index = ({ studioNames }: any) => {
+const index = () => {
   const router = useRouter();
+  const [studios, setStudios] = useState<IStudioInfo[]>([]);
 
-  const studioInfo = Array.from({ length: studioNames.length }).map(
-    (_, index) => {
-      return {
-        name: studioNames[index],
-        url: `/studios/${studioNames[index]}.webp`,
-      };
-    }
-  );
+  //TODO: Error 페이지 구현
+  // if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const fetcher = async (url: string) => await axios.get(url);
+    const allStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`
+          )
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`
+          );
+
+    allStudio.then((data) => {
+      setStudios((state: IStudioInfo[]) => {
+        const studioInfo = [...data.data].map(({ name }) => {
+          return {
+            name,
+            url: `/studios/${name}.webp`,
+          };
+        });
+
+        return [...state, ...studioInfo];
+      });
+    });
+  }, [router.isReady, router.query]);
+
+  //TODO: Loading page 구현
+  // if (!data) return <div>loaidng</div>;
 
   return (
     <Container>
@@ -67,10 +96,10 @@ const index = ({ studioNames }: any) => {
           <div>클래스 신청하러 가기</div>
         </ClassTitle>
         <ClassLogo>
-          {studioInfo.map(({ name, url }, index) => (
+          {studios.map(({ name, url }, index) => (
             <ImageContainer
               key={`${name}${index}`}
-              onClick={() => router.push(`/form/studios/${name}/login`)}
+              onClick={() => router.push(`/form/studios/login/${name}`)}
             >
               <Image
                 layout="responsive"
@@ -78,6 +107,7 @@ const index = ({ studioNames }: any) => {
                 width={362}
                 height={283}
                 src={url}
+                priority
               ></Image>
             </ImageContainer>
           ))}

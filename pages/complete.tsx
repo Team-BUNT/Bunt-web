@@ -1,5 +1,5 @@
 import React from "react";
-import Complete from "../../../../Modules/Registration/Complete/index";
+import Complete from "../Modules/Registration/Complete/index";
 
 const studios = () => <Complete></Complete>;
 
