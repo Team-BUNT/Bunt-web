@@ -1,10 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { appendErrors, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
+import { Class } from "../../../Domains/hooks/Firestore";
+import { firestore } from "../../../Domains/firebase";
+import { Timestamp, where } from "firebase/firestore";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
 
 interface DateContainerProps {
   order: number;
@@ -12,6 +16,45 @@ interface DateContainerProps {
 
 interface CheckboxContainerProps {
   applicantsCount: number;
+  capacity: number;
+}
+
+interface INotice {
+  description: string;
+}
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+
+interface IStudio {
+  ID: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
+
+interface IStudioInfo {
+  studioId: string | null;
+  studioName: string | null;
+}
+
+interface IStudentInfo {
+  studentName: string | null;
+  studentPhone: string | null;
+}
+
+interface IClasses {
+  ID: string;
+  applicantsCount: number;
+  date: Timestamp;
+  hall: IHall;
+  instructorName: string;
+  isPopUp: boolean;
+  studioID: string;
+  title: string;
 }
 
 const Container = styled.section`
@@ -120,9 +163,11 @@ const ClassRegistrationForm = styled.form`
 `;
 
 const ClassRegistrationFormContainer = styled.div`
-  padding-top: 3rem;
-  margin-top: 3rem;
-  border-top: 0.1rem solid #363636;
+  h3 {
+    padding-top: 3rem;
+    margin-top: 3rem;
+    border-top: 0.1rem solid #363636;
+  }
 `;
 
 const LabelContainer = styled.label`
@@ -138,7 +183,7 @@ const LabelContainer = styled.label`
   -ms-user-select: none;
   user-select: none;
 
-  & input[type="checkbox"] {
+  & input[type="radio"] {
     position: absolute;
     opacity: 0;
     border-radius: 50%;
@@ -158,21 +203,21 @@ const LabelContainer = styled.label`
     border-radius: 5px;
   }
 
-  &:hover input[type="checkbox"] ~ span {
+  &:hover input[type="radio"] ~ span {
     background-color: transparent;
     border: 1.5px solid #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span {
+  & input[type="radio"]:checked ~ span {
     border: 1.5px solid #da0000;
     background-color: #da0000;
   }
 
-  & input[type="checkbox"]:checked ~ span:after {
+  & input[type="radio"]:checked ~ span:after {
     display: block;
   }
 
-  & input[type="checkbox"]:disabled ~ span {
+  & input[type="radio"]:disabled ~ span {
     background-color: #4b4b4b;
     border-color: #4b4b4b;
   }
@@ -209,8 +254,10 @@ const LabelText = styled.div<CheckboxContainerProps>`
   font-weight: 400;
   color: #a4a4a4;
   line-height: -5.2rem;
-  color: ${({ applicantsCount }) => applicantsCount === 0 && "#787878"};
-  text-decoration: ${({ applicantsCount }) => applicantsCount === 0 && "line-through"};
+  color: ${({ capacity, applicantsCount }) =>
+    capacity <= applicantsCount && "#787878"};
+  text-decoration: ${({ capacity, applicantsCount }) =>
+    capacity <= applicantsCount && "line-through"};
 `;
 
 const ButtonContainer = styled.div`
@@ -232,44 +279,107 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ classes }: any) => {
+const index = () => {
   const router = useRouter();
-  const { studio, name, phone } = router.query;
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const week = findThisWeek();
-
-  const sortWeek = [...week].map((day) =>
-    [...classes].filter(
-      (aClass) =>
-        // new Date(aClass.date.seconds * 1000)
-        new Date(aClass.date.seconds * 1000).getDate() === day.getDate() &&
-        new Date(aClass.date.seconds * 1000).getMonth() === day.getMonth()
-    )
-  );
-
-  const [targetClasses, settargetClasses] = useState(sortWeek);
 
   const [day, setDay] = useState(0);
-  const [studentName, setstudentName] = useState(name);
-  const [studentPhone, setstudentPhone] = useState(phone);
+  const [studio, setStudioInfo] = useState<IStudioInfo>();
+  const [student, setStudentInfo] = useState<IStudentInfo>();
+  const [classes, setClasses] = useState<IClasses[]>([]);
 
   useEffect(() => {
     if (!router.isReady) return;
   }, [router.isReady]);
 
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+
+    const studioInfo = {
+      studioId: urlSearchParams.get("studioId"),
+      studioName: urlSearchParams.get("studioName"),
+    };
+
+    const studentInfo = {
+      studentName: urlSearchParams.get("studentName"),
+      studentPhone: urlSearchParams.get("studentPhone"),
+    };
+
+    setStudioInfo(() => {
+      if (studioInfo !== undefined) {
+        return { ...studioInfo };
+      }
+    });
+
+    setStudentInfo(() => {
+      if (studentInfo !== undefined) {
+        return { ...studentInfo };
+      }
+    });
+  }, []);
+
+  const week = findThisWeek();
+  const start = week[0];
+  const end = week[week.length - 1];
+
+  useEffect(() => {
+    if (studio?.studioId) {
+      new Class(firestore, "classes", [
+        where("date", ">=", new Date(dateFormatter(start, "-"))),
+        where("date", "<=", new Date(dateFormatter(end, "-"))),
+      ])
+        .fetchData()
+        .then((data: any) =>
+          setClasses(() => {
+            return [...data];
+          })
+        )
+        .catch((error) => console.error(error));
+    }
+  }, [studio?.studioId]);
+
   const dateOnClick = (event: React.MouseEvent, order: number) => setDay(order);
+
+  const onSubmit = async (
+    { classId }: FieldValues,
+    e: React.BaseSyntheticEvent<object, any, any> | undefined
+  ) => {
+    e?.preventDefault();
+
+    if (!classId) return alert("수업을 하나라도 선택해야 합니다.");
+
+    try {
+      if (studio?.studioName) {
+        router.push({
+          query: {
+            classId,
+            studioId: studio?.studioId,
+            studioName: studio.studioName,
+            studentName: student?.studentName,
+            studentPhone: student?.studentPhone,
+          },
+          pathname: `/form/studios/coupon/${studio.studioName}`,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Container>
       <ClassContainer>
         <ClassInformation>
-          {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
+          {typeof studio?.studioName === "string" &&
+            (/studio/gi.test(studio?.studioName) ? (
+              <h1>{studio?.studioName.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${studio?.studioName.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 클래스 선택</h2>
         </ClassInformation>
         <CalenderContainer>
@@ -278,7 +388,11 @@ const index = ({ classes }: any) => {
           </h3>
           <DateContainers>
             {week.map((day, index) => (
-              <DateContainer key={`${day}_${index}`} order={index} onClick={(event) => dateOnClick(event, index)}>
+              <DateContainer
+                key={`${day}_${index}`}
+                order={index}
+                onClick={(event) => dateOnClick(event, index)}
+              >
                 <div>{day.getDate()}</div>
                 <div>{dayFormatter(day, index)}</div>
               </DateContainer>
@@ -286,88 +400,110 @@ const index = ({ classes }: any) => {
           </DateContainers>
         </CalenderContainer>
 
-        <ClassRegistrationForm
-          onSubmit={handleSubmit(async (data, e) => {
-            e?.preventDefault();
-
-            if (Object.values(data).every((dancer) => !dancer)) return alert("수업을 하나라도 선택해야 합니다.");
-
-            try {
-              router.push(`/form/studios/${studio}/coupon`, {
-                query: {
-                  selectedClass: [...Object.keys(data)].filter((dancer) => data[dancer] === true),
-                  name: studentName,
-                  phone: studentPhone,
-                },
-                pathname: `/form/studios/${studio}/coupon`,
-              });
-            } catch (error) {
-              console.error(error);
-            }
-          })}
-        >
+        <ClassRegistrationForm onSubmit={handleSubmit(onSubmit)}>
           <ClassRegistrationFormContainer>
             <h3>정규 클래스</h3>
-            {[...targetClasses][day].filter((value) => !value.isPopUp).length === 0 ? (
+            {[...classes]
+              .filter((value) => !value.isPopUp)
+              .filter((value) => value.date.toDate().getDay() === day)
+              .length === 0 ? (
               <LabelContainer>
-                <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
+                <LabelText capacity={1} applicantsCount={1}>
+                  수업이 없습니다.
+                </LabelText>
               </LabelContainer>
             ) : (
-              [...targetClasses][day]
+              [...classes]
                 .filter((value) => !value.isPopUp)
-                .map(({ instructorName, title, date, applicantsCount }, index) => {
-                  return (
-                    <LabelContainer key={`${instructorName} ${index}`}>
-                      {applicantsCount === 0 ? (
-                        <input type="checkbox" onClick={() => false} disabled />
-                      ) : (
-                        <input type="checkbox" {...register(`${instructorName}`)} />
-                      )}
-                      <span></span>
-                      <LabelTextContainer>
-                        <LabelText applicantsCount={applicantsCount}>{`${instructorName} ${title}`}</LabelText>
-                        <LabelText applicantsCount={applicantsCount}>{`${String(
-                          new Date(date.seconds * 1000).getHours()
-                        ).padStart(2, "0")}:${String(new Date(date.seconds * 1000).getMinutes()).padStart(
-                          2,
-                          "0"
-                        )}`}</LabelText>
-                      </LabelTextContainer>
-                    </LabelContainer>
-                  );
-                })
+                .filter((value) => value.date.toDate().getDay() === day)
+                .map(
+                  (
+                    { ID, instructorName, title, date, applicantsCount, hall },
+                    index
+                  ) => {
+                    return (
+                      <LabelContainer key={`${instructorName} ${index}`}>
+                        {hall.capacity <= applicantsCount ? (
+                          <input type="radio" onClick={() => false} disabled />
+                        ) : (
+                          <input
+                            type="radio"
+                            id="dancer"
+                            value={`${ID}`}
+                            {...register(`classId`)}
+                          />
+                        )}
+                        <span></span>
+                        <LabelTextContainer>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
+                          >{`${instructorName} ${title}`}</LabelText>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
+                          >{`${String(
+                            new Date(date.seconds * 1000).getHours()
+                          ).padStart(2, "0")}:${String(
+                            new Date(date.seconds * 1000).getMinutes()
+                          ).padStart(2, "0")}`}</LabelText>
+                        </LabelTextContainer>
+                      </LabelContainer>
+                    );
+                  }
+                )
             )}
-          </ClassRegistrationFormContainer>
-          <ClassRegistrationFormContainer>
+
             <h3>팝업 클래스</h3>
-            {[...targetClasses][day].filter((value) => value.isPopUp).length === 0 ? (
+            {[...classes]
+              .filter((value) => value.isPopUp)
+              .filter((value) => value.date.toDate().getDay() === day)
+              .length === 0 ? (
               <LabelContainer>
-                <LabelText applicantsCount={1}>수업이 없습니다.</LabelText>
+                <LabelText capacity={1} applicantsCount={1}>
+                  수업이 없습니다.
+                </LabelText>
               </LabelContainer>
             ) : (
-              [...targetClasses][day]
+              [...classes]
                 .filter((value) => value.isPopUp)
-                .map(({ instructorName, title, date, applicantsCount }, index) => {
-                  return (
-                    <LabelContainer key={`${instructorName} ${index}`}>
-                      {applicantsCount === 0 ? (
-                        <input type="checkbox" onClick={() => false} disabled />
-                      ) : (
-                        <input type="checkbox" {...register(`${instructorName}`)} />
-                      )}
-                      <span></span>
-                      <LabelTextContainer>
-                        <LabelText applicantsCount={applicantsCount}>{`${instructorName} ${title}`}</LabelText>
-                        <LabelText applicantsCount={applicantsCount}>{`${String(
-                          new Date(date.seconds * 1000).getHours()
-                        ).padStart(2, "0")}:${String(new Date(date.seconds * 1000).getMinutes()).padStart(
-                          2,
-                          "0"
-                        )}`}</LabelText>
-                      </LabelTextContainer>
-                    </LabelContainer>
-                  );
-                })
+                .filter((value) => value.date.toDate().getDay() === day)
+                .map(
+                  (
+                    { instructorName, title, date, applicantsCount, hall },
+                    index
+                  ) => {
+                    return (
+                      <LabelContainer key={`${instructorName} ${index}`}>
+                        {hall.capacity <= applicantsCount ? (
+                          <input type="radio" onClick={() => false} disabled />
+                        ) : (
+                          <input
+                            type="radio"
+                            id="dancer"
+                            value={`${instructorName}`}
+                            {...register("classId")}
+                          />
+                        )}
+                        <span></span>
+                        <LabelTextContainer>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
+                          >{`${instructorName} ${title}`}</LabelText>
+                          <LabelText
+                            applicantsCount={applicantsCount}
+                            capacity={hall.capacity}
+                          >{`${String(
+                            new Date(date.seconds * 1000).getHours()
+                          ).padStart(2, "0")}:${String(
+                            new Date(date.seconds * 1000).getMinutes()
+                          ).padStart(2, "0")}`}</LabelText>
+                        </LabelTextContainer>
+                      </LabelContainer>
+                    );
+                  }
+                )
             )}
           </ClassRegistrationFormContainer>
 

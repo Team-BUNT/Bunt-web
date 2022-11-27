@@ -5,13 +5,16 @@ import {
   collection,
   collectionGroup,
   CollectionReference,
+  doc,
   DocumentData,
   Firestore,
+  getDoc,
   getDocs,
   Query,
   query,
   QueryConstraint,
   Timestamp,
+  where,
 } from "firebase/firestore";
 
 interface IHall {
@@ -31,11 +34,15 @@ interface IClass {
 }
 
 export default class Class extends FirestoreFetcher {
-  condition?: QueryConstraint[];
+  condition?: QueryConstraint[] | string;
   classRef: CollectionReference<DocumentData>;
   classGroupRef: Query<DocumentData>;
 
-  constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
+  constructor(
+    db: Firestore,
+    documentId: string,
+    condition?: QueryConstraint[] | string
+  ) {
     super(db, documentId);
     this.condition = condition;
     this.classRef = collection(this.db, "classes");
@@ -64,16 +71,28 @@ export default class Class extends FirestoreFetcher {
   }
 
   private async getclasses() {
-    if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
+    if (this.condition === undefined)
+      return new Error("조건을 입력해야 합니다.");
 
-    const classesRef = query(this.classGroupRef, ...this.condition);
-    const querySnapshot = await getDocs(classesRef);
+    if (typeof this.condition === "string") {
+      const classRef = doc(this.db, "classes", this.condition);
+      const docSnap = await getDoc(classRef);
+      if (!docSnap.exists()) new Error("동일한 id값을 가진 class가 없습니다.");
 
-    if (querySnapshot.empty) return new Error("값이 없습니다.");
+      return docSnap.data();
+    }
 
-    return querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    }));
+    if (Array.isArray(this.condition)) {
+      const classesRef = query(this.classGroupRef, ...this.condition);
+
+      const querySnapshot = await getDocs(classesRef);
+
+      if (querySnapshot.empty) return new Error("값이 없습니다.");
+
+      return querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }));
+    }
   }
 
   async addData(data: IClass) {

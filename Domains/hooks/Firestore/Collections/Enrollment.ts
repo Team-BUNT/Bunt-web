@@ -5,12 +5,14 @@ import {
   collection,
   collectionGroup,
   CollectionReference,
+  doc,
   DocumentData,
   Firestore,
   getDocs,
   Query,
   query,
   QueryConstraint,
+  setDoc,
   Timestamp,
 } from "firebase/firestore";
 
@@ -28,11 +30,11 @@ interface IEnrollment {
 }
 
 export default class Enrollment extends FirestoreFetcher {
-  condition?: QueryConstraint[];
+  condition?: QueryConstraint;
   enrollmentRef: CollectionReference<DocumentData>;
   enrollmentGroupRef: Query<DocumentData>;
 
-  constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
+  constructor(db: Firestore, documentId: string, condition?: QueryConstraint) {
     super(db, documentId);
     this.condition = condition;
     this.enrollmentRef = collection(this.db, "enrollment");
@@ -45,7 +47,7 @@ export default class Enrollment extends FirestoreFetcher {
     if (this.documentId === undefined || this.documentId.trim() === "")
       return new Error("documentId를 인자로 줘야합니다.");
 
-    return this.condition !== undefined && this.condition.length !== 0
+    return this.condition !== undefined
       ? await this.getEnrollments()
       : await this.getEnrollmentAll();
   }
@@ -61,9 +63,10 @@ export default class Enrollment extends FirestoreFetcher {
   }
 
   private async getEnrollments() {
-    if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
+    if (this.condition === undefined)
+      return new Error("조건을 입력해야 합니다.");
 
-    const enrollmentsRef = query(this.enrollmentGroupRef, ...this.condition);
+    const enrollmentsRef = query(this.enrollmentGroupRef, this.condition);
     const querySnapshot = await getDocs(enrollmentsRef);
 
     if (querySnapshot.empty) return new Error("값이 없습니다.");
@@ -75,7 +78,9 @@ export default class Enrollment extends FirestoreFetcher {
 
   async addData(data: IEnrollment) {
     try {
-      await addDoc(this.enrollmentRef, data);
+      const enrollmentDocRef = doc(this.db, "enrollment", data.ID);
+
+      await setDoc(enrollmentDocRef, data);
     } catch (error) {
       console.error("Error가 발생했습니다. ", error);
     }

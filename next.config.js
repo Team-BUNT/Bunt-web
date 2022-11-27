@@ -3,7 +3,16 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ["localhost", "firebasestorage.googleapis.com"],
+    path: "/_next/image",
+    domains: ["localhost", "bunt.life", "firebasestorage.googleapis.com"],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://bunt.life/:path*",
+      },
+    ];
   },
 };
 

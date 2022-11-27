@@ -78,3 +78,7 @@
 - [ ] 팩토리 패턴으로 도메인 정보 리팩토링 하기
 - [ ] Time 객체로 시간 관련 함수 리팩토링 ( 라이브러리 date-fns 사용 )
 - [ ] Form Submit 객체로 분리
+
+### Bug Report
+
+- class 페이지에서 => coupon 페이지로 넘어갈 시 router.push로 보낸 name과 phone이 getServerSideProps로 전달되지 않은 현상 확인
