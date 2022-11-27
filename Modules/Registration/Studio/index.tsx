@@ -69,7 +69,7 @@ const index = () => {
         );
 
   //TODO: Error 페이지 구현
-  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+  // if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
 
   useEffect(() => {
     if (data) {
