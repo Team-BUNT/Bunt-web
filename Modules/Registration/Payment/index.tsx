@@ -473,9 +473,7 @@ const index = () => {
         return alert("쿠폰 종류와 결제 방법을 체크해주세요.");
       if (!coupon && payment) return alert("쿠폰 종류를 체크해주세요.");
       if (coupon && !payment) return alert("결제 방법을 체크해주세요.");
-      console.log(student);
-      console.log(classId);
-      console.log(studio);
+
       if (
         student &&
         studio &&
@@ -560,6 +558,8 @@ const index = () => {
             : await fetcher(`/api/class/getClass`, "POST", {
                 ID: classId,
               });
+
+        console.log(matchedClass);
 
         payment === "무통장 입금"
           ? useFirebaseFunction({
