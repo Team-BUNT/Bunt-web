@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     path: "/_next/image",
-    domains: ["localhost", "firebasestorage.googleapis.com"],
+    domains: ["localhost", "bunt.life", "firebasestorage.googleapis.com"],
   },
 };
 
