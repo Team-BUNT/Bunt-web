@@ -56,23 +56,23 @@ const index = () => {
   const router = useRouter();
   const [studios, setStudios] = useState<IStudioInfo[]>([]);
 
-  const fetcher = async (url: string) => await axios.get(url);
-  const { data, error } =
-    process.env.NEXT_PUBLIC_MODE === "development"
-      ? useSWR(
-          `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`,
-          fetcher
-        )
-      : useSWR(
-          `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`,
-          fetcher
-        );
-
   //TODO: Error 페이지 구현
   // if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
 
   useEffect(() => {
-    if (data) {
+    if (!router.isReady) return;
+
+    const fetcher = async (url: string) => await axios.get(url);
+    const allStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`
+          )
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`
+          );
+
+    allStudio.then((data) => {
       setStudios((state: IStudioInfo[]) => {
         const studioInfo = [...data.data].map(({ name }) => {
           return {
@@ -83,8 +83,8 @@ const index = () => {
 
         return [...state, ...studioInfo];
       });
-    }
-  }, [data]);
+    });
+  }, [router.isReady, router.query]);
 
   //TODO: Loading page 구현
   // if (!data) return <div>loaidng</div>;
