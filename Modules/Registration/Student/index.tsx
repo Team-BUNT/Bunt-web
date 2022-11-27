@@ -188,10 +188,7 @@ const index = () => {
           `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
           fetcher
         )
-      : useSWR(
-          `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
-          fetcher
-        );
+      : useSWR(`/api/studio/getStudio`, fetcher);
 
   //TODO: Error 페이지 구현
 
@@ -228,12 +225,9 @@ const index = () => {
               phone: studentPhone,
             }
           )
-        : await fetcher(
-            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/getStudent`,
-            {
-              phone: studentPhone,
-            }
-          );
+        : await fetcher(`/api/student/getStudent`, {
+            phone: studentPhone,
+          });
 
     const matchedStudio =
       process.env.NEXT_PUBLIC_MODE === "development"
@@ -243,12 +237,9 @@ const index = () => {
               studioName: studioInfo.name,
             }
           )
-        : await fetcher(
-            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
-            {
-              studioName: studioInfo.name,
-            }
-          );
+        : await fetcher(`/api/studio/getStudio`, {
+            studioName: studioInfo.name,
+          });
 
     if (matchedStudent.data) {
       try {
@@ -277,14 +268,11 @@ const index = () => {
               studentName,
             }
           )
-        : await fetcher(
-            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/addStudent`,
-            {
-              studioId: matchedStudio.data.ID,
-              studentPhone,
-              studentName,
-            }
-          );
+        : await fetcher(`/api/student/addStudent`, {
+            studioId: matchedStudio.data.ID,
+            studentPhone,
+            studentName,
+          });
 
       router.push(`/form/studios/class/${studioInfo.name}`, {
         query: {
