@@ -481,12 +481,12 @@ const index = () => {
         student.studentPhone &&
         studio.studioName
       ) {
-        if (
-          !confirm(
-            `${student.studentName}님 수강신청 감사합니다. ${student.studentPhone}번호로 수강신청 알람이 갑니다. 번호가 일치하나요?`
-          )
-        )
-          return;
+        // if (
+        //   !confirm(
+        //     `${student.studentName}님 수강신청 감사합니다. ${student.studentPhone}번호로 수강신청 알람이 갑니다. 번호가 일치하나요?`
+        //   )
+        // )
+        //   return;
 
         const fetcher = async (url: string, type = "GET", postData = {}) =>
           type === "GET" ? axios.post(url) : axios.post(url, postData);
