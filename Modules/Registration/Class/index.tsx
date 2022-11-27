@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
@@ -346,6 +346,32 @@ const index = () => {
 
   const dateOnClick = (event: React.MouseEvent, order: number) => setDay(order);
 
+  const onSubmit = async (
+    { classId }: FieldValues,
+    e: React.BaseSyntheticEvent<object, any, any> | undefined
+  ) => {
+    e?.preventDefault();
+
+    if (!classId) return alert("수업을 하나라도 선택해야 합니다.");
+
+    try {
+      if (studio?.studioName) {
+        router.push({
+          query: {
+            classId,
+            studioId: studio?.studioId,
+            studioName: studio.studioName,
+            studentName: student?.studentName,
+            studentPhone: student?.studentPhone,
+          },
+          pathname: `/form/studios/coupon/${studio.studioName}`,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Container>
       <ClassContainer>
@@ -376,30 +402,7 @@ const index = () => {
           </DateContainers>
         </CalenderContainer>
 
-        <ClassRegistrationForm
-          onSubmit={handleSubmit(async ({ classId }, e) => {
-            e?.preventDefault();
-
-            if (!classId) return alert("수업을 하나라도 선택해야 합니다.");
-
-            try {
-              studio?.studioName;
-              studio?.studioName;
-
-              router.push({
-                query: {
-                  classId,
-                  studioId: studio?.studioId,
-                  studentName: student?.studentName,
-                  studentPhone: student?.studentPhone,
-                },
-                pathname: `/form/studios/coupon/${studio}`,
-              });
-            } catch (error) {
-              console.error(error);
-            }
-          })}
-        >
+        <ClassRegistrationForm onSubmit={handleSubmit(onSubmit)}>
           <ClassRegistrationFormContainer>
             <h3>정규 클래스</h3>
             {[...classes]

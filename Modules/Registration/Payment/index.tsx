@@ -326,14 +326,7 @@ const Cheap = styled.div`
   visibility: hidden;
 `;
 
-const index = ({
-  selectedClass,
-  studentName,
-  studentPhoneNumber,
-  couponCount,
-  studio,
-  bankAccount,
-}: any) => {
+const index = () => {
   const router = useRouter();
   const {
     register,
@@ -342,7 +335,7 @@ const index = ({
   } = useForm();
   const [deposite, setDeposite] = useState(false);
 
-  const STUDIO_ADMIN_ACCOUNT = bankAccount;
+  // const STUDIO_ADMIN_ACCOUNT = bankAccount;
   const COUPON_TYPE = "모든 쿠폰의 유효기간은 구매 후, 4주 입니다.";
   const CLIPBOARD_MESSAGE = "신청폼 링크가 복사되었습니다.";
 
@@ -412,12 +405,12 @@ const index = ({
     <Container>
       <CouponContainer>
         <CouponInformation>
-          {typeof studio === "string" &&
+          {/* {typeof studio === "string" &&
             (/studio/gi.test(studio) ? (
               <h1>{studio.toUpperCase()}</h1>
             ) : (
               <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
-            ))}
+            ))} */}
           <h2>클래스 신청 - 결제</h2>
           <CouponDescription>
             <h3>쿠폰 가격</h3>
@@ -433,134 +426,134 @@ const index = ({
         </CouponInformation>
 
         <CouponRegistrationForm
-          onSubmit={handleSubmit(async (data, e) => {
-            e?.preventDefault();
-            const { coupon, payment } = data;
+        // onSubmit={handleSubmit(async (data, e) => {
+        //   e?.preventDefault();
+        //   const { coupon, payment } = data;
 
-            const user = localStorage.getItem("user");
+        //   const user = localStorage.getItem("user");
 
-            const { name, phone } =
-              typeof user === "string" && JSON.parse(user);
+        //   const { name, phone } =
+        //     typeof user === "string" && JSON.parse(user);
 
-            try {
-              const studios = await new Studio(
-                firestore,
-                "studios"
-              ).fetchData();
-              const dancers = await new Class(firestore, "classes").fetchData();
-              const studioId =
-                !(studios instanceof Error) &&
-                [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
-              const studentId = `${studioId} ${studentPhoneNumber}`;
+        //   try {
+        //     const studios = await new Studio(
+        //       firestore,
+        //       "studios"
+        //     ).fetchData();
+        //     const dancers = await new Class(firestore, "classes").fetchData();
+        //     const studioId =
+        //       !(studios instanceof Error) &&
+        //       [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
+        //     const studentId = `${studioId} ${studentPhoneNumber}`;
 
-              const classId =
-                !(dancers instanceof Error) &&
-                [...dancers].filter(
-                  (dance) => dance.instructorName === selectedClass
-                )[0].ID;
+        //     const classId =
+        //       !(dancers instanceof Error) &&
+        //       [...dancers].filter(
+        //         (dance) => dance.instructorName === selectedClass
+        //       )[0].ID;
 
-              const enrollment = {
-                ID: `${classId} ${studentPhoneNumber}`,
-                attendance: false,
-                classID: classId,
-                enrolledDate: new Date(),
-                info: "",
-                paid: true,
-                paymentType: "쿠폰 사용",
-                phoneNumber:
-                  typeof studentPhoneNumber === "string"
-                    ? studentPhoneNumber
-                    : "",
-                studioID: studioId,
-                userName: typeof studentName === "string" ? studentName : "",
-              };
+        //     const enrollment = {
+        //       ID: `${classId} ${studentPhoneNumber}`,
+        //       attendance: false,
+        //       classID: classId,
+        //       enrolledDate: new Date(),
+        //       info: "",
+        //       paid: true,
+        //       paymentType: "쿠폰 사용",
+        //       phoneNumber:
+        //         typeof studentPhoneNumber === "string"
+        //           ? studentPhoneNumber
+        //           : "",
+        //       studioID: studioId,
+        //       userName: typeof studentName === "string" ? studentName : "",
+        //     };
 
-              if (coupon === "프리패스") {
-                await new Student(firestore, "student").updateData(
-                  studentId,
-                  {
-                    classID: classId,
-                    studioID: studioId,
-                    expiredDate: new Date(
-                      new Date().setDate(new Date().getDate() + 30)
-                    ),
-                    isFreePass: true,
-                    studentID: studentId,
-                  },
-                  enrollment,
-                  "프리패스"
-                );
-              } else {
-                await new Student(firestore, "student").updateData(
-                  studentId,
-                  {
-                    classID: classId,
-                    studioID: studioId,
-                    expiredDate: new Date(
-                      new Date().setDate(new Date().getDate() + 30)
-                    ),
-                    isFreePass: false,
-                    studentID: studentId,
-                  },
-                  enrollment,
-                  coupon
-                );
-              }
+        //     if (coupon === "프리패스") {
+        //       await new Student(firestore, "student").updateData(
+        //         studentId,
+        //         {
+        //           classID: classId,
+        //           studioID: studioId,
+        //           expiredDate: new Date(
+        //             new Date().setDate(new Date().getDate() + 30)
+        //           ),
+        //           isFreePass: true,
+        //           studentID: studentId,
+        //         },
+        //         enrollment,
+        //         "프리패스"
+        //       );
+        //     } else {
+        //       await new Student(firestore, "student").updateData(
+        //         studentId,
+        //         {
+        //           classID: classId,
+        //           studioID: studioId,
+        //           expiredDate: new Date(
+        //             new Date().setDate(new Date().getDate() + 30)
+        //           ),
+        //           isFreePass: false,
+        //           studentID: studentId,
+        //         },
+        //         enrollment,
+        //         coupon
+        //       );
+        //     }
 
-              await new Enrollment(firestore, "enrollment").addData(enrollment);
+        //     await new Enrollment(firestore, "enrollment").addData(enrollment);
 
-              const targetStudio: any =
-                !(studios instanceof Error) &&
-                [...studios].filter((aStudio) => aStudio.name === studio)[0];
+        //     const targetStudio: any =
+        //       !(studios instanceof Error) &&
+        //       [...studios].filter((aStudio) => aStudio.name === studio)[0];
 
-              const dancer: any =
-                !(dancers instanceof Error) &&
-                [...dancers]
-                  .filter((dance) => dance.instructorName === selectedClass)
-                  .filter((schedule) => {
-                    const today = new Date().getDate();
-                    const nextSevenDaysAfter = new Date().setDate(
-                      new Date().getDate() + 7
-                    );
-                    return (
-                      today <= new Date(schedule.date.toDate()).getDate() &&
-                      nextSevenDaysAfter >=
-                        new Date(schedule.date.toDate()).getDate()
-                    );
-                  })[0];
+        //     const dancer: any =
+        //       !(dancers instanceof Error) &&
+        //       [...dancers]
+        //         .filter((dance) => dance.instructorName === selectedClass)
+        //         .filter((schedule) => {
+        //           const today = new Date().getDate();
+        //           const nextSevenDaysAfter = new Date().setDate(
+        //             new Date().getDate() + 7
+        //           );
+        //           return (
+        //             today <= new Date(schedule.date.toDate()).getDate() &&
+        //             nextSevenDaysAfter >=
+        //               new Date(schedule.date.toDate()).getDate()
+        //           );
+        //         })[0];
 
-              const { title, date } = dancer;
-              const { location, notice } = targetStudio;
+        //     const { title, date } = dancer;
+        //     const { location, notice } = targetStudio;
 
-              payment === "무통장 입금"
-                ? useFirebaseFunction({
-                    to: studentPhoneNumber,
-                    studioName: typeof studio === "string" ? studio : "",
-                    studioAddress: location,
-                    instructorName: selectedClass,
-                    genre: title,
-                    time: dateFormatter(new Date(date.toDate())),
-                    studioAccountNumber: notice.bankAccount,
-                  })
-                : useFirebaseFunction({
-                    to: studentPhoneNumber,
-                    studioName: typeof studio === "string" ? studio : "",
-                    studioAddress: location,
-                    instructorName: selectedClass,
-                    genre: title,
-                    time: dateFormatter(new Date(date.toDate())),
-                    payment,
-                  });
+        //     payment === "무통장 입금"
+        //       ? useFirebaseFunction({
+        //           to: studentPhoneNumber,
+        //           studioName: typeof studio === "string" ? studio : "",
+        //           studioAddress: location,
+        //           instructorName: selectedClass,
+        //           genre: title,
+        //           time: dateFormatter(new Date(date.toDate())),
+        //           studioAccountNumber: notice.bankAccount,
+        //         })
+        //       : useFirebaseFunction({
+        //           to: studentPhoneNumber,
+        //           studioName: typeof studio === "string" ? studio : "",
+        //           studioAddress: location,
+        //           instructorName: selectedClass,
+        //           genre: title,
+        //           time: dateFormatter(new Date(date.toDate())),
+        //           payment,
+        //         });
 
-              router.push(
-                `/form/studios/${studio}/complete`,
-                `/form/studios/${studio}/complete`
-              );
-              return;
-            } catch (error) {
-              console.error(error);
-            }
-          })}
+        //     router.push(
+        //       `/form/studios/${studio}/complete`,
+        //       `/form/studios/${studio}/complete`
+        //     );
+        //     return;
+        //   } catch (error) {
+        //     console.error(error);
+        //   }
+        // })}
         >
           <CouponRegistrationFormContainer>
             <h3>쿠폰 종류</h3>
@@ -627,28 +620,28 @@ const index = ({
               </LabelInputContainer>
               <DepositeInformation>
                 <h3>계좌 정보</h3>
-                <div>
+                {/* <div>
                   <span>{STUDIO_ADMIN_ACCOUNT}</span>
                   <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>
                     복사
                   </button>
-                </div>
+                </div> */}
               </DepositeInformation>
             </DepositeContainer>
           )}
           <PreviousNextButtonClass>
             <ButtonContainer
               onClick={() => {
-                const user = localStorage.getItem("user");
-                const { name, phone } =
-                  typeof user === "string" && JSON.parse(user);
-                router.push(`/form/studios/${studio}/coupon`, {
-                  query: {
-                    name,
-                    phone,
-                  },
-                  pathname: `/form/studios/${studio}/coupon`,
-                });
+                // const user = localStorage.getItem("user");
+                // const { name, phone } =
+                //   typeof user === "string" && JSON.parse(user);
+                // router.push(`/form/studios/${studio}/coupon`, {
+                //   query: {
+                //     name,
+                //     phone,
+                //   },
+                //   pathname: `/form/studios/${studio}/coupon`,
+                // });
               }}
             >
               <Button pageActionType="previous">
