@@ -5,6 +5,12 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
+import { Class } from "../../../Domains/hooks/Firestore";
+import { firestorage, firestore } from "../../../Domains/firebase";
+import { QueryConstraint, Timestamp, where } from "firebase/firestore";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
+import useSWR from "swr";
+import axios from "axios";
 
 interface DateContainerProps {
   order: number;
@@ -13,6 +19,44 @@ interface DateContainerProps {
 interface CheckboxContainerProps {
   applicantsCount: number;
   capacity: number;
+}
+
+interface INotice {
+  description: string;
+}
+
+interface IHall {
+  name: string;
+  capacity: number;
+}
+
+interface IStudio {
+  ID: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
+
+interface IStudioInfo {
+  studioId: string | null;
+  studioName: string | null;
+}
+
+interface IStudentInfo {
+  studentName: string | null;
+  studentPhone: string | null;
+}
+
+interface IClasses {
+  ID: string;
+  applicantsCount: number;
+  date: Timestamp;
+  hall: IHall;
+  instructorName: string;
+  isPopUp: boolean;
+  studioID: string;
+  title: string;
 }
 
 const Container = styled.section`
@@ -237,35 +281,68 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ classes, name, phone }: any) => {
+const index = () => {
   const router = useRouter();
-  const { studio } = router.query;
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const week = findThisWeek();
-
-  const sortWeek = [...week].map((day) =>
-    [...classes].filter(
-      (aClass) =>
-        // new Date(aClass.date.seconds * 1000)
-        new Date(aClass.date.seconds * 1000).getDate() === day.getDate() &&
-        new Date(aClass.date.seconds * 1000).getMonth() === day.getMonth()
-    )
-  );
-
-  const [targetClasses, settargetClasses] = useState(sortWeek);
 
   const [day, setDay] = useState(0);
-  const [studentName, setstudentName] = useState(name);
-  const [studentPhone, setstudentPhone] = useState(phone);
+  const [studio, setStudioInfo] = useState<IStudioInfo>();
+  const [student, setStudentInfo] = useState<IStudentInfo>();
+  const [classes, setClasses] = useState<IClasses[]>([]);
 
   useEffect(() => {
     if (!router.isReady) return;
-  }, [router.isReady, name, phone]);
+  }, [router.isReady]);
+
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+
+    const studioInfo = {
+      studioId: urlSearchParams.get("studioId"),
+      studioName: urlSearchParams.get("studioName"),
+    };
+
+    const studentInfo = {
+      studentName: urlSearchParams.get("studentName"),
+      studentPhone: urlSearchParams.get("studentPhone"),
+    };
+
+    setStudioInfo(() => {
+      if (studioInfo !== undefined) {
+        return { ...studioInfo };
+      }
+    });
+
+    setStudentInfo(() => {
+      if (studentInfo !== undefined) {
+        return { ...studentInfo };
+      }
+    });
+  }, []);
+
+  const week = findThisWeek();
+  const start = week[0];
+  const end = week[week.length - 1];
+
+  useEffect(() => {
+    if (studio?.studioId) {
+      new Class(firestore, "classes", [
+        where("date", ">=", new Date(dateFormatter(start, "-"))),
+        where("date", "<=", new Date(dateFormatter(end, "-"))),
+      ])
+        .fetchData()
+        .then((data: any) =>
+          setClasses(() => {
+            return [...data];
+          })
+        )
+        .catch((error) => console.error(error));
+    }
+  }, [studio?.studioId]);
 
   const dateOnClick = (event: React.MouseEvent, order: number) => setDay(order);
 
@@ -273,11 +350,11 @@ const index = ({ classes, name, phone }: any) => {
     <Container>
       <ClassContainer>
         <ClassInformation>
-          {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? (
-              <h1>{studio.toUpperCase()}</h1>
+          {typeof studio?.studioName === "string" &&
+            (/studio/gi.test(studio?.studioName) ? (
+              <h1>{studio?.studioName.toUpperCase()}</h1>
             ) : (
-              <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
+              <h1>{`${studio?.studioName.toUpperCase()} STUDIO`}</h1>
             ))}
           <h2>클래스 신청 - 클래스 선택</h2>
         </ClassInformation>
@@ -300,17 +377,21 @@ const index = ({ classes, name, phone }: any) => {
         </CalenderContainer>
 
         <ClassRegistrationForm
-          onSubmit={handleSubmit(async ({ dancer }, e) => {
+          onSubmit={handleSubmit(async ({ classId }, e) => {
             e?.preventDefault();
 
-            if (!dancer) return alert("수업을 하나라도 선택해야 합니다.");
+            if (!classId) return alert("수업을 하나라도 선택해야 합니다.");
 
             try {
+              studio?.studioName;
+              studio?.studioName;
+
               router.push({
                 query: {
-                  selectedClass: dancer,
-                  name,
-                  phone,
+                  classId,
+                  studioId: studio?.studioId,
+                  studentName: student?.studentName,
+                  studentPhone: student?.studentPhone,
                 },
                 pathname: `/form/studios/coupon/${studio}`,
               });
@@ -321,7 +402,9 @@ const index = ({ classes, name, phone }: any) => {
         >
           <ClassRegistrationFormContainer>
             <h3>정규 클래스</h3>
-            {[...targetClasses][day].filter((value) => !value.isPopUp)
+            {[...classes]
+              .filter((value) => !value.isPopUp)
+              .filter((value) => value.date.toDate().getDay() === day)
               .length === 0 ? (
               <LabelContainer>
                 <LabelText capacity={1} applicantsCount={1}>
@@ -329,11 +412,12 @@ const index = ({ classes, name, phone }: any) => {
                 </LabelText>
               </LabelContainer>
             ) : (
-              [...targetClasses][day]
+              [...classes]
                 .filter((value) => !value.isPopUp)
+                .filter((value) => value.date.toDate().getDay() === day)
                 .map(
                   (
-                    { instructorName, title, date, applicantsCount, hall },
+                    { ID, instructorName, title, date, applicantsCount, hall },
                     index
                   ) => {
                     return (
@@ -344,8 +428,8 @@ const index = ({ classes, name, phone }: any) => {
                           <input
                             type="radio"
                             id="dancer"
-                            value={`${instructorName}`}
-                            {...register(`dancer`)}
+                            value={`${ID}`}
+                            {...register(`classId`)}
                           />
                         )}
                         <span></span>
@@ -370,16 +454,19 @@ const index = ({ classes, name, phone }: any) => {
             )}
 
             <h3>팝업 클래스</h3>
-            {[...targetClasses][day].filter((value) => value.isPopUp).length ===
-            0 ? (
+            {[...classes]
+              .filter((value) => value.isPopUp)
+              .filter((value) => value.date.toDate().getDay() === day)
+              .length === 0 ? (
               <LabelContainer>
                 <LabelText capacity={1} applicantsCount={1}>
                   수업이 없습니다.
                 </LabelText>
               </LabelContainer>
             ) : (
-              [...targetClasses][day]
+              [...classes]
                 .filter((value) => value.isPopUp)
+                .filter((value) => value.date.toDate().getDay() === day)
                 .map(
                   (
                     { instructorName, title, date, applicantsCount, hall },
@@ -394,7 +481,7 @@ const index = ({ classes, name, phone }: any) => {
                             type="radio"
                             id="dancer"
                             value={`${instructorName}`}
-                            {...register("dancer")}
+                            {...register("classId")}
                           />
                         )}
                         <span></span>

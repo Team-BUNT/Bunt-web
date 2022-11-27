@@ -1,40 +1,47 @@
 import React from "react";
 import Class from "../../../../Modules/Registration/Class/index";
-const studios = ({ classes, name, phone }: any) => (
-  <Class classes={classes} name={name} phone={phone}></Class>
-);
+
+const studios = () => <Class></Class>;
 
 export default studios;
 
-export async function getServerSideProps(context: {
-  query: { studio: string; name: string; phone: string };
-}) {
-  const { studio, name, phone } = context.query;
+// export async function getServerSideProps({
+//   query: { studio, studentName, studentPhone },
+// }: any) {
+//   console.log(studio, studentName, studentPhone);
+//   return {
+//     props: {},
+//   };
+// }
 
-  // 여기가 시작점
-  console.log("server side", name, phone);
-  const studioId = await getStudio(studio);
-  if (studioId && name && phone) {
-    const classes = await getClass(studioId[0].ID).then((e) =>
-      JSON.parse(JSON.stringify(e))
-    );
+//   query: { studio: string; name: string; phone: string };
+// }) {
+//   const { studio, name, phone } = context.query;
 
-    return {
-      props: {
-        classes,
-        name: name && JSON.stringify(name),
-        phone: phone && phone,
-      },
-    };
-  }
+//   // 여기가 시작점
+//   console.log("server side", name, phone);
+//   const studioId = await getStudio(studio);
+//   if (studioId && name && phone) {
+//     const classes = await getClass(studioId[0].ID).then((e) =>
+//       JSON.parse(JSON.stringify(e))
+//     );
 
-  if (!name || !phone) {
-    return {
-      redirect: {
-        destiantion: "*",
-        permanent: false,
-        statusCode: 307,
-      },
-    };
-  }
-}
+//     return {
+//       props: {
+//         classes,
+//         name: name && JSON.stringify(name),
+//         phone: phone && phone,
+//       },
+//     };
+//   }
+
+//   if (!name || !phone) {
+//     return {
+//       redirect: {
+//         destiantion: "*",
+//         permanent: false,
+//         statusCode: 307,
+//       },
+//     };
+//   }
+// }

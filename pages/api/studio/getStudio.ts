@@ -21,7 +21,6 @@ const getStudio = async (name: string) => {
 
 const handler = async (req: any, res: any) => {
   const requestMethod = req.method;
-
   const { studioName }: { studioName: string } = req.body;
 
   switch (requestMethod) {

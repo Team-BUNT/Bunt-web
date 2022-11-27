@@ -194,7 +194,6 @@ const index = () => {
         );
 
   //TODO: Error 페이지 구현
-  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -208,14 +207,15 @@ const index = () => {
       setStudioInfo((_) => {
         return {
           name,
-          url: `/studios/banner/${name}.webp`,
+          url: `/studios/banner/${studio}.webp`,
         };
       });
     }
-  }, [data, router.isReady]);
+  }, [studio, data, router.isReady]);
 
-  //TODO: Loading page 구현
-  // if (!data) return <div>loaidng</div>;
+  //TODO: Error Loading page 구현
+  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+  if (!data) return <div>loaidng</div>;
 
   const onSubmit = async ({ studentName, studentPhone }: any) => {
     const fetcher = async (url: string, postData = {}) =>
@@ -254,6 +254,8 @@ const index = () => {
       try {
         router.push(`/form/studios/class/${studioInfo.name}`, {
           query: {
+            studioId: matchedStudio.data.ID,
+            studioName: studio,
             studentName,
             studentPhone,
           },
@@ -286,6 +288,7 @@ const index = () => {
 
       router.push(`/form/studios/class/${studioInfo.name}`, {
         query: {
+          studioName: studio,
           studentName,
           studentPhone,
         },
@@ -301,15 +304,15 @@ const index = () => {
     <Container>
       <StudioContainer>
         <StudioInformation>
-          {typeof studioInfo.name === "string" &&
-            (/studio/gi.test(studioInfo.name) ? (
-              <h1>{studioInfo.name.toUpperCase()}</h1>
+          {typeof studio === "string" &&
+            (/studio/gi.test(studio) ? (
+              <h1>{studio.toUpperCase()}</h1>
             ) : (
-              <h1>{`${studioInfo.name.toUpperCase()} STUDIO`}</h1>
+              <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
             ))}
           <h2>클래스 신청 - 개인정보</h2>
           <ImageContainer>
-            {
+            {studioInfo.url && (
               <Image
                 src={studioInfo.url}
                 alt="Studio Image"
@@ -317,7 +320,7 @@ const index = () => {
                 width={660}
                 height={218}
               ></Image>
-            }
+            )}
           </ImageContainer>
           <StudioDescription>
             {matchedStudio.notice?.description}
