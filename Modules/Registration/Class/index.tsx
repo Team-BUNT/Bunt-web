@@ -1,16 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { findThisWeek } from "../../../Domains/findThisWeek";
 import { dayFormatter } from "../../../Domains/dayFormatter";
 import { Class } from "../../../Domains/hooks/Firestore";
-import { firestorage, firestore } from "../../../Domains/firebase";
-import { QueryConstraint, Timestamp, where } from "firebase/firestore";
+import { firestore } from "../../../Domains/firebase";
+import { Timestamp, where } from "firebase/firestore";
 import { dateFormatter } from "../../../Domains/\bdateFormatter";
-import useSWR from "swr";
-import axios from "axios";
 
 interface DateContainerProps {
   order: number;
