@@ -344,6 +344,8 @@ const index = () => {
     }
   }, [studio?.studioId]);
 
+  if (!studio || !student) return <h1>데이터가 없습니다.</h1>;
+
   const dateOnClick = (event: React.MouseEvent, order: number) => setDay(order);
 
   const onSubmit = async (
