@@ -3,10 +3,12 @@
 
 import { useRouter } from "next/router";
 import Image from "next/image";
+import userSWR from "swr";
 
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import useSWR from "swr";
 
 interface IStudioInfo {
   name: string;
@@ -66,7 +68,9 @@ const index = () => {
         ? fetcher(
             `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`
           )
-        : fetcher(`/api/studio/getAllStudio`);
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`
+          );
 
     allStudio.then((data) => {
       setStudios((state: IStudioInfo[]) => {
