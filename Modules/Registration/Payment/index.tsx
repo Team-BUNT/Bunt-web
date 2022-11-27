@@ -1,11 +1,21 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
-import styled, { keyframes } from "styled-components";
-import { Class, Enrollment, Student, Studio } from "../../../Domains/hooks/Firestore";
-import { firestore } from "../../../Domains/firebase";
+import { FieldValues, useForm } from "react-hook-form";
+import styled from "styled-components";
+import axios from "axios";
+import { useFirebaseFunction } from "../../../Domains/hooks/useFirebaseFunction";
+import { dateFormatter } from "../../../Domains/\bdateFormatter";
 
+interface IStudioInfo {
+  studioId: string | null;
+  studioName: string | null;
+}
+
+interface IStudentInfo {
+  studentName: string | null;
+  studentPhone: string | null;
+}
 interface ButtonProps {
   pageActionType: string;
 }
@@ -273,10 +283,14 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button<ButtonProps>`
-  background-color: ${({ pageActionType }) => (pageActionType === "complete" ? "#202020" : "transparent")};
-  border-radius: ${({ pageActionType }) => (pageActionType === "complete" ? "0.7rem" : "0")};
-  width: ${({ pageActionType }) => (pageActionType === "complete" ? "15.5rem" : "auto")};
-  height: ${({ pageActionType }) => (pageActionType === "complete" ? "5rem" : "auto")};
+  background-color: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "#202020" : "transparent"};
+  border-radius: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "0.7rem" : "0"};
+  width: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "15.5rem" : "auto"};
+  height: ${({ pageActionType }) =>
+    pageActionType === "complete" ? "5rem" : "auto"};
   border: 0;
   font-size: 1.7rem;
   cursor: pointer;
@@ -286,11 +300,15 @@ const Button = styled.button<ButtonProps>`
     justify-content: center;
     align-items: center;
 
-    width: ${({ pageActionType }) => pageActionType === "complete" && "15.5rem"};
+    width: ${({ pageActionType }) =>
+      pageActionType === "complete" && "15.5rem"};
     height: ${({ pageActionType }) => pageActionType === "complete" && "5rem"};
-    border-radius: ${({ pageActionType }) => pageActionType === "complete" && "0.7rem"};
-    background-color: ${({ pageActionType }) => pageActionType === "complete" && "#202020"};
-    margin-left: ${({ pageActionType }) => (pageActionType === "previous" ? "3.4rem" : "0")};
+    border-radius: ${({ pageActionType }) =>
+      pageActionType === "complete" && "0.7rem"};
+    background-color: ${({ pageActionType }) =>
+      pageActionType === "complete" && "#202020"};
+    margin-left: ${({ pageActionType }) =>
+      pageActionType === "previous" ? "3.4rem" : "0"};
   }
 `;
 
@@ -311,16 +329,20 @@ const Cheap = styled.div`
   visibility: hidden;
 `;
 
-const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, studio, bankAccount }: any) => {
+const index = () => {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [deposite, setDeposite] = useState(false);
 
-  const STUDIO_ADMIN_ACCOUNT = bankAccount;
+  const [studio, setStudioInfo] = useState<IStudioInfo>();
+  const [student, setStudentInfo] = useState<IStudentInfo>();
+  const [classId, setClassId] = useState<string>("");
+  const [deposite, setDeposite] = useState(false);
+  const [account, setAccount] = useState("");
+  // const STUDIO_ADMIN_ACCOUNT = bankAccount;
   const COUPON_TYPE = "모든 쿠폰의 유효기간은 구매 후, 4주 입니다.";
   const CLIPBOARD_MESSAGE = "신청폼 링크가 복사되었습니다.";
 
@@ -364,6 +386,58 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
     },
   ];
 
+  useEffect(() => {
+    if (!router.isReady) return;
+  }, [router.isReady, router.query]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const urlSearchParams = new URLSearchParams(window.location.search);
+
+    const studioInfo = {
+      studioId: urlSearchParams.get("studioId"),
+      studioName: urlSearchParams.get("studioName"),
+    };
+
+    const studentInfo = {
+      studentName: urlSearchParams.get("studentName"),
+      studentPhone: urlSearchParams.get("studentPhone"),
+    };
+
+    setStudioInfo(() => {
+      if (studioInfo !== undefined) {
+        return { ...studioInfo };
+      }
+    });
+
+    setStudentInfo(() => {
+      if (studentInfo !== undefined) {
+        return { ...studentInfo };
+      }
+    });
+
+    const fetcher = async (url: string, postData = {}) =>
+      await axios.post(url, postData);
+    const matchedStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.studioName,
+            }
+          )
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.studioName,
+            }
+          );
+
+    matchedStudio.then((student) => {
+      setAccount(student.data.notice.bankAccount);
+    });
+  }, [router.isReady, router.query]);
+
   const doCopy = (text: string) => {
     const cheap = document.getElementById("cheap") as HTMLElement;
     navigator.clipboard.writeText(text);
@@ -382,16 +456,167 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
     );
   };
 
-  useEffect(() => {
-    if (!router.isReady) return;
-  }, [router.isReady]);
+  const onSubmit = async (
+    data: FieldValues,
+    e: React.BaseSyntheticEvent<object, any, any> | undefined
+  ) => {
+    e?.preventDefault();
+
+    try {
+      /**
+       * coupon: 1회 | 2회 | 프리패스
+       * payment: 현장카드 | 무통장 입금
+       */
+      const { coupon, payment } = data;
+
+      if (!coupon && !payment)
+        return alert("쿠폰 종류와 결제 방법을 체크해주세요.");
+      if (!coupon && payment) return alert("쿠폰 종류를 체크해주세요.");
+      if (coupon && !payment) return alert("결제 방법을 체크해주세요.");
+
+      if (
+        student &&
+        studio &&
+        classId &&
+        student.studentPhone &&
+        studio.studioName
+      ) {
+        if (
+          !confirm(
+            `${student.studentName}님 수강신청 감사합니다. ${student.studentPhone}번호로 수강신청 알람이 갑니다. 번호가 일치하나요?`
+          )
+        )
+          return;
+
+        const fetcher = async (url: string, type = "GET", postData = {}) =>
+          type === "GET" ? axios.post(url) : axios.post(url, postData);
+
+        process.env.NEXT_PUBLIC_MODE === "development"
+          ? await fetcher(
+              `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/enrollment/addEnrollment`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+              }
+            )
+          : await fetcher(
+              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/enrollment/addEnrollment`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+              }
+            );
+
+        process.env.NEXT_PUBLIC_MODE === "development"
+          ? await fetcher(
+              `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/updateStudent`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+                isFreePass: coupon === "프리패스" ? true : false,
+                couponType: coupon === "프리패스" ? "프리패스" : coupon,
+              }
+            )
+          : await fetcher(
+              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/updateStudent`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+                isFreePass: coupon === "프리패스" ? true : false,
+                couponType: coupon === "프리패스" ? "프리패스" : coupon,
+              }
+            );
+
+        const matchedStudio =
+          process.env.NEXT_PUBLIC_MODE === "development"
+            ? await fetcher(
+                `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+                "POST",
+                {
+                  studioName: studio.studioName,
+                }
+              )
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+                "POST",
+                {
+                  studioName: studio.studioName,
+                }
+              );
+
+        const matchedClass =
+          process.env.NEXT_PUBLIC_MODE === "development"
+            ? await fetcher(
+                `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/class/getClass`,
+                "POST",
+                {
+                  ID: classId,
+                }
+              )
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/class/getClass`,
+                "POST",
+                {
+                  ID: classId,
+                }
+              );
+
+        payment === "무통장 입금"
+          ? useFirebaseFunction({
+              to: student?.studentPhone,
+              studioName: studio?.studioName,
+              studioAddress: matchedStudio.data.location,
+              instructorName: matchedClass.data.instructorName,
+              genre: matchedClass.data.title,
+              time: dateFormatter(
+                new Date(matchedClass.data.date.seconds * 1000)
+              ),
+              studioAccountNumber: matchedStudio.data.notice.bankAccount,
+            })
+          : useFirebaseFunction({
+              to: student?.studentPhone,
+              studioName: studio?.studioName,
+              studioAddress: matchedStudio.data.location,
+              instructorName: matchedClass.data.instructorName,
+              genre: matchedClass.data.title,
+              time: dateFormatter(
+                new Date(matchedClass.data.date.seconds * 1000)
+              ),
+              payment,
+            });
+
+        router.push(`/complete`, `/complete`);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Container>
       <CouponContainer>
         <CouponInformation>
-          {typeof studio === "string" &&
-            (/studio/gi.test(studio) ? <h1>{studio.toUpperCase()}</h1> : <h1>{`${studio.toUpperCase()} STUDIO`}</h1>)}
+          {typeof studio?.studioName === "string" &&
+            (/studio/gi.test(studio?.studioName) ? (
+              <h1>{studio?.studioName.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${studio?.studioName.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 결제</h2>
           <CouponDescription>
             <h3>쿠폰 가격</h3>
@@ -406,104 +631,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
           </CouponDescription>
         </CouponInformation>
 
-        <CouponRegistrationForm
-          onSubmit={handleSubmit(async (data, e) => {
-            e?.preventDefault();
-            const { coupon, payment } = data;
-
-            const user = localStorage.getItem("user");
-            const { name, phone } = typeof user === "string" && JSON.parse(user);
-
-            /** Todo
-             * 1. coupon 개수에 따라 student에 coupon 추가
-             * 2. enrollment 등록
-             */
-
-            try {
-              const studios = await new Studio(firestore, "studios").fetchData();
-              const dancers = await new Class(firestore, "classes").fetchData();
-              const studioId =
-                !(studios instanceof Error) && [...studios].filter((aStudio) => aStudio.name === studio)[0].ID;
-              const studentId = `${studioId} ${phone}`;
-
-              if (Array.isArray(selectedClass) && selectedClass.length !== 0) {
-                const classIds = selectedClass.map(
-                  (dancerName) =>
-                    !(dancers instanceof Error) &&
-                    [...dancers].filter((dance) => dance.instructorName === dancerName)[0].ID
-                );
-                classIds.forEach(async (classId) => {
-                  const enrollment = {
-                    ID: `${studioId} ${phone}`,
-                    attendance: false,
-                    classID: classId,
-                    enrolledDate: new Date(),
-                    info: "",
-                    paid: true,
-                    paymentType: "쿠폰 사용",
-                    phoneNumber: typeof phone === "string" ? phone : "",
-                    studioID: studioId,
-                    userName: typeof name === "string" ? name : "",
-                  };
-
-                  await new Student(firestore, "student").updateData(
-                    studentId,
-                    {
-                      studioID: studioId,
-                      expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-                      isFreePass: coupon === "프리패스" ? true : false,
-                      studentID: studentId,
-                    },
-                    enrollment
-                  );
-
-                  await new Enrollment(firestore, "enrollment").addData(enrollment);
-                });
-
-                router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
-                return;
-              }
-
-              const classId =
-                !(dancers instanceof Error) &&
-                [...dancers].filter((dance) => dance.instructorName === selectedClass)[0].ID;
-
-              console.log(classId);
-              const enrollment = {
-                ID: `${studioId} ${phone}`,
-                attendance: false,
-                classID: classId,
-                enrolledDate: new Date(),
-                info: "",
-                paid: true,
-                paymentType: "쿠폰 사용",
-                phoneNumber: typeof phone === "string" ? phone : "",
-                studioID: studioId,
-                userName: typeof name === "string" ? name : "",
-              };
-
-              console.log(enrollment);
-              await new Student(firestore, "student").updateData(
-                studentId,
-                {
-                  studioID: studioId,
-                  expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-                  isFreePass: coupon === "프리패스" ? true : false,
-                  studentID: studentId,
-                },
-                enrollment
-              );
-
-              await new Enrollment(firestore, "enrollment").addData(enrollment);
-
-              router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
-              return;
-            } catch (error) {
-              console.error(error);
-              router.push(`/form/studios/${studio}/complete`, `/form/studios/${studio}/complete`);
-            }
-          })}
-        >
+        <CouponRegistrationForm onSubmit={handleSubmit(onSubmit)}>
           <CouponRegistrationFormContainer>
             <h3>쿠폰 종류</h3>
             {couponType.map(({ type }, index) => {
@@ -528,7 +656,9 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
                     value={type}
                     id={type}
                     onClick={() => {
-                      const depositeElement = document.getElementById("무통장 입금") as HTMLInputElement;
+                      const depositeElement = document.getElementById(
+                        "무통장 입금"
+                      ) as HTMLInputElement;
                       setDeposite(depositeElement.checked);
                     }}
                     {...register("payment")}
@@ -568,8 +698,8 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
               <DepositeInformation>
                 <h3>계좌 정보</h3>
                 <div>
-                  <span>{STUDIO_ADMIN_ACCOUNT}</span>
-                  <button onClick={() => doCopy(STUDIO_ADMIN_ACCOUNT)}>복사</button>
+                  <span>{account}</span>
+                  <button onClick={() => doCopy(account)}>복사</button>
                 </div>
               </DepositeInformation>
             </DepositeContainer>
@@ -577,15 +707,7 @@ const index = ({ selectedClass, studentName, studentPhoneNumber, couponCount, st
           <PreviousNextButtonClass>
             <ButtonContainer
               onClick={() => {
-                const user = localStorage.getItem("user");
-                const { name, phone } = typeof user === "string" && JSON.parse(user);
-                router.push(`/form/studios/${studio}/coupon`, {
-                  query: {
-                    name,
-                    phone,
-                  },
-                  pathname: `/form/studios/${studio}/coupon`,
-                });
+                router.back();
               }}
             >
               <Button pageActionType="previous">

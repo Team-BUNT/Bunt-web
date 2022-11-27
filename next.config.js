@@ -3,7 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ["localhost", "firebasestorage.googleapis.com"],
+    path: "/_next/image",
+    domains: ["localhost", "bunt.life", "firebasestorage.googleapis.com"],
   },
 };
 

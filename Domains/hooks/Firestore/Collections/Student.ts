@@ -12,11 +12,13 @@ import {
   Query,
   query,
   QueryConstraint,
+  setDoc,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
 
 interface ICoupon {
+  classID: null | string;
   studioID: string;
   expiredDate: Date;
   isFreePass: boolean;
@@ -46,11 +48,11 @@ interface IStudent {
 }
 
 export default class Student extends FirestoreFetcher {
-  condition?: QueryConstraint[];
+  condition?: QueryConstraint;
   studentRef: CollectionReference<DocumentData>;
   studentGroupRef: Query<DocumentData>;
 
-  constructor(db: Firestore, documentId: string, condition?: QueryConstraint[]) {
+  constructor(db: Firestore, documentId: string, condition?: QueryConstraint) {
     super(db, documentId);
     this.condition = condition;
     this.studentRef = collection(this.db, "student");
@@ -63,7 +65,7 @@ export default class Student extends FirestoreFetcher {
     if (this.documentId === undefined || this.documentId.trim() === "")
       return new Error("documentId를 인자로 줘야합니다.");
 
-    return this.condition !== undefined && this.condition.length !== 0
+    return this.condition !== undefined
       ? await this.getStudents()
       : await this.getStudentAll();
   }
@@ -79,9 +81,10 @@ export default class Student extends FirestoreFetcher {
   }
 
   private async getStudents() {
-    if (this.condition === undefined) return new Error("조건을 입력해야 합니다.");
+    if (this.condition === undefined)
+      return new Error("조건을 입력해야 합니다.");
 
-    const studentsRef = query(this.studentGroupRef, ...this.condition);
+    const studentsRef = query(this.studentGroupRef, this.condition);
     const querySnapshot = await getDocs(studentsRef);
 
     if (querySnapshot.empty) return new Error("값이 없습니다.");
@@ -93,35 +96,110 @@ export default class Student extends FirestoreFetcher {
 
   async addData(data: IStudent) {
     try {
-      await addDoc(this.studentRef, data);
+      const studentDocRef = doc(this.db, "student", data.ID);
+
+      await setDoc(studentDocRef, data);
       return "Done";
     } catch (error) {
       console.error("Error가 발생했습니다. ", error);
     }
   }
 
-  async updateData(studentId: string, newCoupons: ICoupon[] | ICoupon, newEnrollments: IEnrollment[] | IEnrollment) {
-    console.log(this.db, studentId);
-    const studentRef = doc(this.db, "student", studentId);
-    const tempStudentAll = await this.getStudentAll();
-    const { coupons, enrollments }: any =
-      !(tempStudentAll instanceof Error) && Array.from(tempStudentAll).filter((student) => student.ID === studentId)[0];
+  async updateData(
+    studentId: string,
+    newCoupons: ICoupon[] | ICoupon,
+    newEnrollments: IEnrollment[] | IEnrollment,
+    couponType = "쿠폰 사용"
+  ) {
+    if (couponType === "쿠폰 사용") {
+      const studentRef = doc(this.db, "student", studentId);
+      const tempStudentAll = await this.getStudentAll();
 
-    // 쿠폰을 추가하는 형태가 아닌 제거하는 형태
-    if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
-      await updateDoc(studentRef, {
-        coupons: [...coupons, newCoupons],
-        enrollments: [...enrollments, newEnrollments],
-      });
-      return "Done";
-    }
+      const { coupons, enrollments }: any =
+        !(tempStudentAll instanceof Error) &&
+        Array.from(tempStudentAll).filter(
+          (student) => student.ID === studentId
+        )[0];
 
-    if (Array.isArray(newCoupons) && Array.isArray(newEnrollments)) {
-      await updateDoc(studentRef, {
-        coupons: [...coupons, ...newCoupons],
-        enrollments: [...enrollments, ...newEnrollments],
-      });
-      return "Done";
+      if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+        if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+          });
+
+        const noneClassIdCoupons = [...coupons].filter(
+          (coupon) => !coupon.classID
+        );
+        const haveClassIdCoupons = [...coupons].filter(
+          (coupon) => coupon.classID
+        );
+
+        const sortedCoupons = [...noneClassIdCoupons]
+          .filter((coupon) => !coupon.classID)
+          .sort((a, b) => b.expiredDate - a.expiredDate);
+        Array.isArray(sortedCoupons) &&
+          sortedCoupons.length !== 0 &&
+          (sortedCoupons[0].classID = newEnrollments.classID);
+
+        await updateDoc(studentRef, {
+          coupons: [...haveClassIdCoupons, ...sortedCoupons],
+          enrollments: [...enrollments, newEnrollments],
+        });
+        return "Done";
+      }
+    } else {
+      const studentRef = doc(this.db, "student", studentId);
+      const tempStudentAll = await this.getStudentAll();
+      const parseCoupon = parseInt(couponType);
+
+      const { coupons, enrollments }: any =
+        !(tempStudentAll instanceof Error) &&
+        Array.from(tempStudentAll).filter(
+          (student) => student.ID === studentId
+        )[0];
+
+      if (!Array.isArray(newCoupons) && !Array.isArray(newEnrollments)) {
+        if (coupons.some((coupon: ICoupon) => coupon.isFreePass === true))
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+          });
+
+        if (couponType === "프리패스") {
+          const freePassCoupon = { ...newCoupons };
+          freePassCoupon.isFreePass = true;
+          return await updateDoc(studentRef, {
+            enrollments: [...enrollments, newEnrollments],
+            coupons: [...coupons, newCoupons],
+          });
+        }
+
+        const noneClassIdCoupons = [...coupons].filter(
+          (coupon) => !coupon.classID
+        );
+        const haveClassIdCoupons = [...coupons].filter(
+          (coupon) => coupon.classID
+        );
+
+        const sortedCoupons = [...noneClassIdCoupons]
+          .filter((coupon) => !coupon.classID)
+          .sort((a, b) => b.expiredDate - a.expiredDate);
+
+        const unusedCoupon = { ...newCoupons };
+        unusedCoupon.classID = "";
+
+        await updateDoc(studentRef, {
+          coupons: [
+            ...sortedCoupons,
+            ...haveClassIdCoupons,
+            newCoupons,
+            ...Array.from({
+              length: parseCoupon - 1,
+            }).fill(unusedCoupon),
+          ],
+          enrollments: [...enrollments, newEnrollments],
+        });
+        return "Done";
+      }
     }
   }
 }

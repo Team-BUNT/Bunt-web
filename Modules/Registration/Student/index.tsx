@@ -1,21 +1,16 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import testImage from "../../../public/studios/BuntStudentViewTestImage.png";
-import { Student, Studio } from "../../../Domains/hooks/Firestore";
-import { firestore } from "../../../Domains/firebase";
 
 import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import { v4 as uuidv4 } from "uuid";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { getStudio } from "../../../pages/api/studios";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import axios from "axios";
 
 interface INotice {
-  bankAccount: string;
   description: string;
-  imageURL: string;
 }
 
 interface IHall {
@@ -25,10 +20,15 @@ interface IHall {
 
 interface IStudio {
   ID: string;
-  location: string;
+  name?: string;
+  location?: string;
+  notice?: INotice;
+  halls?: IHall[];
+}
+
+interface IStudioInfo {
   name: string;
-  notice: INotice[];
-  halls: IHall[];
+  url: string;
 }
 
 const Container = styled.section`
@@ -144,13 +144,15 @@ const Button = styled.button`
   }
 `;
 
-const index = ({ studio, url }: any) => {
+const index = () => {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const { studio } = router.query;
 
   /**
    * Studio
@@ -163,74 +165,168 @@ const index = ({ studio, url }: any) => {
    * };
    * halls: IHall[];
    */
-  const { name } = studio;
-  const { description } = studio.notice;
+
+  const [matchedStudio, setMatchedStudio] = useState<IStudio>({
+    ID: "",
+    name: "",
+    location: "",
+    notice: { description: "" },
+  });
+  const [studioInfo, setStudioInfo] = useState({
+    name: "",
+    url: "",
+  });
+
+  const fetcher = async (url: string) =>
+    await axios.post(url, {
+      studioName: studio,
+    });
+
+  const { data, error } =
+    process.env.NEXT_PUBLIC_MODE === "development"
+      ? useSWR(
+          `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+          fetcher
+        )
+      : useSWR(
+          `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+          fetcher
+        );
+
+  //TODO: Error 페이지 구현
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (data) {
+      setMatchedStudio((_) => {
+        return { ...data.data };
+      });
+
+      const { name } = data.data;
+      setStudioInfo((_) => {
+        return {
+          name,
+          url: `/studios/banner/${studio}.webp`,
+        };
+      });
+    }
+  }, [studio, data, router.isReady]);
+
+  //TODO: Error Loading page 구현
+  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+  if (!data) return <div>loaidng</div>;
+
+  const onSubmit = async ({ studentName, studentPhone }: any) => {
+    const fetcher = async (url: string, postData = {}) =>
+      await axios.post(url, postData);
+    const matchedStudent =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/getStudent`,
+            {
+              phone: studentPhone,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/getStudent`,
+            {
+              phone: studentPhone,
+            }
+          );
+
+    const matchedStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.name,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.name,
+            }
+          );
+
+    if (matchedStudent.data) {
+      try {
+        router.push(`/form/studios/class/${studioInfo.name}`, {
+          query: {
+            studioId: matchedStudio.data.ID,
+            studioName: studio,
+            studentName,
+            studentPhone,
+          },
+          pathname: `/form/studios/class/${studioInfo.name}`,
+        });
+        return;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    try {
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? await fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/addStudent`,
+            {
+              studioId: matchedStudio.data.ID,
+              studentPhone,
+              studentName,
+            }
+          )
+        : await fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/addStudent`,
+            {
+              studioId: matchedStudio.data.ID,
+              studentPhone,
+              studentName,
+            }
+          );
+
+      router.push(`/form/studios/class/${studioInfo.name}`, {
+        query: {
+          studioName: studio,
+          studentName,
+          studentPhone,
+        },
+        pathname: `/form/studios/class/${studioInfo.name}`,
+      });
+      return;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Container>
       <StudioContainer>
         <StudioInformation>
-          {typeof name === "string" &&
-            (/studio/gi.test(name) ? <h1>{name.toUpperCase()}</h1> : <h1>{`${name.toUpperCase()} STUDIO`}</h1>)}
+          {typeof studio === "string" &&
+            (/studio/gi.test(studio) ? (
+              <h1>{studio.toUpperCase()}</h1>
+            ) : (
+              <h1>{`${studio.toUpperCase()} STUDIO`}</h1>
+            ))}
           <h2>클래스 신청 - 개인정보</h2>
           <ImageContainer>
-            <Image src={url} alt="Studio Image" objectFit="cover" width={660} height={218}></Image>
+            {studioInfo.url && (
+              <Image
+                src={studioInfo.url}
+                alt="Studio Image"
+                objectFit="cover"
+                width={660}
+                height={218}
+              ></Image>
+            )}
           </ImageContainer>
-          <StudioDescription>{description}</StudioDescription>
+          <StudioDescription>
+            {matchedStudio.notice?.description}
+          </StudioDescription>
         </StudioInformation>
-        <ClassRegistrationForm
-          onSubmit={handleSubmit(async ({ userName, phone }) => {
-            const studentClass = new Student(firestore, "student");
-
-            const allStudent = await studentClass.fetchData();
-            const allStudio = await new Studio(firestore, "studios").fetchData();
-
-            const studioId =
-              !(allStudio instanceof Error) && [...allStudio].filter((aStudio) => aStudio.name === name)[0].ID;
-
-            const hasStudent =
-              !(allStudent instanceof Error) &&
-              allStudent.filter((aStudent) => aStudent.name === userName && aStudent.phoneNumber === phone).length !==
-                0;
-
-            if (hasStudent) {
-              try {
-                router.push(`/form/studios/${name}/class`, {
-                  query: {
-                    name: userName,
-                    phone,
-                  },
-                  pathname: `/form/studios/${name}/class`,
-                });
-                return;
-              } catch (error) {
-                console.error(error);
-              }
-            }
-
-            try {
-              studentClass.addData({
-                ID: `${studioId} ${phone}`,
-                coupons: [],
-                enrollments: [],
-                name: userName,
-                phoneNumber: phone,
-                studioID: studioId,
-                subPhoneNumber: "",
-              });
-              router.push(`/form/studios/${name}/class`, {
-                query: {
-                  name: userName,
-                  phone,
-                },
-                pathname: `/form/studios/${name}/class`,
-              });
-              return;
-            } catch (error) {
-              console.error(error);
-            }
-          })}
-        >
+        <ClassRegistrationForm onSubmit={handleSubmit(onSubmit)}>
           <LabelContainer>
             <label htmlFor="studentName">
               이름
@@ -238,7 +334,7 @@ const index = ({ studio, url }: any) => {
                 type="text"
                 id="studentName"
                 placeholder="Ex. 김민수(김민수)"
-                {...register("userName", {
+                {...register("studentName", {
                   required: "이름을 입력해주세요.",
                   minLength: {
                     value: 2,
@@ -251,7 +347,9 @@ const index = ({ studio, url }: any) => {
                 })}
               />
             </label>
-            <p>{errors.userName && (errors.userName.message as string)}</p>
+            <p>
+              {errors.studentName && (errors.studentName.message as string)}
+            </p>
           </LabelContainer>
           <LabelContainer>
             <label htmlFor="studentPhone">
@@ -260,7 +358,7 @@ const index = ({ studio, url }: any) => {
                 type="text"
                 id="studentPhone"
                 placeholder="01050946369"
-                {...register("phone", {
+                {...register("studentPhone", {
                   required: "번호를 입력해주세요.",
                   minLength: {
                     value: 10,
@@ -272,7 +370,8 @@ const index = ({ studio, url }: any) => {
                   },
                   pattern: {
                     value: /^[0-9]{10,11}$/,
-                    message: "적절한 양식으로 번호를 입력해주세요. (Ex. 01012345678)",
+                    message:
+                      "적절한 양식으로 번호를 입력해주세요. (Ex. 01012345678)",
                   },
                 })}
               />
