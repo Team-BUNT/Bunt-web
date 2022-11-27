@@ -426,9 +426,12 @@ const index = () => {
               studioName: studioInfo.studioName,
             }
           )
-        : fetcher(`/api/studio/getStudio`, {
-            studioName: studioInfo.studioName,
-          });
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+            {
+              studioName: studioInfo.studioName,
+            }
+          );
 
     matchedStudio.then((student) => {
       setAccount(student.data.notice.bankAccount);
@@ -499,12 +502,16 @@ const index = () => {
                 studentName: student?.studentName,
               }
             )
-          : await fetcher(`/api/enrollment/addEnrollment`, "POST", {
-              classId,
-              studioId: studio?.studioId,
-              studentPhone: student?.studentPhone,
-              studentName: student?.studentName,
-            });
+          : await fetcher(
+              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/enrollment/addEnrollment`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+              }
+            );
 
         process.env.NEXT_PUBLIC_MODE === "development"
           ? await fetcher(
@@ -520,15 +527,19 @@ const index = () => {
                 couponType: coupon === "프리패스" ? "프리패스" : coupon,
               }
             )
-          : await fetcher(`/api/student/updateStudent`, "POST", {
-              classId,
-              studioId: studio?.studioId,
-              studentId: `${studio?.studioId} ${student?.studentPhone}`,
-              studentPhone: student?.studentPhone,
-              studentName: student?.studentName,
-              isFreePass: coupon === "프리패스" ? true : false,
-              couponType: coupon === "프리패스" ? "프리패스" : coupon,
-            });
+          : await fetcher(
+              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/updateStudent`,
+              "POST",
+              {
+                classId,
+                studioId: studio?.studioId,
+                studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                studentPhone: student?.studentPhone,
+                studentName: student?.studentName,
+                isFreePass: coupon === "프리패스" ? true : false,
+                couponType: coupon === "프리패스" ? "프리패스" : coupon,
+              }
+            );
 
         const matchedStudio =
           process.env.NEXT_PUBLIC_MODE === "development"
@@ -539,9 +550,13 @@ const index = () => {
                   studioName: studio.studioName,
                 }
               )
-            : await fetcher(`/api/studio/getStudio`, "POST", {
-                studioName: studio.studioName,
-              });
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+                "POST",
+                {
+                  studioName: studio.studioName,
+                }
+              );
 
         const matchedClass =
           process.env.NEXT_PUBLIC_MODE === "development"
@@ -552,9 +567,13 @@ const index = () => {
                   ID: classId,
                 }
               )
-            : await fetcher(`/api/class/getClass`, "POST", {
-                ID: classId,
-              });
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/class/getClass`,
+                "POST",
+                {
+                  ID: classId,
+                }
+              );
 
         payment === "무통장 입금"
           ? useFirebaseFunction({

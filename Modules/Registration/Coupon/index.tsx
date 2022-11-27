@@ -307,9 +307,12 @@ const index = () => {
               phone: studentPhone,
             }
           )
-        : fetcher(`/api/student/getStudent`, {
-            phone: studentPhone,
-          });
+        : fetcher(
+            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/getStudent`,
+            {
+              phone: studentPhone,
+            }
+          );
 
     matchedStudent.then((student) => {
       setCouponCount(
@@ -378,12 +381,16 @@ const index = () => {
                   studentName: student?.studentName,
                 }
               )
-            : await fetcher(`/api/enrollment/addEnrollment`, "POST", {
-                classId,
-                studioId: studio?.studioId,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              });
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/enrollment/addEnrollment`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              );
 
           process.env.NEXT_PUBLIC_MODE === "development"
             ? await fetcher(
@@ -397,13 +404,17 @@ const index = () => {
                   studentName: student?.studentName,
                 }
               )
-            : await fetcher(`/api/student/updateStudent`, "POST", {
-                classId,
-                studioId: studio?.studioId,
-                studentId: `${studio?.studioId} ${student?.studentPhone}`,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              });
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/updateStudent`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              );
 
           const matchedStudio =
             process.env.NEXT_PUBLIC_MODE === "development"
@@ -414,9 +425,13 @@ const index = () => {
                     studioName: studio.studioName,
                   }
                 )
-              : await fetcher(`/api/studio/getStudio`, "POST", {
-                  studioName: studio.studioName,
-                });
+              : await fetcher(
+                  `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getStudio`,
+                  "POST",
+                  {
+                    studioName: studio.studioName,
+                  }
+                );
 
           const matchedClass =
             process.env.NEXT_PUBLIC_MODE === "development"
@@ -427,9 +442,13 @@ const index = () => {
                     ID: classId,
                   }
                 )
-              : await fetcher(`/api/class/getClass`, "POST", {
-                  ID: classId,
-                });
+              : await fetcher(
+                  `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/class/getClass`,
+                  "POST",
+                  {
+                    ID: classId,
+                  }
+                );
 
           useFirebaseFunction({
             to: student?.studentPhone,
