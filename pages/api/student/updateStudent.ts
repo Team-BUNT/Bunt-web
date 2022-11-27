@@ -8,6 +8,8 @@ interface IStudent {
   studentId: string;
   studentName: string;
   studentPhone: string;
+  isFreePass?: boolean;
+  couponType?: string;
 }
 
 const updateStudent = async ({
@@ -16,7 +18,10 @@ const updateStudent = async ({
   studentId,
   studentName,
   studentPhone,
+  isFreePass = false,
+  couponType = "쿠폰 사용",
 }: IStudent) => {
+  console.log(couponType);
   try {
     await new Student(
       firestore,
@@ -28,7 +33,7 @@ const updateStudent = async ({
         classID: classId,
         studioID: studioId,
         expiredDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-        isFreePass: false,
+        isFreePass,
         studentID: studentId,
       },
       {
@@ -42,7 +47,8 @@ const updateStudent = async ({
         phoneNumber: studentPhone,
         studioID: studioId,
         userName: studentName,
-      }
+      },
+      couponType
     );
   } catch (error) {
     console.error(error);

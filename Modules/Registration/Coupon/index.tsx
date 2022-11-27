@@ -342,9 +342,11 @@ const index = () => {
 
       const target = e?.nativeEvent as SubmitEvent;
       if (
-        target !== null &&
-        target.submitter !== null &&
-        target.submitter.textContent === "수강완료"
+        student &&
+        studio &&
+        classId &&
+        student.studentPhone &&
+        studio.studioName
       ) {
         /**
          * 수강완료
@@ -352,62 +354,68 @@ const index = () => {
          * 2. updateData에 쿠폰 넘김
          */
 
-        const fetcher = async (url: string, type = "GET", postData = {}) =>
-          type === "GET" ? axios.post(url) : axios.post(url, postData);
-
-        process.env.NEXT_PUBLIC_MODE === "development"
-          ? await fetcher(
-              `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/enrollment/addEnrollment`,
-              "POST",
-              {
-                classId,
-                studioId: studio?.studioId,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              }
-            )
-          : await fetcher(
-              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/enrollment/addEnrollment`,
-              "POST",
-              {
-                classId,
-                studioId: studio?.studioId,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              }
-            );
-
-        process.env.NEXT_PUBLIC_MODE === "development"
-          ? await fetcher(
-              `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/updateStudent`,
-              "POST",
-              {
-                classId,
-                studioId: studio?.studioId,
-                studentId: `${studio?.studioId} ${student?.studentPhone}`,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              }
-            )
-          : await fetcher(
-              `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/updateStudent`,
-              "POST",
-              {
-                classId,
-                studioId: studio?.studioId,
-                studentPhone: student?.studentPhone,
-                studentName: student?.studentName,
-              }
-            );
-
         // 알림톡
         if (
-          student &&
-          studio &&
-          classId &&
-          student.studentPhone &&
-          studio.studioName
+          target !== null &&
+          target.submitter !== null &&
+          target.submitter.textContent === "수강완료"
         ) {
+          if (
+            !confirm(
+              `${student.studentName}님 수강신청 감사합니다. ${student.studentPhone}번호로 수강신청 알람이 갑니다. 번호가 일치하나요?`
+            )
+          )
+            return;
+
+          const fetcher = async (url: string, type = "GET", postData = {}) =>
+            type === "GET" ? axios.post(url) : axios.post(url, postData);
+
+          process.env.NEXT_PUBLIC_MODE === "development"
+            ? await fetcher(
+                `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/enrollment/addEnrollment`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              )
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/enrollment/addEnrollment`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              );
+
+          process.env.NEXT_PUBLIC_MODE === "development"
+            ? await fetcher(
+                `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/student/updateStudent`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              )
+            : await fetcher(
+                `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/student/updateStudent`,
+                "POST",
+                {
+                  classId,
+                  studioId: studio?.studioId,
+                  studentId: `${studio?.studioId} ${student?.studentPhone}`,
+                  studentPhone: student?.studentPhone,
+                  studentName: student?.studentName,
+                }
+              );
+
           const matchedStudio =
             process.env.NEXT_PUBLIC_MODE === "development"
               ? await fetcher(
@@ -442,40 +450,34 @@ const index = () => {
                   }
                 );
 
-          if (
-            confirm(
-              `${student.studentName}님 수강신청 감사합니다. ${student.studentPhone}번호로 수강신청 알람이 갑니다. 번호가 일치하나요?`
-            )
-          ) {
-            useFirebaseFunction({
-              to: student?.studentPhone,
-              studioName: studio?.studioName,
-              studioAddress: matchedStudio.data.location,
-              instructorName: matchedClass.data.instructorName,
-              genre: matchedClass.data.title,
-              time: dateFormatter(
-                new Date(matchedClass.data.date.seconds * 1000)
-              ),
-              payment: "쿠폰 사용",
-            });
+          useFirebaseFunction({
+            to: student?.studentPhone,
+            studioName: studio?.studioName,
+            studioAddress: matchedStudio.data.location,
+            instructorName: matchedClass.data.instructorName,
+            genre: matchedClass.data.title,
+            time: dateFormatter(
+              new Date(matchedClass.data.date.seconds * 1000)
+            ),
+            payment: "쿠폰 사용",
+          });
 
-            router.push(`/complete`, `/complete`);
-            return;
-          }
+          router.push(`/complete`, `/complete`);
+          return;
         }
-      }
 
-      // 쿠폰 구매를 누르고 다음 버튼을 누를 시
-      router.push(`/form/studios/payment/${studio?.studioName}`, {
-        query: {
-          classId,
-          studioId: studio?.studioId,
-          studioName: studio?.studioName,
-          studentName: student?.studentName,
-          studentPhone: student?.studentPhone,
-        },
-        pathname: `/form/studios/payment/${studio?.studioName}`,
-      });
+        // 쿠폰 구매를 누르고 다음 버튼을 누를 시
+        router.push(`/form/studios/payment/${studio?.studioName}`, {
+          query: {
+            classId,
+            studioId: studio?.studioId,
+            studioName: studio?.studioName,
+            studentName: student?.studentName,
+            studentPhone: student?.studentPhone,
+          },
+          pathname: `/form/studios/payment/${studio?.studioName}`,
+        });
+      }
     } catch (error) {
       console.error(error);
     }
