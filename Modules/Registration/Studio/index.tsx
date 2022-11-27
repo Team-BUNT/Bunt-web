@@ -68,9 +68,7 @@ const index = () => {
         ? fetcher(
             `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getAllStudio`
           )
-        : fetcher(
-            `${process.env.NEXT_PUBLIC_PRODUCTION_URL}/api/studio/getAllStudio`
-          );
+        : fetcher(`/api/studio/getAllStudio`);
 
     allStudio.then((data) => {
       setStudios((state: IStudioInfo[]) => {
