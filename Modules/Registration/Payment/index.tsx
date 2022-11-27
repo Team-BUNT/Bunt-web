@@ -339,7 +339,7 @@ const index = () => {
 
   const [studio, setStudioInfo] = useState<IStudioInfo>();
   const [student, setStudentInfo] = useState<IStudentInfo>();
-  const [classId, setClassId] = useState<string>("");
+  const [classId, setClassId] = useState<string | null>("");
   const [deposite, setDeposite] = useState(false);
   const [account, setAccount] = useState("");
   // const STUDIO_ADMIN_ACCOUNT = bankAccount;
@@ -416,6 +416,9 @@ const index = () => {
       }
     });
 
+    urlSearchParams.get("classId") &&
+      setClassId(urlSearchParams.get("classId"));
+
     const fetcher = async (url: string, postData = {}) =>
       await axios.post(url, postData);
     const matchedStudio =
@@ -470,7 +473,9 @@ const index = () => {
         return alert("쿠폰 종류와 결제 방법을 체크해주세요.");
       if (!coupon && payment) return alert("쿠폰 종류를 체크해주세요.");
       if (coupon && !payment) return alert("결제 방법을 체크해주세요.");
-
+      console.log(student);
+      console.log(classId);
+      console.log(studio);
       if (
         student &&
         studio &&
