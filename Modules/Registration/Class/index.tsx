@@ -433,7 +433,7 @@ const index = () => {
                           <input
                             type="radio"
                             id="dancer"
-                            value={`${ID}`}
+                            value={ID}
                             {...register(`classId`)}
                           />
                         )}
@@ -474,7 +474,7 @@ const index = () => {
                 .filter((value) => value.date.toDate().getDay() === day)
                 .map(
                   (
-                    { instructorName, title, date, applicantsCount, hall },
+                    { ID, instructorName, title, date, applicantsCount, hall },
                     index
                   ) => {
                     return (
@@ -485,7 +485,7 @@ const index = () => {
                           <input
                             type="radio"
                             id="dancer"
-                            value={`${instructorName}`}
+                            value={ID}
                             {...register("classId")}
                           />
                         )}
