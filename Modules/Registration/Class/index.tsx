@@ -330,10 +330,13 @@ const index = () => {
 
   useEffect(() => {
     if (studio?.studioId) {
-      new Class(firestore, "classes", [
+      const matcedClass = new Class(firestore, "classes", [
         where("date", ">=", new Date(dateFormatter(start, "-"))),
         where("date", "<=", new Date(dateFormatter(end, "-"))),
-      ])
+      ]);
+
+      console.log(matcedClass);
+      matcedClass
         .fetchData()
         .then((data: any) =>
           setClasses(() => {

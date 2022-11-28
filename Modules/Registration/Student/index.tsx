@@ -177,25 +177,26 @@ const index = () => {
     url: "",
   });
 
-  const fetcher = async (url: string) =>
-    await axios.post(url, {
-      studioName: studio,
-    });
-
-  const { data, error } =
-    process.env.NEXT_PUBLIC_MODE === "development"
-      ? useSWR(
-          `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
-          fetcher
-        )
-      : useSWR(`/api/studio/getStudio`, fetcher);
-
   //TODO: Error 페이지 구현
-
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (data) {
+    const fetcher = async (url: string, postData = {}) =>
+      await axios.post(url, postData);
+
+    const aStudio =
+      process.env.NEXT_PUBLIC_MODE === "development"
+        ? fetcher(
+            `${process.env.NEXT_PUBLIC_DEVELOPMENT_URL}/api/studio/getStudio`,
+            {
+              studioName: studio,
+            }
+          )
+        : fetcher(`/api/studio/getStudio`, {
+            studioName: studio,
+          });
+
+    aStudio.then((data) => {
       setMatchedStudio((_) => {
         return { ...data.data };
       });
@@ -207,12 +208,12 @@ const index = () => {
           url: `/studios/banner/${studio}.webp`,
         };
       });
-    }
-  }, [studio, data, router.isReady]);
+    });
+  }, [router.isReady]);
 
   //TODO: Error Loading page 구현
-  if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
-  if (!data) return <div>loaidng</div>;
+  // if (error) return <h1>데이터를 가져오지 못해 에러가 발생했습니다.</h1>;
+  // if (!data) return <div>loaidng</div>;
 
   const onSubmit = async ({ studentName, studentPhone }: any) => {
     const fetcher = async (url: string, postData = {}) =>
